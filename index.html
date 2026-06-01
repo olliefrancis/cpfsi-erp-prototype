@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<title>CPFSI MIS - Prototype v1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* -----------------------------------------------------------
+     CPFSI prototype - low-fi, structure-first
+     Deliberately restrained. The goal is to feel the IA, not
+     the visual design. Type and spacing are doing all the work.
+     ----------------------------------------------------------- */
+
+  :root {
+    --bg: #f4f4f1;
+    --surface: #ffffff;
+    --ink: #0b0c0c;             /* GOV.UK ink */
+    --ink-2: #4a4a48;
+    --ink-3: #7a7a78;
+    --line: #d9d9d3;
+    --line-2: #ebebe6;
+    --accent: #1d70b8;          /* GOV.UK link blue */
+    --accent-soft: #e9f1f8;
+    --accent-dark: #003078;     /* GOV.UK dark blue, for accents */
+    --gov-green: #00703c;       /* GOV.UK button green */
+    --gov-green-dk: #005a30;    /* darker shade for hover */
+    --gov-focus: #ffdd00;       /* GOV.UK focus yellow */
+    --red: #d4351c;             /* GOV.UK error red */
+    --red-soft: #fde2e2;
+    --amber: #b45309;
+    --amber-soft: #fef0d4;
+    --green: #15803d;
+    --green-soft: #dcefe2;
+    --purple: #6d28d9;
+    --purple-soft: #ece1ff;
+    --mono: 'SFMono-Regular', Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  a { color: var(--accent); text-decoration: none; cursor: pointer; }
+  a:hover { text-decoration: underline; }
+  button { font-family: inherit; font-size: inherit; cursor: pointer; }
+
+  /* Top bar */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-size: 15px;
+  }
+  .logo span { color: var(--ink-3); font-weight: 400; }
+  .back-btn {
+    background: none;
+    border: 1px solid var(--line);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .back-btn:hover:not(:disabled) {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .back-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .nav { display: flex; gap: 4px; flex: 1; }
+  .nav button {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    color: var(--ink-2);
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .nav button.active { background: var(--ink); color: white; }
+  .nav button:hover:not(.active) { background: var(--line-2); }
+  .search {
+    flex: 0 1 320px;
+    position: relative;
+  }
+  .search input {
+    width: 100%;
+    padding: 7px 10px 7px 30px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--bg);
+  }
+  .search::before {
+    content: '⌕';
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-3);
+  }
+  .user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-2);
+  }
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 12px;
+  }
+
+  /* Main column */
+  main {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Headings */
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 16px; margin: 24px 0 12px; letter-spacing: -0.005em; }
+  h3 { font-size: 13px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 600; }
+  .crumbs { color: var(--ink-3); font-size: 13px; margin-bottom: 8px; }
+  .meta { color: var(--ink-3); font-size: 13px; }
+  .meta strong { color: var(--ink-2); font-weight: 600; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .card-row { display: flex; gap: 16px; }
+  .card-row .card { flex: 1; margin-bottom: 0; }
+
+  /* Dashboard grid: consistent 2-column layout so panels align across rows */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .dash-grid .card { margin-bottom: 0; }
+
+  /* Pills */
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
+  .pill.red { background: var(--red-soft); color: var(--red); }
+  .pill.amber { background: var(--amber-soft); color: var(--amber); }
+  .pill.green { background: var(--green-soft); color: var(--green); }
+  .pill.blue { background: var(--accent-soft); color: var(--accent); }
+  .pill.grey { background: var(--line-2); color: var(--ink-2); }
+  .pill.purple { background: var(--purple-soft); color: var(--purple); }
+
+  /* CPIN counts */
+  .cpin-counts {
+    display: flex;
+    gap: 24px;
+    margin: 8px 0 12px;
+  }
+  .count { display: flex; align-items: center; gap: 8px; }
+  .count .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .count .dot.red { background: var(--red); }
+  .count .dot.amber { background: var(--amber); }
+  .count .dot.green { background: var(--green); }
+  .count strong { font-size: 18px; }
+  .count .label { color: var(--ink-3); font-size: 13px; }
+
+  /* Lists */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table.data th, table.data td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--line-2);
+    text-align: left;
+    font-size: 13px;
+  }
+  table.data th {
+    color: var(--ink-3);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  table.data tr { cursor: pointer; }
+  table.data tbody tr:hover { background: var(--bg); }
+  table.data td.score-cell { font-family: var(--mono); font-weight: 600; }
+  table.data td.score-cell.high { color: var(--red); }
+  table.data td.score-cell.mid { color: var(--amber); }
+  table.data td.score-cell.low { color: var(--green); }
+  .delta { font-size: 11px; margin-left: 4px; color: var(--ink-3); }
+  .delta.down { color: var(--green); }
+  .delta.up { color: var(--red); }
+
+  /* Time bar */
+  .time-bar {
+    height: 8px;
+    background: var(--line-2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .time-bar > div {
+    height: 100%;
+    background: var(--accent);
+  }
+
+  /* Process page layout */
+  .process-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr 280px;
+    gap: 20px;
+    margin-top: 16px;
+  }
+  .stage-rail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 8px;
+    height: fit-content;
+  }
+  .stage {
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: var(--ink-3);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .stage:hover { background: var(--bg); }
+  .stage.done { color: var(--ink-2); }
+  .stage.done::before { content: '✓'; color: var(--green); font-weight: 700; }
+  .stage.current { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .stage.current::before { content: '▶'; color: var(--accent); font-size: 10px; }
+  .stage.future::before { content: '○'; color: var(--ink-3); }
+
+  .stage-content {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .context-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .context-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .context-card h3 { margin-bottom: 6px; }
+  .context-card .row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-2);
+    padding: 4px 0;
+  }
+  .context-card .row .k { color: var(--ink-3); }
+
+  /* Assessment finding */
+  .finding {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    background: #fdfdfc;
+  }
+  .finding .article { font-weight: 600; margin-bottom: 4px; }
+  .finding .scores {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+  }
+  .score-btn {
+    width: 28px; height: 28px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 4px;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .score-btn.selected {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+  }
+  .finding .example {
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-top: 6px;
+  }
+  .finding .attribution {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .finding .attribution span {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .stage-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-2);
+  }
+  .btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .btn.primary {
+    background: var(--gov-green);
+    color: white;
+    border-color: var(--gov-green);
+    box-shadow: 0 2px 0 var(--gov-green-dk);
+  }
+  .btn:hover { background: var(--bg); }
+  .btn.primary:hover { background: var(--gov-green-dk); }
+
+  /* GOV-style focus state. Yellow background, 3px black underline.
+     Iconic and high-contrast. Applies to anything tab-focused. */
+  *:focus-visible {
+    outline: 3px solid var(--gov-focus);
+    outline-offset: 0;
+    box-shadow: 0 3px 0 var(--ink);
+  }
+  a:focus-visible {
+    background: var(--gov-focus);
+    color: var(--ink);
+    box-shadow: 0 -2px var(--gov-focus), 0 4px var(--ink);
+    text-decoration: none;
+  }
+  .btn.primary:focus-visible {
+    outline-color: var(--gov-focus);
+    box-shadow: 0 3px 0 var(--ink), 0 0 0 3px var(--gov-focus);
+  }
+
+  /* GOV-style phase banner. Sits below the topbar to mark the
+     prototype's status. Sticky alongside the topbar. */
+  .phase-banner {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 24px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--ink-2);
+    position: sticky;
+    top: 56px;
+    z-index: 9;
+  }
+  .phase-banner.show { display: flex; }
+  .phase-tag {
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 0;
+    line-height: 1;
+  }
+
+  /* GOV inset text. Thick left border, no background. Used to
+     pull out important context inline. */
+  .inset {
+    border-left: 5px solid var(--ink);
+    padding: 4px 16px;
+    margin: 12px 0 18px;
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .inset strong { color: var(--ink); }
+  .inset p { margin: 6px 0; }
+
+  /* Activity strip */
+  .activity {
+    margin-top: 20px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  .activity strong { color: var(--ink); }
+
+  /* CPIN page */
+  .cpin-tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+  .cpin-tab {
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: var(--ink-3);
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .cpin-tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+  .cpin-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .cpin-card.red { border-left: 3px solid var(--red); }
+  .cpin-card.amber { border-left: 3px solid var(--amber); }
+  .cpin-card.green { border-left: 3px solid var(--green); }
+  .cpin-card .when {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .cpin-card .summary {
+    font-size: 13px;
+  }
+  .cpin-card .premises { font-weight: 600; }
+  .cpin-card .actions { display: flex; gap: 6px; }
+  .cpin-card .actions .btn { padding: 5px 10px; font-size: 12px; }
+
+  /* Premises detail */
+  .premises-header {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  .premises-header h1 { font-size: 26px; }
+  .score-block {
+    text-align: right;
+  }
+  .score-block .big {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--red);
+    line-height: 1;
+  }
+  .score-block .lbl {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+  }
+  .score-block .trend {
+    font-size: 12px;
+    color: var(--green);
+    margin-top: 4px;
+  }
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--line);
+    margin: 24px 0 16px;
+  }
+  .tabs button {
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: var(--ink-3);
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tabs button.active {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+
+  /* Letter preview */
+  .letter-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 16px;
+    flex-wrap: wrap;
+  }
+  .letter-tab {
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    font-size: 12px;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .letter-tab.active {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+  .letter-preview {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 24px;
+    font-family: 'Georgia', serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .letter-preview .head { font-family: var(--sans); font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+  .letter-preview .conditional {
+    background: #fff8e0;
+    padding: 2px 4px;
+    border-radius: 3px;
+    border-bottom: 1px dashed #d4a800;
+  }
+
+  /* Help banner */
+  .banner {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  /* Footer note */
+  .footnote {
+    margin-top: 32px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.6;
+  }
+
+  /* Login screen */
+  .login {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+  }
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 40px 36px;
+    width: 380px;
+    text-align: center;
+  }
+  .login-card h1 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .login-card .sub {
+    color: var(--ink-3);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  .ms-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .ms-btn:hover { background: var(--bg); }
+  .ms-logo {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 16px; height: 16px;
+    gap: 2px;
+  }
+  .ms-logo div { background: #f25022; }
+  .ms-logo div:nth-child(2) { background: #7fba00; }
+  .ms-logo div:nth-child(3) { background: #00a4ef; }
+  .ms-logo div:nth-child(4) { background: #ffb900; }
+
+  .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 16px; }
+  .chip {
+    padding: 4px 12px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 14px;
+    font-size: 12px;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .chip.on {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+
+  /* Prompts panel content */
+  .prompt-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line-2);
+    color: var(--ink-2);
+    font-size: 12px;
+  }
+  .prompt-item:last-child { border-bottom: none; }
+  .prompt-item .badge {
+    display: inline-block;
+    background: var(--purple-soft);
+    color: var(--purple);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-right: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- CPINs panel (richer dashboard tile) ---------- */
+  .cpin-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 4px 0 12px;
+  }
+  .cpin-tile {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .cpin-tile.red { background: var(--red-soft); border-color: var(--red-soft); }
+  .cpin-tile.amber { background: var(--amber-soft); border-color: var(--amber-soft); }
+  .cpin-tile.green { background: var(--green-soft); border-color: var(--green-soft); }
+  .cpin-tile .lbl {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cpin-tile.red .lbl { color: var(--red); }
+  .cpin-tile.amber .lbl { color: var(--amber); }
+  .cpin-tile.green .lbl { color: var(--green); }
+  .cpin-tile .lbl .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .cpin-tile.red .lbl .dot { background: var(--red); }
+  .cpin-tile.amber .lbl .dot { background: var(--amber); }
+  .cpin-tile.green .lbl .dot { background: var(--green); }
+  .cpin-tile .big {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-top: 6px;
+    letter-spacing: -0.02em;
+  }
+  .cpin-tile.red .big { color: var(--red); }
+  .cpin-tile.amber .big { color: var(--amber); }
+  .cpin-tile.green .big { color: var(--green); }
+  .cpin-tile .sub {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .cpin-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .cpin-mini:hover { background: var(--bg); }
+  .cpin-mini .lead { display: flex; align-items: center; gap: 8px; }
+  .cpin-mini .lead .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cpin-mini.red .lead .dot { background: var(--red); }
+  .cpin-mini.amber .lead .dot { background: var(--amber); }
+  .cpin-mini .when { color: var(--ink-3); font-size: 11px; }
+  .close-all {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--green-soft);
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .close-all .copy { font-size: 12px; color: var(--green); font-weight: 500; }
+  .close-all button {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ---------- Time logging ---------- */
+  .time-week {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .time-week .row {
+    display: grid;
+    grid-template-columns: 100px 1fr 80px;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line-2);
+    align-items: center;
+  }
+  .time-week .row.today { background: #fffceb; }
+  .time-week .row:last-child { border-bottom: none; }
+  .time-week .row .day .num {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .time-week .row .day .name {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+  .time-week .row .entries {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+  }
+  .time-week .row .entries .entry {
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-2);
+  }
+  .time-week .row .entries .entry .what { font-weight: 500; }
+  .time-week .row .entries .entry .what .pill { margin-right: 6px; }
+  .time-week .row .entries .entry .dur { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .time-week .row .day-total {
+    text-align: right;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .time-week .row .day-total.over { color: var(--green); }
+
+  .quick-log {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr 120px auto;
+    gap: 12px;
+    align-items: end;
+  }
+  .quick-log label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .quick-log input, .quick-log select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .quick-log input[type="date"], .quick-log input[type="time"] {
+    font-variant-numeric: tabular-nums;
+    color-scheme: light;
+  }
+
+  /* Date / time inputs in the audit setup section */
+  .field input[type="date"], .field input[type="time"] {
+    font-variant-numeric: tabular-nums;
+    color-scheme: light;
+  }
+  .date-helper {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .date-helper strong { color: var(--ink-2); font-weight: 500; }
+
+  /* ---------- + New modal ---------- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 20, 18, 0.45);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 100;
+    padding: 80px 20px 20px;
+    overflow-y: auto;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 640px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 20px 24px 14px;
+    border-bottom: 1px solid var(--line-2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+  .modal-header .sub {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 18px;
+    border-radius: 6px;
+  }
+  .modal-close:hover {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .modal-body {
+    padding: 16px 24px 20px;
+  }
+  .modal-group {
+    margin-bottom: 18px;
+  }
+  .modal-group:last-child { margin-bottom: 4px; }
+  .modal-group-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .new-option {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    background: var(--surface);
+    transition: border-color 120ms, background 120ms;
+  }
+  .new-option:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .new-option .icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .new-option .icon svg { display: block; }
+  .new-option .ttl {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .new-option .desc {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .new-option .shortcut {
+    margin-left: auto;
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 10px;
+  }
+  .modal-footer {
+    padding: 12px 24px;
+    background: var(--bg);
+    font-size: 11px;
+    color: var(--ink-3);
+    border-top: 1px solid var(--line-2);
+    line-height: 1.5;
+  }
+
+  /* Empty state */
+  .empty-state {
+    background: var(--green-soft);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .empty-state .icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--green);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .empty-state .ttl {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+  .empty-state .sub {
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .empty-state .undo {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--green);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  /* When green CPINs are closed, also recolour the green tile */
+  .cpin-tile.green.closed {
+    background: var(--line-2);
+  }
+  .cpin-tile.green.closed .lbl, .cpin-tile.green.closed .big { color: var(--ink-3); }
+  .cpin-tile.green.closed .lbl .dot { background: var(--ink-3); }
+  .close-all.done {
+    background: var(--line-2);
+  }
+  .close-all.done .copy { color: var(--ink-3); }
+  .quick-log .submit {
+    background: var(--gov-green);
+    color: white;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    box-shadow: 0 2px 0 var(--gov-green-dk);
+  }
+  .quick-log .submit:hover { background: var(--gov-green-dk); }
+
+  .week-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .week-summary .stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .week-summary .stat .lbl {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .week-summary .stat .val {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 4px;
+    letter-spacing: -0.01em;
+  }
+  .week-summary .stat .sub {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+
+  /* ---------- Audit setup ---------- */
+  .setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    margin-top: 16px;
+  }
+  .setup-section {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+  }
+  .setup-section h3 {
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: -0.005em;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .setup-section .help {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+  .field-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .field-row > div { flex: 1; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--surface);
+    font-family: inherit;
+    color: var(--ink);
+  }
+  .radio-row {
+    display: flex;
+    gap: 8px;
+  }
+  .radio-btn {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    cursor: pointer;
+    text-align: left;
+  }
+  .radio-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent-soft) inset;
+  }
+  .radio-btn .ttl { font-weight: 600; font-size: 13px; }
+  .radio-btn .desc { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .radio-btn.selected .ttl { color: var(--accent); }
+
+  .holder-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: #fcfcfa;
+  }
+  .holder-card .avatar-sm {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--line-2);
+    color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .holder-card .name { font-weight: 600; font-size: 13px; }
+  .holder-card .role { color: var(--ink-3); font-size: 12px; margin-top: 1px; }
+  .holder-card .remove {
+    color: var(--ink-3); cursor: pointer; font-size: 16px;
+    padding: 2px 6px;
+  }
+  .holder-card .remove:hover { color: var(--red); }
+
+  .check-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 0;
+    color: var(--ink-2);
+    font-size: 12px;
+  }
+  .check-row .tick {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--green);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+
+  .summary-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 18px;
+    position: sticky;
+    top: 76px;
+    height: fit-content;
+  }
+  .summary-card h3 {
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: -0.005em;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .summary-card .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line-2);
+    font-size: 12px;
+  }
+  .summary-card .row:last-child { border-bottom: none; }
+  .summary-card .row .k { color: var(--ink-3); }
+  .summary-card .row .v { color: var(--ink); text-align: right; font-weight: 500; }
+  .summary-card .row .v.pending { color: var(--ink-3); font-style: italic; font-weight: 400; }
+
+  /* ---------- Reports ---------- */
+  .reports-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .report-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: border-color 120ms;
+  }
+  .report-card:hover { border-color: var(--accent); }
+  .report-card .cat {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .report-card .ttl {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 4px 0;
+    letter-spacing: -0.005em;
+  }
+  .report-card .desc {
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .report-card .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .report-card .foot .pill { padding: 2px 8px; }
+
+  /* ---------- Process list (richer) ---------- */
+  .proc-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr 140px 120px 100px;
+    gap: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line-2);
+    align-items: center;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .proc-row:hover { background: var(--bg); }
+  .proc-row:last-child { border-bottom: none; }
+  .proc-row .ptype .pill { font-size: 10px; }
+  .proc-row .premises { font-weight: 600; }
+  .proc-row .premises .id {
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 400;
+    font-family: var(--mono);
+  }
+  .proc-row .status { color: var(--ink-2); }
+  .proc-row .owner { color: var(--ink-3); display: flex; align-items: center; gap: 6px; }
+  .proc-row .owner .avatar-tiny {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--line-2); color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600;
+  }
+  .proc-row .age { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  .saved-views {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+  }
+  .views-rail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 8px;
+    height: fit-content;
+  }
+  .views-rail h4 {
+    margin: 8px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .view-item {
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--ink-2);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .view-item:hover { background: var(--bg); }
+  .view-item.active {
+    background: var(--ink);
+    color: white;
+  }
+  .view-item .pin {
+    color: var(--ink-3);
+    font-size: 12px;
+  }
+  .view-item.active .pin { color: rgba(255,255,255,0.7); }
+
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     LOGIN SCREEN
+========================================================= -->
+<div id="login" class="screen active">
+  <div class="login">
+    <div class="login-card">
+      <div style="font-weight:700;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:32px;">CPFSI</div>
+      <h1>Sign in to the Fire Safety MIS</h1>
+      <div class="sub">Use your CPFSI Microsoft account.</div>
+      <button class="ms-btn" onclick="show('dashboard')">
+        <span class="ms-logo"><div></div><div></div><div></div><div></div></span>
+        Sign in with Microsoft
+      </button>
+      <div style="margin-top:24px;font-size:11px;color:var(--ink-3);line-height:1.5;">
+        Single sign-on via Microsoft Entra ID with 2FA.<br>
+        Trouble signing in? Contact your team leader.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     TOP BAR (shared across all signed-in screens)
+========================================================= -->
+<div id="topbar" class="topbar" style="display:none;">
+  <button id="back-btn" class="back-btn" onclick="goBack()" title="Back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M9 1L3 7L9 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="logo">CPFSI <span>·  Fire Safety MIS</span></div>
+  <div class="nav">
+    <button id="nav-dashboard" onclick="show('dashboard')">Dashboard</button>
+    <button id="nav-premises" onclick="show('premises')">Premises</button>
+    <button id="nav-processes" onclick="show('processes')">Processes</button>
+    <button id="nav-cpins" onclick="show('cpins')">CPINs</button>
+    <button id="nav-reports" onclick="show('reports')">Reports</button>
+  </div>
+  <div class="search">
+    <input type="text" placeholder="Search premises, processes, CPINs…">
+  </div>
+  <div class="user">
+    <span style="font-size:13px;">Phil Gower</span>
+    <div class="avatar">PG</div>
+  </div>
+</div>
+
+<!-- Phase banner. Sticky directly below the topbar, hidden on login. -->
+<div id="phase-banner" class="phase-banner">
+  <span class="phase-tag">Beta</span>
+  <span>This is a new service replacing Themis. <a>Send feedback</a> to help us improve it.</span>
+</div>
+
+<!-- =========================================================
+     DASHBOARD
+========================================================= -->
+<div id="dashboard" class="screen">
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>Good morning, Phil.</h1>
+        <div class="meta">Monday 22 June 2026  ·  Week 26  ·  Patch: Kent, Surrey, Sussex</div>
+      </div>
+      <button class="btn primary" onclick="openNewModal()">+ New</button>
+    </div>
+
+    <div class="dash-grid">
+      <!-- TOP LEFT: CPINs block -->
+      <div class="card" onclick="show('cpins')" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <h3 style="margin:0;">My CPINs</h3>
+          <span style="font-size:11px;color:var(--ink-3);" id="dash-cpin-meta">7 to action  ·  3 unassigned</span>
+        </div>
+
+        <div class="cpin-hero">
+          <div class="cpin-tile red">
+            <div class="lbl"><span class="dot"></span>Red</div>
+            <div class="big">2</div>
+            <div class="sub">Serious, act now</div>
+          </div>
+          <div class="cpin-tile amber">
+            <div class="lbl"><span class="dot"></span>Amber</div>
+            <div class="big">1</div>
+            <div class="sub">Needs enquiry</div>
+          </div>
+          <div class="cpin-tile green" id="dash-green-tile">
+            <div class="lbl"><span class="dot"></span>Green</div>
+            <div class="big" id="dash-green-count">4</div>
+            <div class="sub" id="dash-green-sub">No action needed</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin:8px 0 4px;">Action now</div>
+        <div class="cpin-mini red" onclick="event.stopPropagation();show('cpins');">
+          <div class="lead"><span class="dot"></span><strong>HMP Lewes</strong>  ·  Cell fire, serious injury</div>
+          <span class="when">04:22 today</span>
+        </div>
+        <div class="cpin-mini red" onclick="event.stopPropagation();show('cpins');">
+          <div class="lead"><span class="dot"></span><strong>Belmarsh</strong>  ·  Kitchen fire, 2 injured</div>
+          <span class="when">21:14 yest</span>
+        </div>
+        <div class="cpin-mini amber" onclick="event.stopPropagation();show('cpins');">
+          <div class="lead"><span class="dot"></span><strong>Temple Quay House</strong>  ·  Electrical, no injuries</div>
+          <span class="when">12 Jun</span>
+        </div>
+
+        <div class="close-all" id="dash-close-all" onclick="event.stopPropagation();">
+          <div class="copy" id="dash-close-copy">4 Green CPINs ready to close</div>
+          <button id="dash-close-btn" onclick="event.stopPropagation();closeAllGreen();">Close all  ✓</button>
+        </div>
+      </div>
+
+      <!-- TOP RIGHT: This week -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <h3 style="margin:0;">This week</h3>
+          <a onclick="show('time')" style="font-size:11px;">Open time page →</a>
+        </div>
+        <div style="font-size:12px;color:var(--ink-3);margin-top:8px;">Time logged</div>
+        <div style="font-size:18px;font-weight:600;margin-top:2px;">21.5 <span style="font-weight:400;color:var(--ink-3);font-size:13px;">/ 37 hours</span></div>
+        <div class="time-bar"><div style="width:58%;"></div></div>
+        <button class="btn" style="width:100%;margin-top:8px;" onclick="show('time')">+ Log time</button>
+
+        <div style="margin-top:16px;font-size:12px;color:var(--ink-3);">Upcoming</div>
+        <div style="font-size:13px;margin-top:6px;">
+          <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">2 consultations <span style="color:var(--amber);">· SLA approaching</span></div>
+          <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">1 follow-up due in 12 days</div>
+          <div style="padding:6px 0;">1 28-DAP closing Friday</div>
+        </div>
+      </div>
+
+      <!-- BOTTOM LEFT: Suggested patch -->
+      <div class="card">
+        <h3>Suggested for your patch</h3>
+        <div style="font-size:12px;color:var(--ink-3);margin-bottom:8px;">Premises in Kent, Surrey or Sussex, ranked by RBIP score.</div>
+        <table class="data">
+          <thead>
+            <tr><th>Premises</th><th>Type</th><th>Score</th><th>Last audit</th></tr>
+          </thead>
+          <tbody>
+            <tr onclick="show('premisesdetail')">
+              <td><strong>Temple Quay House</strong></td>
+              <td>Government office</td>
+              <td class="score-cell high">47 <span class="delta up">▲ 3</span></td>
+              <td>Jan 2025</td>
+            </tr>
+            <tr>
+              <td>HMP Lewes</td>
+              <td>Prison · Cat B</td>
+              <td class="score-cell high">42 <span class="delta down">▼ 5</span></td>
+              <td>Oct 2024</td>
+            </tr>
+            <tr>
+              <td>Maidstone Magistrates Court</td>
+              <td>Court</td>
+              <td class="score-cell mid">34 <span class="delta down">▼ 2</span></td>
+              <td>Mar 2024</td>
+            </tr>
+            <tr>
+              <td>Crawley Job Centre Plus</td>
+              <td>DWP office</td>
+              <td class="score-cell mid">31</td>
+              <td>Jul 2024</td>
+            </tr>
+          </tbody>
+        </table>
+        <a style="margin-top:8px;display:inline-block;">See full RBIP for your patch →</a>
+      </div>
+
+      <!-- BOTTOM RIGHT: Open processes -->
+      <div class="card">
+        <h3>My open processes  ·  12</h3>
+        <div class="filter-chips">
+          <button class="chip on">All</button>
+          <button class="chip">Audits</button>
+          <button class="chip">Follow-ups</button>
+          <button class="chip">Consultations</button>
+          <button class="chip">Concerns</button>
+        </div>
+        <table class="data">
+          <tbody>
+            <tr onclick="show('audit')">
+              <td><span class="pill blue">Audit</span></td>
+              <td><strong>Temple Quay House</strong></td>
+              <td>Site visit (Stage 2 of 6)</td>
+              <td style="color:var(--ink-3);">Started 14 Jun</td>
+            </tr>
+            <tr>
+              <td><span class="pill purple">Follow-up</span></td>
+              <td>HMP Lewes</td>
+              <td>Awaiting action plan</td>
+              <td style="color:var(--ink-3);">Due in 12 days</td>
+            </tr>
+            <tr>
+              <td><span class="pill grey">Consultation</span></td>
+              <td>Charing Cross House refurb</td>
+              <td>Reviewing</td>
+              <td style="color:var(--amber);"><strong>SLA: 5 days left</strong></td>
+            </tr>
+            <tr>
+              <td><span class="pill grey">Concern</span></td>
+              <td>Maidstone Magistrates Court</td>
+              <td>Awaiting contact</td>
+              <td style="color:var(--ink-3);">Logged 18 Jun</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footnote">
+      <strong>Why this dashboard.</strong> Today's dashboard pulls some incorrect data, hides time spent (so people use Excel), and includes a calendar nobody uses. This one leads with what the team actually log in to see: CPIN triage front and centre, suggested RBIP work for their patch, and their own time card. The unused calendar block is gone; Outlook handles diary, the system pushes deadlines to it.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     PREMISES LIST
+========================================================= -->
+<div id="premises" class="screen">
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>Premises</h1>
+        <div class="meta">2,847 premises across the Crown estate</div>
+      </div>
+      <button class="btn">+ Add premises</button>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="filter-chips">
+        <button class="chip on">My patch</button>
+        <button class="chip">All</button>
+        <button class="chip">Prisons</button>
+        <button class="chip">Courts</button>
+        <button class="chip">Government offices</button>
+        <button class="chip">Worst scores first</button>
+        <button class="chip">+ Filter</button>
+      </div>
+    </div>
+
+    <div class="card" style="padding:0;">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Premises</th>
+            <th>Type</th>
+            <th>Department</th>
+            <th>RBIP score</th>
+            <th>Last audit</th>
+            <th>Open work</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr onclick="show('premisesdetail')">
+            <td><strong>Temple Quay House</strong><br><span style="color:var(--ink-3);font-size:12px;">Temple Back East, Bristol BS1</span></td>
+            <td>Government office</td>
+            <td>HMCTS</td>
+            <td class="score-cell high">47</td>
+            <td>Jan 2025</td>
+            <td><span class="pill blue">Audit in progress</span></td>
+          </tr>
+          <tr>
+            <td><strong>HMP Lewes</strong></td>
+            <td>Prison · Cat B</td>
+            <td>HMPPS</td>
+            <td class="score-cell high">42</td>
+            <td>Oct 2024</td>
+            <td><span class="pill purple">Follow-up due</span></td>
+          </tr>
+          <tr>
+            <td><strong>Maidstone Magistrates Court</strong></td>
+            <td>Court</td>
+            <td>HMCTS</td>
+            <td class="score-cell mid">34</td>
+            <td>Mar 2024</td>
+            <td><span class="pill grey">Concern open</span></td>
+          </tr>
+          <tr>
+            <td><strong>Crawley Job Centre Plus</strong></td>
+            <td>DWP office</td>
+            <td>DWP</td>
+            <td class="score-cell mid">31</td>
+            <td>Jul 2024</td>
+            <td style="color:var(--ink-3);">none</td>
+          </tr>
+          <tr>
+            <td><strong>Folkestone Tribunal Hearing Centre</strong></td>
+            <td>Tribunal</td>
+            <td>HMCTS</td>
+            <td class="score-cell low">22</td>
+            <td>Nov 2024</td>
+            <td style="color:var(--ink-3);">none</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footnote">
+      <strong>Pattern note.</strong> Filtering uses multi-select chips (replacing today's boolean syntax that breaks on a typo). Sort defaults to worst-score-first when the "My patch" chip is on, matching Phil's mental model. Clicking a row goes to the Premises detail page.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     PREMISES DETAIL
+========================================================= -->
+<div id="premisesdetail" class="screen">
+  <main>
+    <div class="crumbs"><a onclick="show('premises')">Premises</a> /  Temple Quay House</div>
+
+    <div class="premises-header">
+      <div>
+        <h1>Temple Quay House</h1>
+        <div class="meta">Temple Back East, Bristol BS1  ·  <strong>HMCTS</strong>  ·  Government office</div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <span class="pill blue">Audit in progress</span>
+          <span class="pill grey">Sprinkler system</span>
+          <span class="pill grey">Smoke ventilation</span>
+        </div>
+      </div>
+      <div class="score-block">
+        <div class="big">47</div>
+        <div class="lbl">RBIP score</div>
+        <div class="trend">▲ 3 since Jan 2025</div>
+        <div style="font-size:11px;color:var(--ink-3);margin-top:8px;">Building 22 · Duty Holder 25 · <strong style="color:var(--ink);">Total 47</strong></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="active">Overview</button>
+      <button>Processes  ·  18</button>
+      <button>Duty Holders  ·  3</button>
+      <button>Documents</button>
+      <button>History</button>
+    </div>
+
+    <div class="card-row">
+      <div class="card">
+        <h3>Duty Holders</h3>
+        <div style="font-size:13px;line-height:1.7;">
+          <strong>HMCTS</strong> <span class="pill grey" style="margin-left:6px;">Government dept</span><br>
+          <span style="color:var(--ink-3);font-size:12px;">Mark Stevens · Property Director</span>
+        </div>
+        <div style="font-size:13px;line-height:1.7;margin-top:10px;">
+          <strong>Equans</strong> <span class="pill grey" style="margin-left:6px;">FM company</span><br>
+          <span style="color:var(--ink-3);font-size:12px;">Sarah Patel · Maintenance Lead</span>
+        </div>
+        <div style="font-size:13px;line-height:1.7;margin-top:10px;">
+          <strong>The Property Directorate</strong> <span class="pill grey" style="margin-left:6px;">Internal</span><br>
+          <span style="color:var(--ink-3);font-size:12px;">James Howell · Property Officer</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Recent activity</h3>
+        <div style="font-size:13px;line-height:1.7;">
+          <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">
+            <strong>Audit started</strong>  ·  Phil Gower
+            <div style="color:var(--ink-3);font-size:12px;">14 Jun 2026  ·  Reactive (CPIN-2026-0418)</div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">
+            <strong>CPIN logged</strong>  ·  Amber
+            <div style="color:var(--ink-3);font-size:12px;">12 Jun 2026  ·  Avon Fire & Rescue</div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">
+            <strong>Business support meeting</strong>  ·  Phil Gower
+            <div style="color:var(--ink-3);font-size:12px;">02 May 2026  ·  Fire door training discussion</div>
+          </div>
+          <div style="padding:6px 0;">
+            <strong>Audit closed</strong>  ·  GSS issued
+            <div style="color:var(--ink-3);font-size:12px;">Jan 2025  ·  Score 44 → 47</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Quick actions</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn" onclick="show('audit')">▶ Continue current audit</button>
+          <button class="btn" onclick="show('auditsetup')">+ New audit</button>
+          <button class="btn">+ Log business support</button>
+          <button class="btn">+ Log safety concern</button>
+          <button class="btn">+ New consultation</button>
+        </div>
+        <div style="margin-top:16px;font-size:11px;color:var(--ink-3);">
+          Starting an audit from here pre-fills the Duty Holders this premises already knows.
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      <strong>Pattern note.</strong> The premises page is the spine. Score split three ways (Building / Duty Holder / Total) as Phil suggested. Duty Holder roles are set at this level, not per-process. Recent activity is a unified timeline across all processes; the parent/child "onion" of Themis is collapsed into one chronological stream.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     AUDIT PROCESS (the centrepiece)
+========================================================= -->
+<div id="audit" class="screen">
+  <main>
+    <div class="crumbs">
+      <a onclick="show('premisesdetail')">Temple Quay House</a> /  Audit A-2026-0314
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>Audit  ·  A-2026-0314</h1>
+        <div class="meta">
+          <span class="pill blue">In progress</span>
+          &nbsp;Stage 2 of 6  ·  Reactive  ·  Triggered by <a>CPIN-2026-0418</a>  ·  Lead inspector: <strong>Phil Gower</strong>
+        </div>
+      </div>
+      <button class="btn">⋯ Process options</button>
+    </div>
+
+    <div class="process-grid">
+      <!-- Stage rail -->
+      <div class="stage-rail">
+        <div class="stage done">Setup pre-audit</div>
+        <div class="stage current">Site visit and assessment</div>
+        <div class="stage future">Scoring and enforcement</div>
+        <div class="stage future">Outcomes and letters</div>
+        <div class="stage future">Action plans / Follow-up</div>
+        <div class="stage future">Close</div>
+
+        <div style="margin-top:16px;padding:10px 12px;font-size:11px;color:var(--ink-3);">
+          Each stage carries its own notes, files and time. Activity feeds into one log against this audit.
+        </div>
+      </div>
+
+      <!-- Stage content -->
+      <div class="stage-content">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <h2 style="margin:0;">Site visit and assessment</h2>
+          <span style="font-size:12px;color:var(--ink-3);">Tracker brought inside the system</span>
+        </div>
+        <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">
+          Score each article against the three categories: General Fire Precautions (GFP), Fire Safety Management (FSM), Fire Safety Maintenance (FSM). Add specific examples you saw. Attribute findings to the responsible Duty Holder. Templates and wording are <a>editable in config</a> by Steve or Phil; no developer needed.
+        </div>
+
+        <div class="finding">
+          <div class="article">Article 7  ·  Fire detection and warning</div>
+          <div style="font-size:12px;color:var(--ink-3);">Category: Fire Safety Maintenance</div>
+          <div class="scores">
+            <button class="score-btn">0</button>
+            <button class="score-btn">1</button>
+            <button class="score-btn selected">2</button>
+            <button class="score-btn">3</button>
+            <button class="score-btn">4</button>
+            <button class="score-btn">5</button>
+            <button class="score-btn">6</button>
+          </div>
+          <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
+          <div style="margin:4px 0 6px;">
+            <span class="pill amber">Fire door defects</span>
+          </div>
+          <div class="example">
+            <strong>Example seen:</strong> Two fire door closers missing on first-floor corridor (rooms 103, 107). Cold-smoke seal damaged on door 109.
+          </div>
+          <div class="attribution">
+            Attributed to:
+            <span>Equans (FM)</span>
+          </div>
+        </div>
+
+        <div class="finding">
+          <div class="article">Article 13  ·  Means of escape</div>
+          <div style="font-size:12px;color:var(--ink-3);">Category: General Fire Precautions</div>
+          <div class="scores">
+            <button class="score-btn">0</button>
+            <button class="score-btn selected">1</button>
+            <button class="score-btn">2</button>
+            <button class="score-btn">3</button>
+            <button class="score-btn">4</button>
+            <button class="score-btn">5</button>
+            <button class="score-btn">6</button>
+          </div>
+          <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
+          <div style="margin:4px 0 6px;">
+            <span class="pill amber">Obstructed escape route</span>
+          </div>
+          <div class="example">
+            <strong>Example seen:</strong> Office furniture stored in the rear escape stairwell. Plan in place to clear within 14 days.
+          </div>
+          <div class="attribution">
+            Attributed to:
+            <span>HMCTS</span>
+            <span>+ add another</span>
+          </div>
+        </div>
+
+        <div style="text-align:center;padding:12px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:13px;cursor:pointer;">
+          + Add finding
+        </div>
+
+        <div class="stage-actions">
+          <button class="btn">Save draft</button>
+          <button class="btn">Request more info (Article 27)</button>
+          <button class="btn primary">Mark stage complete →</button>
+        </div>
+      </div>
+
+      <!-- Context rail -->
+      <div class="context-rail">
+        <div class="context-card">
+          <h3>Premises</h3>
+          <div style="font-weight:600;">Temple Quay House</div>
+          <div style="color:var(--ink-3);font-size:12px;margin-bottom:8px;">Government office  ·  HMCTS</div>
+          <div class="row"><span class="k">RBIP score</span><span style="color:var(--red);font-weight:600;">47</span></div>
+          <div class="row"><span class="k">Last audit</span><span>Jan 2025</span></div>
+          <div class="row"><span class="k">Sprinkler</span><span>Yes</span></div>
+        </div>
+
+        <div class="context-card">
+          <h3>Duty Holders here</h3>
+          <div style="font-size:12px;color:var(--ink-3);margin-bottom:8px;">Pre-filled from this premises. Edit if needed.</div>
+          <div class="row"><span>HMCTS</span><span class="pill grey">Govt</span></div>
+          <div class="row"><span>Equans</span><span class="pill grey">FM</span></div>
+          <div class="row"><span>The Property Directorate</span><span class="pill grey">Internal</span></div>
+        </div>
+
+        <div class="context-card">
+          <h3>Prompts</h3>
+          <div class="prompt-item">
+            <span class="badge">Tip</span>Don't forget to record the EMM discussion before moving to scoring.
+          </div>
+          <div class="prompt-item">
+            <span class="badge">Check</span>Have you attributed each failing to the right Duty Holder? Affects letter content.
+          </div>
+          <div class="prompt-item">
+            <span class="badge">Note</span>Article 27 pauses the audit timer and keeps this stage open.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity strip -->
+    <div class="activity">
+      <strong>Activity</strong>
+      <span>3 notes</span>
+      <span>2 files (site photos)</span>
+      <span>6h 20m logged</span>
+      <button class="btn" style="margin-left:auto;" onclick="show('time')">+ Log time</button>
+      <button class="btn">+ Add note</button>
+    </div>
+
+    <!-- Skipping ahead: a preview of stage 4, smart letters -->
+    <h2 style="margin-top:32px;">A preview of stage 4: Outcomes and letters</h2>
+    <div style="font-size:13px;color:var(--ink-2);margin-bottom:12px;">
+      Once the audit is marked complete, the system drafts a letter for every Duty Holder in one action. No child processes. Each letter only includes the legal text relevant to that Duty Holder's attributed failings. Inspector reviews each in turn, edits inline, then a single Finalise and send saves the actual sent version against the audit and the premises.
+    </div>
+
+    <div class="letter-tabs">
+      <button class="letter-tab active">Letter for HMCTS  ·  28-DAP</button>
+      <button class="letter-tab">Letter for Equans  ·  28-DAP</button>
+      <button class="letter-tab">Letter for The Property Directorate  ·  NoD</button>
+    </div>
+
+    <div class="letter-preview">
+      <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+      <div>22 June 2026</div>
+      <div style="margin-top:12px;">
+        Mark Stevens<br>
+        Property Director<br>
+        HMCTS<br>
+        Temple Quay House, Temple Back East, Bristol BS1
+      </div>
+      <div style="margin-top:16px;font-weight:600;">28-Day Action Plan</div>
+      <p>Following the fire safety audit conducted at Temple Quay House on 22 June 2026, I am writing to require an action plan from HMCTS in respect of the following deficiencies.</p>
+      <p>
+        <span class="conditional">Article 13, Means of escape.</span> The escape route in the rear stairwell was found to be obstructed by office furniture. HMCTS must produce, within twenty-eight (28) days, a plan for restoring and maintaining the means of escape, in accordance with Article 13 of the Regulatory Reform (Fire Safety) Order 2005.
+      </p>
+      <p style="color:var(--ink-3);font-size:12px;">Highlighted text is conditional - included only because Article 13 was attributed to HMCTS in this audit.</p>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn">Edit letter</button>
+      <button class="btn">Preview as PDF</button>
+      <button class="btn primary">Finalise all three letters and send</button>
+    </div>
+
+    <div class="footnote">
+      <strong>Pattern note.</strong> This is the design move that retires the "Conga onion": one audit, many Duty Holders, many letters, all held inside the same process. The conditional-text engine pulls only the legal wording relevant to the failings scored against each Duty Holder. The final sent version is what the system saves, not the blank template. Letter templates and conditional rules are admin-editable by Steve, without a developer.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     CPIN TRIAGE QUEUE
+========================================================= -->
+<div id="cpins" class="screen">
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>CPINs</h1>
+        <div class="meta">Reports of fire incidents from Fire & Rescue Services</div>
+      </div>
+    </div>
+
+    <div class="cpin-counts" style="margin-top:16px;">
+      <div class="count"><div class="dot red"></div><strong>2</strong><span class="label">Red, mine</span></div>
+      <div class="count"><div class="dot amber"></div><strong>1</strong><span class="label">Amber, mine</span></div>
+      <div class="count"><div class="dot green"></div><strong>4</strong><span class="label">Green, mine</span></div>
+      <div class="count" style="margin-left:32px;"><strong>3</strong><span class="label">Unassigned</span></div>
+    </div>
+
+    <div class="cpin-tabs">
+      <button class="cpin-tab active">My CPINs  ·  7</button>
+      <button class="cpin-tab">Unassigned  ·  3</button>
+      <button class="cpin-tab">Completed</button>
+    </div>
+
+    <div class="cpin-card red">
+      <span class="pill red">RED</span>
+      <div>
+        <div class="premises">HMP Lewes  ·  CPIN-2026-0421</div>
+        <div class="summary" style="color:var(--ink-2);">Cell fire, serious injury reported. Avon FRS attended.  <span style="color:var(--ink-3);">21 Jun, 04:22</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);">Duty Holder auto-linked: <strong>HMPPS</strong></div>
+      <div class="actions">
+        <button class="btn">Make enquiries</button>
+        <button class="btn primary" onclick="show('auditsetup')">Start audit</button>
+      </div>
+    </div>
+
+    <div class="cpin-card red">
+      <span class="pill red">RED</span>
+      <div>
+        <div class="premises">Belmarsh  ·  CPIN-2026-0420</div>
+        <div class="summary" style="color:var(--ink-2);">Kitchen fire, two staff injured. LFB attended.  <span style="color:var(--ink-3);">20 Jun, 21:14</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);">Duty Holder auto-linked: <strong>HMPPS</strong></div>
+      <div class="actions">
+        <button class="btn">Make enquiries</button>
+        <button class="btn primary" onclick="show('auditsetup')">Start audit</button>
+      </div>
+    </div>
+
+    <div class="cpin-card amber">
+      <span class="pill amber">AMBER</span>
+      <div>
+        <div class="premises">Temple Quay House  ·  CPIN-2026-0418</div>
+        <div class="summary" style="color:var(--ink-2);">Suspected electrical fault in plant room, FRS attended, no injuries.  <span style="color:var(--ink-3);">12 Jun, 15:46</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);">Audit started, <a onclick="show('audit')">A-2026-0314</a></div>
+      <div class="actions">
+        <span class="pill blue">Escalated</span>
+      </div>
+    </div>
+
+    <div id="green-section">
+      <h2 style="margin-top:28px;" id="green-heading">Green CPINs  ·  <span id="green-count">4</span> ready to close</h2>
+      <div style="font-size:13px;color:var(--ink-2);margin-bottom:12px;">
+        No injury, no FF action required. One click closes all four with a templated note and default time logged.
+      </div>
+
+      <div class="cpin-card green">
+        <span class="pill green">GREEN</span>
+        <div>
+          <div class="premises">DWP Crawley  ·  CPIN-2026-0419</div>
+          <div class="summary" style="color:var(--ink-2);">False alarm, fire alarm panel reset.  <span style="color:var(--ink-3);">18 Jun, 09:02</span></div>
+        </div>
+        <div></div>
+        <div class="actions">
+          <button class="btn">Open</button>
+          <button class="btn primary">Close, no action</button>
+        </div>
+      </div>
+
+      <div class="cpin-card green">
+        <span class="pill green">GREEN</span>
+        <div>
+          <div class="premises">HMRC Stratford  ·  CPIN-2026-0417</div>
+          <div class="summary" style="color:var(--ink-2);">Burnt toast in canteen, no FF action.  <span style="color:var(--ink-3);">17 Jun, 12:39</span></div>
+        </div>
+        <div></div>
+        <div class="actions">
+          <button class="btn">Open</button>
+          <button class="btn primary">Close, no action</button>
+        </div>
+      </div>
+
+      <div class="cpin-card green">
+        <span class="pill green">GREEN</span>
+        <div>
+          <div class="premises">HM Treasury  ·  CPIN-2026-0416</div>
+          <div class="summary" style="color:var(--ink-2);">Toaster set off detector, staff dealt with.  <span style="color:var(--ink-3);">17 Jun, 08:14</span></div>
+        </div>
+        <div></div>
+        <div class="actions">
+          <button class="btn">Open</button>
+          <button class="btn primary">Close, no action</button>
+        </div>
+      </div>
+
+      <div class="cpin-card green">
+        <span class="pill green">GREEN</span>
+        <div>
+          <div class="premises">DVLA Swansea  ·  CPIN-2026-0415</div>
+          <div class="summary" style="color:var(--ink-2);">False alarm, plant room. No FF action.  <span style="color:var(--ink-3);">16 Jun, 14:55</span></div>
+        </div>
+        <div></div>
+        <div class="actions">
+          <button class="btn">Open</button>
+          <button class="btn primary">Close, no action</button>
+        </div>
+      </div>
+
+      <button class="btn primary" style="margin-top:8px;" onclick="closeAllGreen();">Close all 4 Green CPINs in one click</button>
+    </div>
+
+    <!-- Empty state, hidden until close-all is triggered -->
+    <div id="green-empty" style="display:none;margin-top:28px;">
+      <div class="empty-state">
+        <div class="icon">✓</div>
+        <div class="ttl">All Green CPINs closed</div>
+        <div class="sub"><strong>4 CPINs closed in one action</strong>  ·  Templated note "No injury, no FF action required" added to each  ·  2 minutes default time logged against each premises.</div>
+        <span class="undo" onclick="restoreGreen();">Undo</span>
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);font-style:italic;text-align:center;">New Green CPINs will appear here as Fire & Rescue Services submit them.</div>
+    </div>
+
+    <div class="footnote">
+      <strong>Pattern note.</strong> 80%+ of CPINs are Green and need no action. Today, even those take many clicks (spawn an Investigation record, look up the Duty Holder, write a note, log time). Here, one click closes them with a templated note and default time. Red and Amber CPINs get the path the team actually need: make enquiries inline, then either close or escalate to a pre-filled audit. No re-keying, no manual queue management.
+
+      <br><br><strong>What happens when they are all closed.</strong> The Green section collapses into a confirmation tile showing how many were closed and what was auto-logged. Each closure carries the templated note "No injury, no FF action required" and a default 2 minutes against the premises, so the audit trail and the time card both stay clean. An Undo affords the inspector a reversal window in case they batch-closed something they didn't mean to.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     TIME (personal timesheet + quick log)
+========================================================= -->
+<div id="time" class="screen">
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>Time</h1>
+        <div class="meta">Week 26  ·  15 to 21 June 2026  ·  <a>‹ Prev week</a>  ·  <a>Next week ›</a></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn">Export this week</button>
+        <button class="btn">My team's time  ·  manager only</button>
+      </div>
+    </div>
+
+    <div class="inset" style="margin-top:16px;">
+      <strong>Quick log.</strong> Date defaults to today, person to you. Only the duration is yours to enter. Log against a premises (which links it to its open processes automatically), against a process you have open, or as general admin time.
+    </div>
+
+    <!-- Quick log form -->
+    <div class="quick-log">
+      <div>
+        <label>Date</label>
+        <input type="date" value="2026-06-22" max="2026-06-22" />
+      </div>
+      <div>
+        <label>What for</label>
+        <select>
+          <option>Process: A-2026-0314  ·  Temple Quay House audit</option>
+          <option>Premises: HMP Lewes</option>
+          <option>Premises: Maidstone Magistrates Court</option>
+          <option>General admin / non-premises</option>
+          <option>+ Search for another premises or process</option>
+        </select>
+      </div>
+      <div>
+        <label>Activity</label>
+        <select>
+          <option>Site visit</option>
+          <option>Desk-based investigation</option>
+          <option>Letter drafting</option>
+          <option>Meeting</option>
+          <option>Phone call</option>
+          <option>Travel</option>
+          <option>General admin</option>
+        </select>
+      </div>
+      <div>
+        <label>Duration</label>
+        <select id="dur-select">
+          <option>15m</option>
+          <option>30m</option>
+          <option>45m</option>
+          <option>1h</option>
+          <option selected>1h 30m</option>
+          <option>2h</option>
+          <option>2h 30m</option>
+          <option>3h</option>
+          <option>Half day (4h)</option>
+          <option>Full day (7h)</option>
+          <option>Custom...</option>
+        </select>
+      </div>
+      <button class="submit">Log time</button>
+    </div>
+
+    <!-- Week summary stats -->
+    <div class="week-summary">
+      <div class="stat">
+        <div class="lbl">This week</div>
+        <div class="val">21.5 <span style="font-weight:400;color:var(--ink-3);font-size:14px;">/ 37h</span></div>
+        <div class="sub">58% to target</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Against premises</div>
+        <div class="val">16.0h</div>
+        <div class="sub">74% of logged time</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">General admin</div>
+        <div class="val">5.5h</div>
+        <div class="sub">26% of logged time</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Remaining</div>
+        <div class="val">15.5h</div>
+        <div class="sub">to reach 37h week</div>
+      </div>
+    </div>
+
+    <!-- Day-by-day breakdown -->
+    <div class="time-week">
+      <div class="row today">
+        <div class="day">
+          <div class="num">22</div>
+          <div class="name">Mon  ·  Today</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="what"><span class="pill blue">Audit</span>Temple Quay House  ·  Site visit</span>
+            <span class="dur">3h 30m</span>
+          </div>
+          <div class="entry">
+            <span class="what"><span class="pill red">CPIN</span>HMP Lewes  ·  Initial enquiry call</span>
+            <span class="dur">45m</span>
+          </div>
+        </div>
+        <div class="day-total">4h 15m</div>
+      </div>
+
+      <div class="row">
+        <div class="day">
+          <div class="num">19</div>
+          <div class="name">Fri</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="what"><span class="pill blue">Audit</span>Temple Quay House  ·  Letter drafting</span>
+            <span class="dur">2h 00m</span>
+          </div>
+          <div class="entry">
+            <span class="what"><span class="pill grey">Admin</span>Team meeting</span>
+            <span class="dur">1h 00m</span>
+          </div>
+          <div class="entry">
+            <span class="what"><span class="pill purple">Follow-up</span>HMP Lewes  ·  Action plan review</span>
+            <span class="dur">1h 30m</span>
+          </div>
+        </div>
+        <div class="day-total">4h 30m</div>
+      </div>
+
+      <div class="row">
+        <div class="day">
+          <div class="num">18</div>
+          <div class="name">Thu</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="what"><span class="pill grey">Consult</span>Charing Cross House refurb  ·  Plan review</span>
+            <span class="dur">3h 00m</span>
+          </div>
+          <div class="entry">
+            <span class="what"><span class="pill grey">Admin</span>Email and admin</span>
+            <span class="dur">1h 30m</span>
+          </div>
+        </div>
+        <div class="day-total">4h 30m</div>
+      </div>
+
+      <div class="row">
+        <div class="day">
+          <div class="num">17</div>
+          <div class="name">Wed</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="what"><span class="pill blue">Audit</span>Temple Quay House  ·  Travel + site visit</span>
+            <span class="dur">5h 15m</span>
+          </div>
+        </div>
+        <div class="day-total">5h 15m</div>
+      </div>
+
+      <div class="row">
+        <div class="day">
+          <div class="num">16</div>
+          <div class="name">Tue</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="what"><span class="pill blue">Audit</span>Temple Quay House  ·  Pre-audit prep</span>
+            <span class="dur">2h 00m</span>
+          </div>
+          <div class="entry">
+            <span class="what"><span class="pill grey">Admin</span>RBIP planning</span>
+            <span class="dur">1h 00m</span>
+          </div>
+        </div>
+        <div class="day-total">3h 00m</div>
+      </div>
+
+      <div class="row">
+        <div class="day">
+          <div class="num">15</div>
+          <div class="name">Mon</div>
+        </div>
+        <div class="entries">
+          <div class="entry" style="color:var(--ink-3);font-style:italic;">
+            <span class="what">No time logged</span>
+            <span class="dur">0h</span>
+          </div>
+        </div>
+        <div class="day-total" style="color:var(--ink-3);">0h</div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      <strong>Why this design.</strong> Today, logging time means going to a separate place, picking the date, picking yourself, picking the premises, picking the activity, typing the duration. Five fields when three of them are already known. This quick-log strip leaves only Duration and What-for as real choices. Activity defaults from context where possible (a Site visit auto-defaults if you are logging from inside an audit). The page also retires the "exceptions timecard" name; non-premises work just appears as "General admin" alongside everything else.
+
+      The manager view (top right, role-permissioned) reuses this layout but adds a team-roster column on the left, so a team leader can see workload at a glance without seeing individual performance comparisons.
+
+      A "+ Log time" button appears in every process page's activity strip and pre-fills the What-for field with that process. The intent is that logging time should never feel like a separate task.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     PROCESSES LIST
+========================================================= -->
+<div id="processes" class="screen">
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>Processes</h1>
+        <div class="meta">All active work across the inspectorate, in one place.</div>
+      </div>
+      <button class="btn">+ New process</button>
+    </div>
+
+    <div class="saved-views" style="margin-top:20px;">
+      <!-- Saved views rail (left) -->
+      <div class="views-rail">
+        <h4>Pinned views</h4>
+        <div class="view-item active">Open and mine <span class="pin">★ 12</span></div>
+        <div class="view-item">My patch (open) <span class="pin">★ 38</span></div>
+        <div class="view-item">Worst score first <span class="pin">★</span></div>
+        <div class="view-item">Awaiting action plan <span class="pin">★</span></div>
+
+        <h4 style="margin-top:16px;">Shared views</h4>
+        <div class="view-item">Whole team, open</div>
+        <div class="view-item">Prisons only</div>
+        <div class="view-item">SLA approaching</div>
+        <div class="view-item">Closed this month</div>
+        <div class="view-item" style="color:var(--accent);">+ Save current view</div>
+      </div>
+
+      <!-- Main results -->
+      <div>
+        <div class="filter-chips" style="margin-top:0;">
+          <button class="chip on">All types</button>
+          <button class="chip">Audits</button>
+          <button class="chip">Follow-ups</button>
+          <button class="chip">CPINs</button>
+          <button class="chip">Concerns</button>
+          <button class="chip">Consultations</button>
+          <button class="chip">Business support</button>
+          <button class="chip">Appeals</button>
+        </div>
+        <div class="filter-chips" style="margin-top:0;">
+          <button class="chip on">Open</button>
+          <button class="chip">In progress</button>
+          <button class="chip">Awaiting action plan</button>
+          <button class="chip">Awaiting follow-up</button>
+          <button class="chip">Closed</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 4px 8px;font-size:12px;color:var(--ink-3);">
+          <div>Showing <strong style="color:var(--ink);">12</strong> processes  ·  Sort by <strong style="color:var(--ink);">Worst score first</strong> ▾</div>
+          <div><a>Export CSV</a></div>
+        </div>
+
+        <div class="card" style="padding:0;">
+          <!-- Header row -->
+          <div class="proc-row" style="background:var(--bg);cursor:default;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">
+            <div>Type</div>
+            <div>Premises</div>
+            <div>Stage / status</div>
+            <div>Score</div>
+            <div>Owner</div>
+            <div style="text-align:right;">Age</div>
+          </div>
+
+          <div class="proc-row" onclick="show('audit')">
+            <div class="ptype"><span class="pill blue">Audit</span></div>
+            <div class="premises">Temple Quay House <div class="id">A-2026-0314</div></div>
+            <div class="status">Stage 2 of 6  ·  Site visit</div>
+            <div class="score-cell high" style="font-family:var(--mono);font-weight:600;color:var(--red);">47 ▲</div>
+            <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
+            <div class="age" style="text-align:right;">8 days</div>
+          </div>
+
+          <div class="proc-row">
+            <div class="ptype"><span class="pill purple">Follow-up</span></div>
+            <div class="premises">HMP Lewes <div class="id">F-2026-0142</div></div>
+            <div class="status">Awaiting action plan</div>
+            <div class="score-cell high" style="font-family:var(--mono);font-weight:600;color:var(--red);">42 ▼</div>
+            <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
+            <div class="age" style="text-align:right;">12 days</div>
+          </div>
+
+          <div class="proc-row">
+            <div class="ptype"><span class="pill blue">Audit</span></div>
+            <div class="premises">HMP Maidstone <div class="id">A-2026-0301</div></div>
+            <div class="status">Stage 4 of 6  ·  Outcomes</div>
+            <div class="score-cell high" style="font-family:var(--mono);font-weight:600;color:var(--red);">38</div>
+            <div class="owner"><div class="avatar-tiny">SF</div>Steve France</div>
+            <div class="age" style="text-align:right;">23 days</div>
+          </div>
+
+          <div class="proc-row">
+            <div class="ptype"><span class="pill grey">Consult</span></div>
+            <div class="premises">Charing Cross House refurb <div class="id">C-2026-0089</div></div>
+            <div class="status">Reviewing  ·  <strong style="color:var(--amber);">SLA: 5 days</strong></div>
+            <div class="score-cell mid" style="font-family:var(--mono);font-weight:600;color:var(--amber);">36</div>
+            <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
+            <div class="age" style="text-align:right;">10 days</div>
+          </div>
+
+          <div class="proc-row">
+            <div class="ptype"><span class="pill grey">Concern</span></div>
+            <div class="premises">Maidstone Magistrates Court <div class="id">SC-2026-0073</div></div>
+            <div class="status">Awaiting contact</div>
+            <div class="score-cell mid" style="font-family:var(--mono);font-weight:600;color:var(--amber);">34</div>
+            <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
+            <div class="age" style="text-align:right;">4 days</div>
+          </div>
+
+          <div class="proc-row">
+            <div class="ptype"><span class="pill blue">Audit</span></div>
+            <div class="premises">DWP Crawley <div class="id">A-2026-0298</div></div>
+            <div class="status">Stage 5  ·  Action plan</div>
+            <div class="score-cell mid" style="font-family:var(--mono);font-weight:600;color:var(--amber);">31 ▼</div>
+            <div class="owner"><div class="avatar-tiny">HM</div>Hannah Munro</div>
+            <div class="age" style="text-align:right;">2 months</div>
+          </div>
+
+          <div class="proc-row">
+            <div class="ptype"><span class="pill purple">Follow-up</span></div>
+            <div class="premises">HMP Belmarsh <div class="id">F-2026-0118</div></div>
+            <div class="status">Awaiting follow-up visit</div>
+            <div class="score-cell mid" style="font-family:var(--mono);font-weight:600;color:var(--amber);">29</div>
+            <div class="owner"><div class="avatar-tiny">SF</div>Steve France</div>
+            <div class="age" style="text-align:right;">4 months</div>
+          </div>
+
+          <div class="proc-row">
+            <div class="ptype"><span class="pill grey">Support</span></div>
+            <div class="premises">Royal Courts of Justice <div class="id">B-2026-0044</div></div>
+            <div class="status">Meeting scheduled  ·  25 Jun</div>
+            <div class="score-cell low" style="font-family:var(--mono);font-weight:600;color:var(--green);">22</div>
+            <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
+            <div class="age" style="text-align:right;">3 days</div>
+          </div>
+        </div>
+
+        <div class="footnote">
+          <strong>Pattern notes.</strong> Saved views down the left (pinnable, with shared team views below). Multi-select chips replace today's boolean filter. The list always shows one row per process, never the parent/child onion. Score column shows current and direction of travel since the previous audit. Sort is on score by default ("worst first" matches how the team plans), but switchable. Bulk actions (close, reassign, export) appear when you select rows.
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     REPORTS
+========================================================= -->
+<div id="reports" class="screen">
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>Reports</h1>
+        <div class="meta">Templated reports up front  ·  Custom builder behind  ·  Role-tiered access</div>
+      </div>
+      <button class="btn">+ Build a custom report</button>
+    </div>
+
+    <h2 style="margin-top:24px;">Annual report sources</h2>
+    <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px;">The 12 data sets that feed the public-facing annual report. One click runs each.</div>
+    <div class="reports-grid">
+      <div class="report-card">
+        <div class="cat">Activity</div>
+        <div class="ttl">Audits completed</div>
+        <div class="desc">Audits closed this period, broken down by type (full, short, themed) and by custodial/non-custodial.</div>
+        <div class="foot"><span>Last run: 14 Jun</span><span class="pill grey">Annual</span></div>
+      </div>
+      <div class="report-card">
+        <div class="cat">Activity</div>
+        <div class="ttl">CPINs received and outcomes</div>
+        <div class="desc">Volume, RAG flag split, escalation rate to audit, and average time to triage.</div>
+        <div class="foot"><span>Last run: 14 Jun</span><span class="pill grey">Annual</span></div>
+      </div>
+      <div class="report-card">
+        <div class="cat">Impact</div>
+        <div class="ttl">Score improvement</div>
+        <div class="desc">Year-on-year change in RBIP scores following CPFSI intervention. Evidence of impact.</div>
+        <div class="foot"><span>Last run: 12 Jun</span><span class="pill grey">Annual</span></div>
+      </div>
+      <div class="report-card">
+        <div class="cat">Estate</div>
+        <div class="ttl">Buildings by department</div>
+        <div class="desc">Count of premises and average RBIP score, grouped by government department.</div>
+        <div class="foot"><span>Last run: 09 Jun</span><span class="pill grey">Annual</span></div>
+      </div>
+      <div class="report-card">
+        <div class="cat">Enforcement</div>
+        <div class="ttl">Notices issued</div>
+        <div class="desc">NoD, 28-DAP and Enforcement Notices issued, with breakdown by Duty Holder and outcome.</div>
+        <div class="foot"><span>Last run: 08 Jun</span><span class="pill grey">Annual</span></div>
+      </div>
+      <div class="report-card">
+        <div class="cat">Estate</div>
+        <div class="ttl">Risk profile of the estate</div>
+        <div class="desc">Distribution of RBIP scores across the whole Crown estate, with year-on-year movement.</div>
+        <div class="foot"><span>Last run: 02 Jun</span><span class="pill grey">Annual</span></div>
+      </div>
+    </div>
+
+    <h2>Operational reports</h2>
+    <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px;">Day-to-day reports the team run as needed.</div>
+    <div class="reports-grid">
+      <div class="report-card">
+        <div class="cat">Workload</div>
+        <div class="ttl">Open processes by patch</div>
+        <div class="desc">All open processes grouped by inspector patch, with age and status.</div>
+        <div class="foot"><span>Last run: today</span><span class="pill blue">Weekly</span></div>
+      </div>
+      <div class="report-card">
+        <div class="cat">SLA</div>
+        <div class="ttl">Consultations approaching deadline</div>
+        <div class="desc">Building Control Consultations within 5 working days of their 15-day SLA.</div>
+        <div class="foot"><span>Live</span><span class="pill amber">Live</span></div>
+      </div>
+      <div class="report-card">
+        <div class="cat">Follow-up</div>
+        <div class="ttl">28-day Action Plans due</div>
+        <div class="desc">Action plans due in the next 28 days, ranked by remaining time.</div>
+        <div class="foot"><span>Live</span><span class="pill amber">Live</span></div>
+      </div>
+    </div>
+
+    <h2>For managers only</h2>
+    <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px;">Inspector and team-level reports. Restricted to Team Leader and Manager roles.</div>
+    <div class="reports-grid">
+      <div class="report-card" style="border-style:dashed;">
+        <div class="cat">Team</div>
+        <div class="ttl">Time logged by inspector</div>
+        <div class="desc">Hours logged by each team member this week / month, by activity type and premises.</div>
+        <div class="foot"><span>Last run: today</span><span class="pill purple">Manager</span></div>
+      </div>
+      <div class="report-card" style="border-style:dashed;">
+        <div class="cat">Team</div>
+        <div class="ttl">Process throughput by inspector</div>
+        <div class="desc">Audits, CPINs and concerns closed per inspector. Aggregated, not for performance comparison.</div>
+        <div class="foot"><span>Last run: 14 Jun</span><span class="pill purple">Manager</span></div>
+      </div>
+      <div class="report-card" style="border-style:dashed;">
+        <div class="cat">Cost</div>
+        <div class="ttl">Estimated cost by process</div>
+        <div class="desc">Time logged against each closed process, translated into estimated cost.</div>
+        <div class="foot"><span>Last run: 01 Jun</span><span class="pill purple">Manager</span></div>
+      </div>
+    </div>
+
+    <h2>Trend reports  <span style="font-size:13px;font-weight:400;color:var(--ink-3);margin-left:8px;">later release</span></h2>
+    <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px;">Forward-looking, pattern-spotting reports. Strategic horizon, not v1 priority.</div>
+    <div class="reports-grid">
+      <div class="report-card" style="opacity:0.55;border-style:dashed;">
+        <div class="cat">Trend</div>
+        <div class="ttl">Repeated failure patterns</div>
+        <div class="desc">E.g. "Job Centres with repeated emergency lighting failures over the last 24 months". Highlights focus areas for proactive audits.</div>
+        <div class="foot"><span>Coming v2</span><span class="pill grey">Future</span></div>
+      </div>
+      <div class="report-card" style="opacity:0.55;border-style:dashed;">
+        <div class="cat">Trend</div>
+        <div class="ttl">CPIN volume by region</div>
+        <div class="desc">CPIN counts by region and building type, with seasonality and year-on-year comparison.</div>
+        <div class="foot"><span>Coming v2</span><span class="pill grey">Future</span></div>
+      </div>
+      <div class="report-card" style="opacity:0.55;border-style:dashed;">
+        <div class="cat">Trend</div>
+        <div class="ttl">Incident Summary correlation</div>
+        <div class="desc">HMPPS incident summaries cross-referenced against CPINs, to spot incidents that were never formally reported.</div>
+        <div class="foot"><span>Coming v2</span><span class="pill grey">Future</span></div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      <strong>Pattern notes.</strong> The library leads with the templated reports the team actually use (the 12 that feed the annual report). Operational reports are the day-to-day. Manager reports are visible only to permissioned roles. Trend reports are signposted now but ship later, because the AI angle Phil and Steve mentioned needs more design work and a cleaner data foundation than v1 will have. "Build a custom report" sits top-right as a route into a builder for the cases the templates do not cover.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     AUDIT SETUP (Stage 1 of starting an audit)
+========================================================= -->
+<div id="auditsetup" class="screen">
+  <main>
+    <div class="crumbs">
+      <a onclick="show('premisesdetail')">Temple Quay House</a> /  Start audit
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <div>
+        <h1>Start an audit</h1>
+        <div class="meta">
+          Stage 1 of 6  ·  Setup pre-audit  ·
+          <span class="pill blue" style="margin-left:6px;">Reactive</span>
+          <span style="color:var(--ink-3);margin-left:4px;">Triggered from <a onclick="show('cpins')">CPIN-2026-0418</a></span>
+        </div>
+      </div>
+      <button class="btn">Cancel</button>
+    </div>
+
+    <div class="inset">
+      <strong>Pre-filled from the source.</strong> Because this audit was started from a CPIN, the premises, the Duty Holders and the trigger are already filled in. Review them, set the type, confirm the appointment, then start. You can save a draft at any point.
+    </div>
+
+    <div class="setup-grid">
+      <!-- LEFT: setup form -->
+      <div>
+        <!-- Premises -->
+        <div class="setup-section">
+          <h3>1. Premises</h3>
+          <div class="help">Locked from where this audit was started. Change at your own risk.</div>
+          <div class="holder-card" style="background:var(--accent-soft);border-color:var(--accent);">
+            <div class="avatar-sm" style="background:var(--accent);color:white;">TQ</div>
+            <div>
+              <div class="name">Temple Quay House</div>
+              <div class="role">Temple Back East, Bristol BS1  ·  Government office  ·  HMCTS</div>
+            </div>
+            <span class="pill blue">RBIP score 47</span>
+            <a style="font-size:12px;">Change</a>
+          </div>
+        </div>
+
+        <!-- Audit type -->
+        <div class="setup-section">
+          <h3>2. Audit type</h3>
+          <div class="help">The building type drives the question set, scoring weighting and letter wording. You can switch on the day if scope changes.</div>
+          <div class="radio-row">
+            <button class="radio-btn selected">
+              <div class="ttl">Full</div>
+              <div class="desc">All articles, all categories. Typical for a high-score premises.</div>
+            </button>
+            <button class="radio-btn">
+              <div class="ttl">Short</div>
+              <div class="desc">Subset of articles, scoped to the trigger. Faster site visit.</div>
+            </button>
+            <button class="radio-btn">
+              <div class="ttl">Themed</div>
+              <div class="desc">Targeted at one theme across many premises (e.g. fire doors).</div>
+            </button>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--ink-3);">Question set <strong style="color:var(--ink);">Government office, full</strong>  ·  <a>preview the questions</a></div>
+        </div>
+
+        <!-- Team -->
+        <div class="setup-section">
+          <h3>3. Team</h3>
+          <div class="help">Lead inspector defaults to you. Add colleagues if this is a two-person audit.</div>
+          <div class="holder-card">
+            <div class="avatar-sm" style="background:var(--accent);color:white;">PG</div>
+            <div>
+              <div class="name">Phil Gower</div>
+              <div class="role">Lead Fire Safety Inspector</div>
+            </div>
+            <span class="pill blue">Lead</span>
+            <span style="color:var(--ink-3);font-size:12px;padding:0 6px;">You</span>
+          </div>
+          <div style="text-align:center;padding:8px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:12px;cursor:pointer;">+ Add another inspector</div>
+        </div>
+
+        <!-- Duty Holders -->
+        <div class="setup-section">
+          <h3>4. Duty Holders and Responsible Persons</h3>
+          <div class="help">Pre-suggested from this premises. Review and add or remove as needed. Not pre-locked, since who is on site can change.</div>
+
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders (organisations)</div>
+          <div class="holder-card">
+            <div class="avatar-sm">HM</div>
+            <div>
+              <div class="name">HMCTS</div>
+              <div class="role">Government department  ·  Property responsibility</div>
+            </div>
+            <span class="pill blue">From premises</span>
+            <span class="remove" title="Remove">×</span>
+          </div>
+          <div class="holder-card">
+            <div class="avatar-sm">EQ</div>
+            <div>
+              <div class="name">Equans</div>
+              <div class="role">FM company  ·  Maintenance responsibility</div>
+            </div>
+            <span class="pill blue">From premises</span>
+            <span class="remove" title="Remove">×</span>
+          </div>
+          <div class="holder-card">
+            <div class="avatar-sm">PD</div>
+            <div>
+              <div class="name">The Property Directorate</div>
+              <div class="role">Internal  ·  Strategic property responsibility</div>
+            </div>
+            <span class="pill blue">From premises</span>
+            <span class="remove" title="Remove">×</span>
+          </div>
+          <div style="text-align:center;padding:8px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:12px;cursor:pointer;">+ Add a Duty Holder</div>
+
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:16px 0 6px;">Responsible Persons (individuals)</div>
+          <div class="holder-card">
+            <div class="avatar-sm">MS</div>
+            <div>
+              <div class="name">Mark Stevens</div>
+              <div class="role">HMCTS  ·  Property Director</div>
+            </div>
+            <span class="pill blue">From premises</span>
+            <span class="remove" title="Remove">×</span>
+          </div>
+          <div class="holder-card">
+            <div class="avatar-sm">SP</div>
+            <div>
+              <div class="name">Sarah Patel</div>
+              <div class="role">Equans  ·  Maintenance Lead</div>
+            </div>
+            <span class="pill blue">From premises</span>
+            <span class="remove" title="Remove">×</span>
+          </div>
+          <div style="text-align:center;padding:8px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:12px;cursor:pointer;">+ Add a Responsible Person</div>
+        </div>
+
+        <!-- Appointment -->
+        <div class="setup-section">
+          <h3>5. Appointment</h3>
+          <div class="help">Pick a date and time. We will check the lead inspector's calendar and the premises' working hours.</div>
+          <div class="field-row">
+            <div class="field">
+              <label>Date</label>
+              <input type="date" id="apt-date" value="2026-07-07" min="2026-06-22" onchange="updateApptHelper()" />
+              <div class="date-helper" id="apt-date-helper"><strong>Tuesday</strong>  ·  15 working days from today  ·  no Outlook conflicts</div>
+            </div>
+            <div class="field">
+              <label>Time</label>
+              <input type="time" id="apt-time" value="10:00" step="900" />
+              <div class="date-helper">Inside premises working hours (8am to 5pm)</div>
+            </div>
+            <div class="field">
+              <label>Duration (estimated)</label>
+              <select>
+                <option>Half day (4 hours)</option>
+                <option>Full day (7 hours)</option>
+                <option>Two days</option>
+                <option>Custom...</option>
+              </select>
+              <div class="date-helper">Half day is the default for a Full audit at a non-custodial premises.</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--green);margin-top:8px;">✓ No conflicts in Phil's Outlook calendar  ·  ✓ Pushes to Outlook on start</div>
+        </div>
+
+        <!-- Appointment letter preview -->
+        <div class="setup-section">
+          <h3>6. Appointment letter</h3>
+          <div class="help">The system has drafted the appointment letter using the right template for this premises type (Government office, non-custodial). Review, edit if needed, then it sends when you start the audit.</div>
+          <div class="letter-preview" style="padding:18px;font-size:12px;">
+            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+            <div>22 June 2026</div>
+            <div style="margin-top:10px;">
+              Mark Stevens<br>
+              Property Director, HMCTS<br>
+              Temple Quay House, Bristol BS1
+            </div>
+            <p style="margin-top:12px;">Following an incident notification received on 12 June 2026, CPFSI will be conducting a <span class="conditional">reactive full fire safety audit</span> at Temple Quay House on <span class="conditional">Tuesday 7 July 2026 at 10:00</span>. We anticipate the visit will take half a day.</p>
+            <p>Please ensure that representatives from <span class="conditional">HMCTS, Equans, and The Property Directorate</span> are available, along with relevant fire safety documentation and access to all premises areas.</p>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn">Edit letter</button>
+            <button class="btn">Preview as PDF</button>
+            <span style="font-size:11px;color:var(--ink-3);align-self:center;margin-left:auto;">Templates are <a>admin-editable in config</a>, no developer needed.</span>
+          </div>
+        </div>
+
+        <!-- Final actions -->
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+          <button class="btn">Save as draft</button>
+          <button class="btn primary" onclick="show('audit')">Start audit and send appointment letter →</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: live summary -->
+      <div>
+        <div class="summary-card">
+          <h3>Summary</h3>
+          <div class="row"><span class="k">Trigger</span><span class="v">Reactive (CPIN)</span></div>
+          <div class="row"><span class="k">Premises</span><span class="v">Temple Quay House</span></div>
+          <div class="row"><span class="k">Audit type</span><span class="v">Full</span></div>
+          <div class="row"><span class="k">Question set</span><span class="v">Govt office, full</span></div>
+          <div class="row"><span class="k">Lead inspector</span><span class="v">Phil Gower</span></div>
+          <div class="row"><span class="k">Other inspectors</span><span class="v pending">none</span></div>
+          <div class="row"><span class="k">Duty Holders</span><span class="v">3</span></div>
+          <div class="row"><span class="k">Responsible Persons</span><span class="v">2</span></div>
+          <div class="row"><span class="k">Appointment</span><span class="v">Tue 7 Jul, 10:00</span></div>
+
+          <h3 style="margin-top:16px;">When you start</h3>
+          <div class="check-row"><span class="tick">✓</span>Audit record A-2026-0314 created</div>
+          <div class="check-row"><span class="tick">✓</span>Appointment letter sent to all Duty Holders</div>
+          <div class="check-row"><span class="tick">✓</span>Calendar event pushed to your Outlook</div>
+          <div class="check-row"><span class="tick">✓</span>CPIN-2026-0418 linked to this audit</div>
+          <div class="check-row"><span class="tick">✓</span>Question set loaded for Stage 2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      <strong>Pattern notes.</strong> The whole of Becky's Stage 1 is on a single page rather than a wizard. Six small sections, all pre-filled from context where possible, in a logical top-to-bottom order. The live summary on the right shows what will happen when you start; it removes the "what just happened" surprise that today's system frequently produces.
+
+      Three deliberate behaviours: (1) Duty Holders are pre-suggested from the premises but never silently pre-filled into the audit, because who is responsible on the day can change. (2) The appointment letter is generated using conditional text driven by the choices above; if you switch audit type or change Duty Holders, it updates. (3) The Outlook calendar push is the system honouring the team's existing diary habit, rather than reinventing it.
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
+     + NEW QUICK-CREATE MODAL
+     Everything CPFSI can create themselves. CPINs are excluded
+     because they're submitted by Fire & Rescue Services through
+     the external form, not created from inside the system.
+========================================================= -->
+<div id="new-modal" class="modal-backdrop" onclick="if(event.target===this) closeNewModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2>Create</h2>
+        <div class="sub">Pick what you want to start. Each one opens with the relevant context pre-filled where possible.</div>
+      </div>
+      <button class="modal-close" onclick="closeNewModal()" title="Close (Esc)">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Start a process -->
+      <div class="modal-group">
+        <div class="modal-group-label">Start a process</div>
+        <div class="modal-grid">
+          <button class="new-option" onclick="closeNewModal();show('auditsetup');">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7.5L8 10L12.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Audit  ·  proactive</div>
+              <div class="desc">Routine inspection of a premises on the RBIP. Reactive audits start from a CPIN or Concern.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L1.5 15.5H16.5L9 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 7V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="12.5" r="0.8" fill="currentColor"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Safety concern</div>
+              <div class="desc">Log a hazard reported by a union, fire service, or other party. Triage and escalate if needed.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="6" cy="6.5" r="2.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 14C1.5 11.79 3.5 10 6 10C8.5 10 10.5 11.79 10.5 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10.5 12C10.5 10.62 11.79 9.5 13 9.5C14.5 9.5 16 10.62 16 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Business support meeting</div>
+              <div class="desc">Log a meeting or advice given to a premises. Captures notes, time and outcomes in one record.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 2.5H10.5L14.5 6.5V15.5H3.5V2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10.5 2.5V6.5H14.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 9.5H12M6 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Building Control Consultation</div>
+              <div class="desc">Set up a new consultation with a 15-day SLA. Documents linked from SharePoint.</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Add a record -->
+      <div class="modal-group">
+        <div class="modal-group-label">Add a record</div>
+        <div class="modal-grid">
+          <button class="new-option" onclick="closeNewModal();show('premises');">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2.5 15.5V7L9 2.5L15.5 7V15.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M2.5 15.5H15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 15.5V10.5H11V15.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Premises</div>
+              <div class="desc">Add a new building to the estate. Address, type, government department, fire safety features.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="3" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 7H12M6 9.5H12M6 12H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Duty Holder</div>
+              <div class="desc">Add an organisation responsible for fire safety at one or more premises (e.g. an FM company).</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6.5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 16C2.5 12.5 5.5 11 9 11C12.5 11 15.5 12.5 15.5 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Responsible Person</div>
+              <div class="desc">Add a named individual within a Duty Holder organisation. Role editable once, reflected everywhere.</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Other -->
+      <div class="modal-group">
+        <div class="modal-group-label">Other</div>
+        <div class="modal-grid">
+          <button class="new-option" onclick="closeNewModal();show('time');">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 5.5V9L11.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Log time</div>
+              <div class="desc">Against a premises, a process you have open, or as general admin time.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();show('reports');">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="3" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 12V8M9 12V6M12 12V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Custom report</div>
+              <div class="desc">Build a report by date range, department, type or status. Templated reports already exist.</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      Looking for CPINs? They come in automatically from Fire &amp; Rescue Services through the external incident form, so are never created from here. <a onclick="closeNewModal();show('cpins');">Open the CPIN triage queue</a>.
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------------------------------------------------------
+  // Navigation. Hash-based routing so the browser's back and
+  // forward buttons work naturally, plus an in-UI back arrow
+  // for people who don't think to use them. URLs become
+  // shareable, e.g. ...prototype.html#audit opens that screen.
+  // ---------------------------------------------------------
+
+  function show(id) {
+    // Setting the hash creates a real browser history entry,
+    // which is what makes Back / Forward work. The hashchange
+    // listener does the actual rendering.
+    if (window.location.hash !== '#' + id) {
+      window.location.hash = id;
+    } else {
+      render(id);
+    }
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+
+  function render(id) {
+    if (!document.getElementById(id)) return; // unknown screen
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+
+    // Show/hide topbar and phase banner based on whether we're on login
+    const topbar = document.getElementById('topbar');
+    const phase = document.getElementById('phase-banner');
+    if (id === 'login') {
+      topbar.style.display = 'none';
+      if (phase) phase.classList.remove('show');
+    } else {
+      topbar.style.display = 'flex';
+      if (phase) phase.classList.add('show');
+    }
+
+    // Update active nav
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    const navMap = {
+      dashboard: 'nav-dashboard',
+      premises: 'nav-premises',
+      premisesdetail: 'nav-premises',
+      audit: 'nav-processes',
+      auditsetup: 'nav-processes',
+      processes: 'nav-processes',
+      cpins: 'nav-cpins',
+      reports: 'nav-reports',
+      time: 'nav-dashboard'
+    };
+    const navId = navMap[id];
+    if (navId) document.getElementById(navId).classList.add('active');
+
+    window.scrollTo(0, 0);
+  }
+
+  // Listen for hash changes (covers browser back, forward, and
+  // direct link / paste of a #screen URL).
+  window.addEventListener('hashchange', () => {
+    const id = (window.location.hash || '#login').slice(1);
+    render(id);
+  });
+
+  // Initial load: respect the hash if there is one, else login.
+  window.addEventListener('load', () => {
+    const id = (window.location.hash || '#login').slice(1);
+    render(id);
+  });
+
+  // ---------------------------------------------------------
+  // Close-all-green-CPINs behaviour. Toggles state on both
+  // the CPINs triage screen and the dashboard tile, so the
+  // change is consistent wherever you happen to be looking.
+  // ---------------------------------------------------------
+  let greenClosed = false;
+
+  function closeAllGreen() {
+    greenClosed = true;
+    applyGreenState();
+  }
+  function restoreGreen() {
+    greenClosed = false;
+    applyGreenState();
+  }
+  function applyGreenState() {
+    // CPINs triage screen
+    const section = document.getElementById('green-section');
+    const empty = document.getElementById('green-empty');
+    if (section && empty) {
+      section.style.display = greenClosed ? 'none' : '';
+      empty.style.display = greenClosed ? '' : 'none';
+    }
+
+    // Dashboard tile
+    const tile = document.getElementById('dash-green-tile');
+    const count = document.getElementById('dash-green-count');
+    const sub = document.getElementById('dash-green-sub');
+    const closeBar = document.getElementById('dash-close-all');
+    const closeCopy = document.getElementById('dash-close-copy');
+    const closeBtn = document.getElementById('dash-close-btn');
+    const meta = document.getElementById('dash-cpin-meta');
+    if (greenClosed) {
+      if (tile) tile.classList.add('closed');
+      if (count) count.textContent = '0';
+      if (sub) sub.textContent = 'All closed today';
+      if (closeBar) closeBar.classList.add('done');
+      if (closeCopy) closeCopy.innerHTML = '<strong>4 Green CPINs closed</strong>  ·  templated note added';
+      if (closeBtn) {
+        closeBtn.textContent = 'Undo';
+        closeBtn.onclick = (e) => { e.stopPropagation(); restoreGreen(); };
+        closeBtn.style.background = 'var(--ink-3)';
+      }
+      if (meta) meta.textContent = '3 to action  ·  3 unassigned';
+    } else {
+      if (tile) tile.classList.remove('closed');
+      if (count) count.textContent = '4';
+      if (sub) sub.textContent = 'No action needed';
+      if (closeBar) closeBar.classList.remove('done');
+      if (closeCopy) closeCopy.textContent = '4 Green CPINs ready to close';
+      if (closeBtn) {
+        closeBtn.textContent = 'Close all  ✓';
+        closeBtn.onclick = (e) => { e.stopPropagation(); closeAllGreen(); };
+        closeBtn.style.background = 'var(--green)';
+      }
+      if (meta) meta.textContent = '7 to action  ·  3 unassigned';
+    }
+  }
+
+  // ---------------------------------------------------------
+  // + New modal
+  // ---------------------------------------------------------
+  function openNewModal() {
+    document.getElementById('new-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeNewModal() {
+    document.getElementById('new-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  // Esc closes the modal. 'n' opens it (consistent with the
+  // strategy doc's suggested keyboard shortcut).
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeNewModal();
+    if (e.key === 'n' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+      const onLogin = document.getElementById('login').classList.contains('active');
+      if (!onLogin) {
+        e.preventDefault();
+        openNewModal();
+      }
+    }
+  });
+
+  // ---------------------------------------------------------
+  // Audit appointment date helper - shows the day name and a
+  // working-days-away count when the date changes.
+  // ---------------------------------------------------------
+  function updateApptHelper() {
+    const input = document.getElementById('apt-date');
+    const helper = document.getElementById('apt-date-helper');
+    if (!input || !helper) return;
+    const d = new Date(input.value);
+    if (isNaN(d)) return;
+    const day = d.toLocaleDateString('en-GB', { weekday: 'long' });
+    // Working days from a notional "today" of 22 June 2026
+    const today = new Date('2026-06-22');
+    const diffDays = Math.round((d - today) / (1000 * 60 * 60 * 24));
+    // Rough working-days estimate
+    const workingDays = Math.max(0, Math.floor(diffDays * 5 / 7));
+    helper.innerHTML = '<strong>' + day + '</strong>  ·  ' + workingDays + ' working days from today  ·  no Outlook conflicts';
+  }
+</script>
+
+</body>
+</html>
