@@ -773,24 +773,6 @@
   .cpin-mini.red .lead .dot { background: var(--red); }
   .cpin-mini.amber .lead .dot { background: var(--amber); }
   .cpin-mini .when { color: var(--ink-3); font-size: 11px; }
-  .close-all {
-    margin-top: 10px;
-    padding: 10px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .close-all .copy { font-size: 12px; color: var(--green); font-weight: 500; }
-  .close-all button {
-    background: var(--green);
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-
   /* ---------- Time logging ---------- */
   .time-week {
     background: var(--surface);
@@ -1061,7 +1043,6 @@
   }
   .cpin-tile.green.closed .lbl, .cpin-tile.green.closed .big { color: var(--ink-3); }
   .cpin-tile.green.closed .lbl .dot { background: var(--ink-3); }
-  .close-all.done .copy { color: var(--ink-3); }
   .quick-log .submit {
     background: var(--gov-green);
     color: white;
@@ -1478,10 +1459,6 @@
           <span class="when">12 Jun</span>
         </div>
 
-        <div class="close-all" id="dash-close-all" onclick="event.stopPropagation();">
-          <div class="copy" id="dash-close-copy">4 Green CPINs ready to close</div>
-          <button id="dash-close-btn" onclick="event.stopPropagation();closeAllGreen();">Close all  ✓</button>
-        </div>
       </div>
 
       <!-- TOP RIGHT: This week -->
@@ -3019,9 +2996,8 @@
   });
 
   // ---------------------------------------------------------
-  // Close-all-green-CPINs behaviour. Toggles state on both
-  // the CPINs triage screen and the dashboard tile, so the
-  // change is consistent wherever you happen to be looking.
+  // Close-all-green-CPINs behaviour (CPINs triage screen). Updates
+  // the dashboard green tile when closed so counts stay in sync.
   // ---------------------------------------------------------
   let greenClosed = false;
 
@@ -3046,33 +3022,16 @@
     const tile = document.getElementById('dash-green-tile');
     const count = document.getElementById('dash-green-count');
     const sub = document.getElementById('dash-green-sub');
-    const closeBar = document.getElementById('dash-close-all');
-    const closeCopy = document.getElementById('dash-close-copy');
-    const closeBtn = document.getElementById('dash-close-btn');
     const meta = document.getElementById('dash-cpin-meta');
     if (greenClosed) {
       if (tile) tile.classList.add('closed');
       if (count) count.textContent = '0';
       if (sub) sub.textContent = 'All closed today';
-      if (closeBar) closeBar.classList.add('done');
-      if (closeCopy) closeCopy.innerHTML = '<strong>4 Green CPINs closed</strong>  ·  templated note added';
-      if (closeBtn) {
-        closeBtn.textContent = 'Undo';
-        closeBtn.onclick = (e) => { e.stopPropagation(); restoreGreen(); };
-        closeBtn.style.background = 'var(--ink-3)';
-      }
       if (meta) meta.textContent = '3 to action  ·  3 unassigned';
     } else {
       if (tile) tile.classList.remove('closed');
       if (count) count.textContent = '4';
       if (sub) sub.textContent = 'No action needed';
-      if (closeBar) closeBar.classList.remove('done');
-      if (closeCopy) closeCopy.textContent = '4 Green CPINs ready to close';
-      if (closeBtn) {
-        closeBtn.textContent = 'Close all  ✓';
-        closeBtn.onclick = (e) => { e.stopPropagation(); closeAllGreen(); };
-        closeBtn.style.background = 'var(--green)';
-      }
       if (meta) meta.textContent = '7 to action  ·  3 unassigned';
     }
   }
