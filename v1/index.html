@@ -2939,6 +2939,11 @@
   }
 
   function signInWithMicrosoft() {
+    if (isAuthenticated()) {
+      show('dashboard');
+      return;
+    }
+
     const entered = window.prompt('Enter prototype password');
     if (entered === null) return; // user cancelled
 
