@@ -1362,7 +1362,7 @@
       <div style="font-weight:700;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:32px;">CPFSI</div>
       <h1>Sign in to the Fire Safety MIS</h1>
       <div class="sub">Use your CPFSI Microsoft account.</div>
-      <button class="ms-btn" onclick="show('dashboard')">
+      <button class="ms-btn" onclick="signInWithMicrosoft()">
         <span class="ms-logo"><div></div><div></div><div></div><div></div></span>
         Sign in with Microsoft
       </button>
@@ -2931,7 +2931,31 @@
   // shareable, e.g. ...prototype.html#audit opens that screen.
   // ---------------------------------------------------------
 
+  const PROTOTYPE_PASSWORD = 'fireservicemis';
+  const AUTH_STORAGE_KEY = 'prototype-authenticated';
+
+  function isAuthenticated() {
+    return sessionStorage.getItem(AUTH_STORAGE_KEY) === 'true';
+  }
+
+  function signInWithMicrosoft() {
+    const entered = window.prompt('Enter prototype password');
+    if (entered === null) return; // user cancelled
+
+    if (entered === PROTOTYPE_PASSWORD) {
+      sessionStorage.setItem(AUTH_STORAGE_KEY, 'true');
+      show('dashboard');
+      return;
+    }
+
+    window.alert('Incorrect password.');
+  }
+
   function show(id) {
+    if (id !== 'login' && !isAuthenticated()) {
+      id = 'login';
+    }
+
     // Setting the hash creates a real browser history entry,
     // which is what makes Back / Forward work. The hashchange
     // listener does the actual rendering.
@@ -2985,13 +3009,19 @@
   // Listen for hash changes (covers browser back, forward, and
   // direct link / paste of a #screen URL).
   window.addEventListener('hashchange', () => {
-    const id = (window.location.hash || '#login').slice(1);
+    let id = (window.location.hash || '#login').slice(1);
+    if (id !== 'login' && !isAuthenticated()) {
+      id = 'login';
+    }
     render(id);
   });
 
   // Initial load: respect the hash if there is one, else login.
   window.addEventListener('load', () => {
-    const id = (window.location.hash || '#login').slice(1);
+    let id = (window.location.hash || '#login').slice(1);
+    if (id !== 'login' && !isAuthenticated()) {
+      id = 'login';
+    }
     render(id);
   });
 
