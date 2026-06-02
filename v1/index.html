@@ -2935,7 +2935,7 @@
   const AUTH_STORAGE_KEY = 'prototype-authenticated';
 
   function isAuthenticated() {
-    return sessionStorage.getItem(AUTH_STORAGE_KEY) === 'true';
+    return localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
   }
 
   function signInWithMicrosoft() {
@@ -2943,7 +2943,7 @@
     if (entered === null) return; // user cancelled
 
     if (entered === PROTOTYPE_PASSWORD) {
-      sessionStorage.setItem(AUTH_STORAGE_KEY, 'true');
+      localStorage.setItem(AUTH_STORAGE_KEY, 'true');
       show('dashboard');
       return;
     }
