@@ -365,7 +365,134 @@
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--line-2);
+    flex-wrap: wrap;
   }
+  .audit-panel[hidden] { display: none; }
+  .dh-progress {
+    font-size: 12px;
+    color: var(--ink-2);
+    margin-bottom: 10px;
+  }
+  .dh-progress .bar {
+    height: 6px;
+    background: var(--line-2);
+    border-radius: 3px;
+    margin: 8px 0 10px;
+    overflow: hidden;
+  }
+  .dh-progress .bar > div {
+    height: 100%;
+    width: 66%;
+    background: var(--green);
+    border-radius: 3px;
+  }
+  .dh-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line-2);
+    font-size: 12px;
+  }
+  .dh-status-row:last-child { border-bottom: none; }
+  .score-rollup {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .score-box {
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+  }
+  .score-box .lbl { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .score-box .val { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .score-box .delta { font-size: 12px; color: var(--red); font-weight: 600; }
+  .outcome-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  .outcome-table th, .outcome-table td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .outcome-table th { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .plan-thread {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    background: #fdfdfc;
+  }
+  .plan-thread .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .plan-thread .head .name { font-weight: 600; }
+  .plan-thread .steps {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 8px;
+  }
+  .plan-thread .steps span.done { color: var(--green); }
+  .plan-thread .steps span.current { color: var(--accent); font-weight: 600; }
+  .info-banner {
+    padding: 10px 12px;
+    background: var(--amber-soft);
+    border: 1px solid var(--amber-soft);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+  .success-banner {
+    padding: 10px 12px;
+    background: var(--green-soft);
+    border: 1px solid var(--green-soft);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--green);
+    margin-top: 10px;
+  }
+  .add-finding-btn {
+    text-align: center;
+    padding: 12px;
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    color: var(--ink-3);
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .add-finding-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .add-finding-form {
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: var(--accent-soft);
+  }
+  .add-finding-form h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .add-finding-form .field-row { margin-bottom: 10px; }
+  .finding .remove-finding {
+    float: right;
+    font-size: 12px;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-weight: 400;
+  }
+  .finding .remove-finding:hover { color: var(--red); }
   .btn {
     padding: 8px 14px;
     border-radius: 6px;
@@ -1758,9 +1885,9 @@
     <div style="display:flex;justify-content:space-between;align-items:baseline;">
       <div>
         <h1>Audit  ·  A-2026-0314</h1>
-        <div class="meta">
-          <span class="pill blue">In progress</span>
-          &nbsp;Stage 2 of 6  ·  Reactive  ·  Triggered by <a>CPIN-2026-0418</a>  ·  Lead inspector: <strong>Phil Gower</strong>
+        <div class="meta" id="audit-stage-meta">
+          <span class="pill blue">Open</span>
+          &nbsp;Stage 2 of 6  ·  Site visit and assessment  ·  Reactive  ·  Triggered by <a>CPIN-2026-0418</a>  ·  Lead inspector: <strong>Phil Gower</strong>
         </div>
       </div>
       <button class="btn">⋯ Process options</button>
@@ -1768,89 +1895,345 @@
 
     <div class="process-grid">
       <!-- Stage rail -->
-      <div class="stage-rail">
-        <div class="stage done">Setup pre-audit</div>
-        <div class="stage current">Site visit and assessment</div>
-        <div class="stage future">Scoring and enforcement</div>
-        <div class="stage future">Outcomes and letters</div>
-        <div class="stage future">Action plans / Follow-up</div>
-        <div class="stage future">Close</div>
+      <div class="stage-rail" id="audit-stage-rail">
+        <div class="stage" data-audit-stage="1" onclick="setAuditStage(1)">Setup pre-audit</div>
+        <div class="stage" data-audit-stage="2" onclick="setAuditStage(2)">Site visit and assessment</div>
+        <div class="stage" data-audit-stage="3" onclick="setAuditStage(3)">Scoring and enforcement</div>
+        <div class="stage" data-audit-stage="4" onclick="setAuditStage(4)">Outcomes and letters</div>
+        <div class="stage" data-audit-stage="5" onclick="setAuditStage(5)">Action plans</div>
+        <div class="stage" data-audit-stage="6" onclick="setAuditStage(6)">Close</div>
 
         <div style="margin-top:16px;padding:10px 12px;font-size:11px;color:var(--ink-3);">
-          Each stage carries its own notes, files and time. Activity feeds into one log against this audit.
+          Log calls, emails and time at any point via Activity below. Not a stage — available throughout.
         </div>
       </div>
 
       <!-- Stage content -->
-      <div class="stage-content">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <h2 style="margin:0;">Site visit and assessment</h2>
-          <span style="font-size:12px;color:var(--ink-3);">Tracker brought inside the system</span>
-        </div>
-        <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">
-          Score each article against the three categories: General Fire Precautions (GFP), Fire Safety Management (FSM), Fire Safety Maintenance (FSM). Add specific examples you saw. Attribute findings to the responsible Duty Holder. Templates and wording are <a>editable in config</a> by Steve or Phil; no developer needed.
-        </div>
+      <div class="stage-content" id="audit-stage-content">
 
-        <div class="finding">
-          <div class="article">Article 7  ·  Fire detection and warning</div>
-          <div style="font-size:12px;color:var(--ink-3);">Category: Fire Safety Maintenance</div>
-          <div class="scores">
-            <button class="score-btn">0</button>
-            <button class="score-btn">1</button>
-            <button class="score-btn selected">2</button>
-            <button class="score-btn">3</button>
-            <button class="score-btn">4</button>
-            <button class="score-btn">5</button>
-            <button class="score-btn">6</button>
+        <!-- Stage 1: Setup (completed on auditsetup) -->
+        <div class="audit-panel" id="audit-panel-1" hidden>
+          <h2 style="margin:0;">Setup pre-audit</h2>
+          <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">Completed 22 June 2026. Process created, anchored to premises, appointment letter sent.</div>
+          <div class="summary-card" style="position:static;margin:0;">
+            <div class="row"><span class="k">Status</span><span class="v">Open</span></div>
+            <div class="row"><span class="k">Trigger</span><span class="v">Reactive (CPIN-2026-0418)</span></div>
+            <div class="row"><span class="k">Audit type</span><span class="v">Full</span></div>
+            <div class="row"><span class="k">Question set</span><span class="v">Government office, full</span></div>
+            <div class="row"><span class="k">Lead inspector</span><span class="v">Phil Gower</span></div>
+            <div class="row"><span class="k">Duty Holders</span><span class="v">HMCTS, Equans, The Property Directorate</span></div>
+            <div class="row"><span class="k">Appointment</span><span class="v">Tue 7 Jul 2026, 10:00</span></div>
+            <div class="row"><span class="k">Appointment letter</span><span class="v">Sent to all Duty Holders</span></div>
           </div>
-          <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
-          <div style="margin:4px 0 6px;">
-            <span class="pill amber">Fire door defects</span>
-          </div>
-          <div class="example">
-            <strong>Example seen:</strong> Two fire door closers missing on first-floor corridor (rooms 103, 107). Cold-smoke seal damaged on door 109.
-          </div>
-          <div class="attribution">
-            Attributed to:
-            <span>Equans (FM)</span>
+          <div class="stage-actions">
+            <button class="btn" onclick="show('auditsetup')">View setup</button>
+            <button class="btn primary" onclick="setAuditStage(2)">Continue to site visit →</button>
           </div>
         </div>
 
-        <div class="finding">
-          <div class="article">Article 13  ·  Means of escape</div>
-          <div style="font-size:12px;color:var(--ink-3);">Category: General Fire Precautions</div>
-          <div class="scores">
-            <button class="score-btn">0</button>
-            <button class="score-btn selected">1</button>
-            <button class="score-btn">2</button>
-            <button class="score-btn">3</button>
-            <button class="score-btn">4</button>
-            <button class="score-btn">5</button>
-            <button class="score-btn">6</button>
+        <!-- Stage 2: Site visit and assessment -->
+        <div class="audit-panel" id="audit-panel-2">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <h2 style="margin:0;">Site visit and assessment</h2>
+            <span style="font-size:12px;color:var(--ink-3);">Full audit  ·  On-site</span>
           </div>
-          <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
-          <div style="margin:4px 0 6px;">
-            <span class="pill amber">Obstructed escape route</span>
+          <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">
+            Attend site. Assess against articles in three categories: General Fire Precautions, Fire Safety Management, Fire Safety Maintenance. Score 0–6 per article; record failings, examples and Duty Holder attribution. Enter findings once back in the office — replaces the external Excel tracker.
           </div>
-          <div class="example">
-            <strong>Example seen:</strong> Office furniture stored in the rear escape stairwell. Plan in place to clear within 14 days.
+
+          <div id="audit-findings-list">
+          <div class="finding">
+            <div class="article">Article 7  ·  Fire detection and warning</div>
+            <div style="font-size:12px;color:var(--ink-3);">Category: Fire Safety Maintenance</div>
+            <div class="scores">
+              <button class="score-btn">0</button>
+              <button class="score-btn">1</button>
+              <button class="score-btn selected">2</button>
+              <button class="score-btn">3</button>
+              <button class="score-btn">4</button>
+              <button class="score-btn">5</button>
+              <button class="score-btn">6</button>
+            </div>
+            <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
+            <div style="margin:4px 0 6px;"><span class="pill amber">Fire door defects</span></div>
+            <div class="example"><strong>Example seen:</strong> Two fire door closers missing on first-floor corridor (rooms 103, 107). Cold-smoke seal damaged on door 109.</div>
+            <div class="attribution">Attributed to: <span>Equans (FM)</span></div>
           </div>
-          <div class="attribution">
-            Attributed to:
-            <span>HMCTS</span>
-            <span>+ add another</span>
+
+          <div class="finding">
+            <div class="article">Article 13  ·  Means of escape</div>
+            <div style="font-size:12px;color:var(--ink-3);">Category: General Fire Precautions</div>
+            <div class="scores">
+              <button class="score-btn">0</button>
+              <button class="score-btn selected">1</button>
+              <button class="score-btn">2</button>
+              <button class="score-btn">3</button>
+              <button class="score-btn">4</button>
+              <button class="score-btn">5</button>
+              <button class="score-btn">6</button>
+            </div>
+            <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
+            <div style="margin:4px 0 6px;"><span class="pill amber">Obstructed escape route</span></div>
+            <div class="example"><strong>Example seen:</strong> Office furniture stored in the rear escape stairwell.</div>
+            <div class="attribution">Attributed to: <span>HMCTS</span><span>+ add another</span></div>
+          </div>
+          </div>
+
+          <div class="add-finding-btn" id="audit-add-finding-btn" onclick="toggleAddFindingForm(true)">+ Add finding  ·  manually add failings spotted on site</div>
+
+          <div class="add-finding-form" id="audit-add-finding-form" hidden>
+            <h3>Add a finding</h3>
+            <div class="field-row">
+              <div class="field">
+                <label>Article</label>
+                <select id="new-finding-article">
+                  <option value="5">Article 5  ·  Emergency routes and exits</option>
+                  <option value="11">Article 11  ·  Fire-fighting equipment</option>
+                  <option value="14">Article 14  ·  Emergency lighting</option>
+                  <option value="17">Article 17  ·  Maintenance of facilities</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Category</label>
+                <select id="new-finding-category">
+                  <option>General Fire Precautions</option>
+                  <option>Fire Safety Management</option>
+                  <option selected>Fire Safety Maintenance</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Score (0 = no issue, 6 = serious)</label>
+                <select id="new-finding-score">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Failure type</label>
+                <input type="text" id="new-finding-type" placeholder="e.g. Emergency lighting failure" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Example seen</label>
+              <textarea id="new-finding-example" rows="2" placeholder="What you observed on site…"></textarea>
+            </div>
+            <div class="field">
+              <label>Attributed to</label>
+              <select id="new-finding-dh">
+                <option>HMCTS</option>
+                <option>Equans (FM)</option>
+                <option>The Property Directorate</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn primary" type="button" onclick="saveNewFinding()">Add finding</button>
+              <button class="btn" type="button" onclick="toggleAddFindingForm(false)">Cancel</button>
+            </div>
+          </div>
+
+          <div class="info-banner" id="audit-awaiting-banner" hidden>
+            <strong>Awaiting information.</strong> Process paused until Duty Holder responds. Article 27 formal request available if they do not cooperate (14-day deadline).
+          </div>
+
+          <div class="stage-actions">
+            <button class="btn">Save draft</button>
+            <button class="btn" onclick="document.getElementById('audit-awaiting-banner').hidden=false">Request more info (Article 27)</button>
+            <button class="btn primary" onclick="setAuditStage(3)">Mark stage complete →</button>
           </div>
         </div>
 
-        <div style="text-align:center;padding:12px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:13px;cursor:pointer;">
-          + Add finding
+        <!-- Stage 3: Scoring and enforcement decision -->
+        <div class="audit-panel" id="audit-panel-3" hidden>
+          <h2 style="margin:0;">Scoring and enforcement decision</h2>
+          <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">
+            Attribute failings to Duty Holders. Roll up the premises score. Record EMM dialogue. Determine one outcome per Duty Holder — the audit has no single outcome.
+          </div>
+
+          <div class="score-rollup">
+            <div class="score-box">
+              <div class="lbl">Previous score</div>
+              <div class="val">47</div>
+            </div>
+            <div class="score-box">
+              <div class="lbl">Current score</div>
+              <div class="val" style="color:var(--red);">52</div>
+              <div class="delta">+5 from audit findings</div>
+            </div>
+            <div class="score-box">
+              <div class="lbl">Static baseline</div>
+              <div class="val" style="font-size:16px;">Govt office</div>
+              <div style="font-size:11px;color:var(--ink-3);margin-top:4px;">Building type + features</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin-bottom:6px;">Outcome per Duty Holder</div>
+          <table class="outcome-table">
+            <thead>
+              <tr><th>Duty Holder</th><th>Failings</th><th>Outcome</th><th>Follow-up?</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>HMCTS</strong></td>
+                <td>Article 13 (score 1)</td>
+                <td><span class="pill amber">28-day Action Plan</span></td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Equans</strong></td>
+                <td>Article 7 (score 2)</td>
+                <td><span class="pill amber">28-day Action Plan</span></td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><strong>The Property Directorate</strong></td>
+                <td>None attributed</td>
+                <td><span class="pill green">Generally Suitable &amp; Sufficient</span></td>
+                <td>No</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="field" style="margin-top:12px;">
+            <label>EMM (Enforcement management dialogue)</label>
+            <textarea rows="2" placeholder="Log the enforcement management discussion…">Discussed with line manager. 28-DAP appropriate for HMCTS and Equans given severity. Property Directorate — no failings attributed.</textarea>
+          </div>
+
+          <div class="stage-actions">
+            <button class="btn">Save draft</button>
+            <button class="btn primary" onclick="setAuditStage(4)">Confirm outcomes →</button>
+          </div>
         </div>
 
-        <div class="stage-actions">
-          <button class="btn">Save draft</button>
-          <button class="btn">Request more info (Article 27)</button>
-          <button class="btn primary">Mark stage complete →</button>
+        <!-- Stage 4: Outcomes and letters -->
+        <div class="audit-panel" id="audit-panel-4" hidden>
+          <h2 style="margin:0;">Outcomes and letters</h2>
+          <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">
+            One letter per Duty Holder, generated inside this process. Smart templates pull only failings attributed to each party. Review, edit, then finalise and send — the sent version is saved, not the blank template.
+          </div>
+
+          <div class="letter-tabs" id="audit-letter-tabs">
+            <button class="letter-tab active" data-letter="hmcts" onclick="switchAuditLetter('hmcts')">HMCTS  ·  28-DAP</button>
+            <button class="letter-tab" data-letter="equans" onclick="switchAuditLetter('equans')">Equans  ·  28-DAP</button>
+            <button class="letter-tab" data-letter="propdir" onclick="switchAuditLetter('propdir')">Property Directorate  ·  GSS</button>
+          </div>
+
+          <div class="letter-preview" id="audit-letter-hmcts">
+            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+            <div>22 June 2026</div>
+            <div style="margin-top:12px;">Mark Stevens<br>Property Director<br>HMCTS<br>Temple Quay House, Bristol BS1</div>
+            <div style="margin-top:16px;font-weight:600;">28-Day Action Plan</div>
+            <p>Following the fire safety audit conducted at Temple Quay House on 22 June 2026, I am writing to require an action plan from HMCTS in respect of the following deficiencies.</p>
+            <p><span class="conditional">Article 13, Means of escape.</span> The escape route in the rear stairwell was found to be obstructed by office furniture. HMCTS must produce, within twenty-eight (28) days, a plan for restoring and maintaining the means of escape.</p>
+          </div>
+          <div class="letter-preview" id="audit-letter-equans" hidden>
+            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+            <div>22 June 2026</div>
+            <div style="margin-top:12px;">Sarah Patel<br>Maintenance Lead<br>Equans<br>Temple Quay House, Bristol BS1</div>
+            <div style="margin-top:16px;font-weight:600;">28-Day Action Plan</div>
+            <p>Following the fire safety audit, I am writing to require an action plan from Equans in respect of the following deficiencies.</p>
+            <p><span class="conditional">Article 7, Fire detection and warning.</span> Two fire door closers missing on the first-floor corridor. Equans must produce, within twenty-eight (28) days, a plan for remedying these defects.</p>
+          </div>
+          <div class="letter-preview" id="audit-letter-propdir" hidden>
+            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+            <div>22 June 2026</div>
+            <div style="margin-top:12px;">The Property Directorate<br>Temple Quay House, Bristol BS1</div>
+            <div style="margin-top:16px;font-weight:600;">Generally Suitable and Sufficient</div>
+            <p>Following the fire safety audit conducted at Temple Quay House on 22 June 2026, I am pleased to confirm that no deficiencies were attributed to The Property Directorate. The premises fire safety arrangements for which you are responsible were found to be generally suitable and sufficient.</p>
+          </div>
+
+          <div class="stage-actions">
+            <button class="btn">Edit letter</button>
+            <button class="btn">Preview as PDF</button>
+            <button class="btn primary" onclick="setAuditStage(5)">Finalise all three letters and send →</button>
+          </div>
         </div>
+
+        <!-- Stage 5: Action plans (per Duty Holder, in parallel) -->
+        <div class="audit-panel" id="audit-panel-5" hidden>
+          <h2 style="margin:0;">Action plans</h2>
+          <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">
+            Runs once per Duty Holder with a 28-DAP or EN outcome, in parallel. Each thread: receive plan → review → adequate? → satisfactory letter or feedback loop. GSS/NoD Duty Holders are already settled at Stage 4.
+          </div>
+
+          <div class="plan-thread" id="plan-thread-hmcts">
+            <div class="head">
+              <span class="name">HMCTS</span>
+              <span class="pill amber" id="plan-status-hmcts">28-DAP  ·  Under review</span>
+            </div>
+            <div style="font-size:12px;color:var(--ink-2);">Action plan received 18 July 2026. Saved against this process and premises.</div>
+            <div class="steps" id="plan-steps-hmcts">
+              <span class="done">✓ Received</span> →
+              <span class="current">Reviewing adequacy</span> →
+              <span>Satisfactory letter or feedback</span>
+            </div>
+            <div id="plan-actions-hmcts" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn primary" onclick="markPlanAdequate('hmcts')">Mark adequate</button>
+              <button class="btn">Send unsatisfactory feedback</button>
+            </div>
+            <div class="success-banner" id="plan-success-hmcts" hidden>
+              <strong>Plan marked adequate.</strong> Satisfactory action plan letter drafted and ready to send to HMCTS.
+            </div>
+          </div>
+
+          <div class="plan-thread">
+            <div class="head">
+              <span class="name">Equans</span>
+              <span class="pill grey">28-DAP  ·  Awaiting plan</span>
+            </div>
+            <div style="font-size:12px;color:var(--ink-2);">28 days from letter sent: due 19 August 2026.</div>
+            <div class="steps">
+              <span class="current">Awaiting plan</span> →
+              <span>Review</span> →
+              <span>Satisfactory letter or feedback</span>
+            </div>
+          </div>
+
+          <div class="plan-thread" style="opacity:0.7;">
+            <div class="head">
+              <span class="name">The Property Directorate</span>
+              <span class="pill green">GSS  ·  Settled</span>
+            </div>
+            <div style="font-size:12px;color:var(--ink-3);">No follow-up required. Closed at Stage 4.</div>
+          </div>
+
+          <div class="stage-actions">
+            <button class="btn">Schedule follow-up audit</button>
+            <button class="btn primary" onclick="setAuditStage(6)">Mark settled threads complete →</button>
+          </div>
+        </div>
+
+        <!-- Stage 6: Close -->
+        <div class="audit-panel" id="audit-panel-6" hidden>
+          <h2 style="margin:0;">Close</h2>
+          <div style="font-size:13px;color:var(--ink-2);margin:4px 0 16px;">
+            The process closes when every Duty Holder thread is settled. The slowest Duty Holder sets the close date. Time is finalised, scoring attributed, and the process moves to the historical record.
+          </div>
+
+          <div class="dh-progress" id="audit-close-progress">
+            <strong id="audit-close-progress-label">2 of 3 Duty Holders settled</strong>
+            <div class="bar"><div id="audit-close-progress-bar"></div></div>
+            <div class="dh-status-row"><span>The Property Directorate</span><span class="pill green">Settled</span></div>
+            <div class="dh-status-row" id="audit-close-hmcts"><span>HMCTS</span><span class="pill amber">Action plan under review</span></div>
+            <div class="dh-status-row"><span>Equans</span><span class="pill grey">Awaiting action plan</span></div>
+          </div>
+
+          <div class="inset" style="margin:16px 0;" id="audit-close-message">
+            <strong>Not ready to close yet.</strong> HMCTS and Equans still have open 28-DAP threads. Once both are settled (or a follow-up audit is scheduled), you can close this audit. A linked follow-up audit process can be created for Duty Holders who need in-person verification.
+          </div>
+
+          <div class="stage-actions">
+            <button class="btn" disabled title="Waiting on Duty Holder threads">Close audit</button>
+            <button class="btn">Create follow-up audit (linked)</button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Context rail -->
@@ -1862,6 +2245,17 @@
           <div class="row"><span class="k">RBIP score</span><span style="color:var(--red);font-weight:600;">47</span></div>
           <div class="row"><span class="k">Last audit</span><span>Jan 2025</span></div>
           <div class="row"><span class="k">Sprinkler</span><span>Yes</span></div>
+        </div>
+
+        <div class="context-card">
+          <h3>Duty Holder progress</h3>
+          <div class="dh-progress" style="margin:0;" id="audit-context-progress">
+            <strong id="audit-context-progress-label">2 of 3 settled</strong>
+            <div class="bar"><div id="audit-context-progress-bar"></div></div>
+          </div>
+          <div class="dh-status-row"><span>Property Directorate</span><span class="pill green">GSS</span></div>
+          <div class="dh-status-row" id="audit-context-hmcts"><span>HMCTS</span><span class="pill amber">28-DAP</span></div>
+          <div class="dh-status-row"><span>Equans</span><span class="pill amber">28-DAP</span></div>
         </div>
 
         <div class="context-card">
@@ -1887,7 +2281,7 @@
       </div>
     </div>
 
-    <!-- Activity strip -->
+    <!-- Activity strip (available at every stage) -->
     <div class="activity">
       <strong>Activity</strong>
       <span>3 notes</span>
@@ -1897,43 +2291,8 @@
       <button class="btn">+ Add note</button>
     </div>
 
-    <!-- Skipping ahead: a preview of stage 4, smart letters -->
-    <h2 style="margin-top:32px;">A preview of stage 4: Outcomes and letters</h2>
-    <div style="font-size:13px;color:var(--ink-2);margin-bottom:12px;">
-      Once the audit is marked complete, the system drafts a letter for every Duty Holder in one action. No child processes. Each letter only includes the legal text relevant to that Duty Holder's attributed failings. Inspector reviews each in turn, edits inline, then a single Finalise and send saves the actual sent version against the audit and the premises.
-    </div>
-
-    <div class="letter-tabs">
-      <button class="letter-tab active">Letter for HMCTS  ·  28-DAP</button>
-      <button class="letter-tab">Letter for Equans  ·  28-DAP</button>
-      <button class="letter-tab">Letter for The Property Directorate  ·  NoD</button>
-    </div>
-
-    <div class="letter-preview">
-      <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
-      <div>22 June 2026</div>
-      <div style="margin-top:12px;">
-        Mark Stevens<br>
-        Property Director<br>
-        HMCTS<br>
-        Temple Quay House, Temple Back East, Bristol BS1
-      </div>
-      <div style="margin-top:16px;font-weight:600;">28-Day Action Plan</div>
-      <p>Following the fire safety audit conducted at Temple Quay House on 22 June 2026, I am writing to require an action plan from HMCTS in respect of the following deficiencies.</p>
-      <p>
-        <span class="conditional">Article 13, Means of escape.</span> The escape route in the rear stairwell was found to be obstructed by office furniture. HMCTS must produce, within twenty-eight (28) days, a plan for restoring and maintaining the means of escape, in accordance with Article 13 of the Regulatory Reform (Fire Safety) Order 2005.
-      </p>
-      <p style="color:var(--ink-3);font-size:12px;">Highlighted text is conditional - included only because Article 13 was attributed to HMCTS in this audit.</p>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-top:16px;">
-      <button class="btn">Edit letter</button>
-      <button class="btn">Preview as PDF</button>
-      <button class="btn primary">Finalise all three letters and send</button>
-    </div>
-
     <div class="footnote">
-      <strong>Pattern note.</strong> This is the design move that retires the "Conga onion": one audit, many Duty Holders, many letters, all held inside the same process. The conditional-text engine pulls only the legal wording relevant to the failings scored against each Duty Holder. The final sent version is what the system saves, not the blank template. Letter templates and conditional rules are admin-editable by Steve, without a developer.
+      <strong>One process, many Duty Holders.</strong> Each Duty Holder has their own outcome and resolution path inside audit A-2026-0314. No child processes for letters. A follow-up audit is a separate linked successor when needed.
     </div>
   </main>
 </div>
@@ -2755,7 +3114,7 @@
         <!-- Final actions -->
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
           <button class="btn">Save as draft</button>
-          <button class="btn primary" onclick="show('audit')">Start audit and send appointment letter →</button>
+          <button class="btn primary" onclick="startAudit()">Start audit and send appointment letter →</button>
         </div>
       </div>
 
@@ -2961,18 +3320,50 @@
       id = 'login';
     }
 
-    // Setting the hash creates a real browser history entry,
-    // which is what makes Back / Forward work. The hashchange
-    // listener does the actual rendering.
-    if (window.location.hash !== '#' + id) {
-      window.location.hash = id;
+    const hash = id === 'audit' ? 'audit-stage-' + auditStage : id;
+
+    if (window.location.hash !== '#' + hash) {
+      window.location.hash = hash;
     } else {
-      render(id);
+      renderFromHash();
     }
   }
 
   function goBack() {
     window.history.back();
+  }
+
+  function parseRoute() {
+    const raw = (window.location.hash || '#login').slice(1);
+    const auditMatch = raw.match(/^audit-stage-([1-6])$/);
+    if (auditMatch) {
+      return { screen: 'audit', stage: parseInt(auditMatch[1], 10) };
+    }
+    return { screen: raw, stage: null };
+  }
+
+  function renderFromHash() {
+    let { screen, stage } = parseRoute();
+
+    if (screen !== 'login' && !isAuthenticated()) {
+      screen = 'login';
+      stage = null;
+    }
+
+    // Legacy #audit links redirect to the current stage
+    if (screen === 'audit' && !stage) {
+      window.location.hash = 'audit-stage-' + auditStage;
+      return;
+    }
+
+    if (screen === 'audit' && stage) {
+      auditStage = stage;
+      render(screen);
+      applyAuditStageUI(stage);
+      return;
+    }
+
+    render(screen);
   }
 
   function render(id) {
@@ -3013,22 +3404,180 @@
 
   // Listen for hash changes (covers browser back, forward, and
   // direct link / paste of a #screen URL).
-  window.addEventListener('hashchange', () => {
-    let id = (window.location.hash || '#login').slice(1);
-    if (id !== 'login' && !isAuthenticated()) {
-      id = 'login';
-    }
-    render(id);
-  });
+  window.addEventListener('hashchange', renderFromHash);
 
   // Initial load: respect the hash if there is one, else login.
-  window.addEventListener('load', () => {
-    let id = (window.location.hash || '#login').slice(1);
-    if (id !== 'login' && !isAuthenticated()) {
-      id = 'login';
+  window.addEventListener('load', renderFromHash);
+
+  // ---------------------------------------------------------
+  // Audit process: stage navigation (6-stage lifecycle)
+  // ---------------------------------------------------------
+  const AUDIT_STAGE_NAMES = {
+    1: 'Setup pre-audit',
+    2: 'Site visit and assessment',
+    3: 'Scoring and enforcement',
+    4: 'Outcomes and letters',
+    5: 'Action plans',
+    6: 'Close'
+  };
+  let auditStage = 2;
+  let hmctsPlanSettled = false;
+
+  const ARTICLE_LABELS = {
+    '5': 'Article 5  ·  Emergency routes and exits',
+    '11': 'Article 11  ·  Fire-fighting equipment',
+    '14': 'Article 14  ·  Emergency lighting',
+    '17': 'Article 17  ·  Maintenance of facilities'
+  };
+
+  function startAudit() {
+    auditStage = 2;
+    window.location.hash = 'audit-stage-2';
+  }
+
+  function setAuditStage(n) {
+    auditStage = n;
+    const hash = 'audit-stage-' + n;
+    if (window.location.hash !== '#' + hash) {
+      window.location.hash = hash;
+    } else {
+      applyAuditStageUI(n);
     }
-    render(id);
-  });
+  }
+
+  function applyAuditStageUI(n) {
+    const rail = document.getElementById('audit-stage-rail');
+    if (rail) {
+      rail.querySelectorAll('.stage').forEach(el => {
+        const s = parseInt(el.dataset.auditStage, 10);
+        el.classList.remove('done', 'current', 'future');
+        if (s < n) el.classList.add('done');
+        else if (s === n) el.classList.add('current');
+        else el.classList.add('future');
+      });
+    }
+    for (let i = 1; i <= 6; i++) {
+      const panel = document.getElementById('audit-panel-' + i);
+      if (panel) panel.hidden = (i !== n);
+    }
+    const meta = document.getElementById('audit-stage-meta');
+    if (meta) {
+      meta.innerHTML =
+        '<span class="pill blue">Open</span>' +
+        '&nbsp;Stage ' + n + ' of 6  ·  ' + AUDIT_STAGE_NAMES[n] +
+        '  ·  Reactive  ·  Triggered by <a>CPIN-2026-0418</a>  ·  Lead inspector: <strong>Phil Gower</strong>';
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function toggleAddFindingForm(open) {
+    const form = document.getElementById('audit-add-finding-form');
+    const btn = document.getElementById('audit-add-finding-btn');
+    if (!form || !btn) return;
+    const showForm = typeof open === 'boolean' ? open : form.hidden;
+    form.hidden = !showForm;
+    btn.hidden = showForm;
+    if (showForm) document.getElementById('new-finding-type')?.focus();
+  }
+
+  function saveNewFinding() {
+    const articleKey = document.getElementById('new-finding-article').value;
+    const category = document.getElementById('new-finding-category').value;
+    const score = document.getElementById('new-finding-score').value;
+    const failureType = document.getElementById('new-finding-type').value.trim();
+    const example = document.getElementById('new-finding-example').value.trim();
+    const dutyHolder = document.getElementById('new-finding-dh').value;
+
+    if (!failureType || !example) {
+      window.alert('Please enter a failure type and an example seen.');
+      return;
+    }
+
+    const list = document.getElementById('audit-findings-list');
+    const articleLabel = ARTICLE_LABELS[articleKey] || ('Article ' + articleKey);
+    const pillClass = parseInt(score, 10) >= 4 ? 'red' : 'amber';
+
+    const finding = document.createElement('div');
+    finding.className = 'finding';
+    finding.innerHTML =
+      '<div class="article">' + escHtml(articleLabel) +
+      ' <span class="remove-finding" onclick="this.closest(\'.finding\').remove()">Remove</span></div>' +
+      '<div style="font-size:12px;color:var(--ink-3);">Category: ' + escHtml(category) + '</div>' +
+      '<div class="scores">' +
+      [0,1,2,3,4,5,6].map(s =>
+        '<button class="score-btn' + (s == score ? ' selected' : '') + '">' + s + '</button>'
+      ).join('') +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--ink-3);">Failure type</div>' +
+      '<div style="margin:4px 0 6px;"><span class="pill ' + pillClass + '">' + escHtml(failureType) + '</span></div>' +
+      '<div class="example"><strong>Example seen:</strong> ' + escHtml(example) + '</div>' +
+      '<div class="attribution">Attributed to: <span>' + escHtml(dutyHolder) + '</span></div>';
+
+    list.appendChild(finding);
+
+    document.getElementById('new-finding-type').value = '';
+    document.getElementById('new-finding-example').value = '';
+    toggleAddFindingForm(false);
+  }
+
+  function markPlanAdequate(holder) {
+    if (holder !== 'hmcts' || hmctsPlanSettled) return;
+    hmctsPlanSettled = true;
+
+    const status = document.getElementById('plan-status-hmcts');
+    const steps = document.getElementById('plan-steps-hmcts');
+    const actions = document.getElementById('plan-actions-hmcts');
+    const success = document.getElementById('plan-success-hmcts');
+
+    if (status) {
+      status.className = 'pill green';
+      status.textContent = '28-DAP  ·  Settled';
+    }
+    if (steps) {
+      steps.innerHTML =
+        '<span class="done">✓ Received</span> → ' +
+        '<span class="done">✓ Marked adequate</span> → ' +
+        '<span class="done">✓ Satisfactory letter sent</span>';
+    }
+    if (actions) actions.hidden = true;
+    if (success) success.hidden = false;
+
+    updateDutyHolderProgress();
+  }
+
+  function updateDutyHolderProgress() {
+    const hmctsClose = document.getElementById('audit-close-hmcts');
+    if (hmctsClose) {
+      hmctsClose.innerHTML = '<span>HMCTS</span><span class="pill green">Settled</span>';
+    }
+    const hmctsContext = document.getElementById('audit-context-hmcts');
+    if (hmctsContext) {
+      hmctsContext.innerHTML = '<span>HMCTS</span><span class="pill green">Settled</span>';
+    }
+
+    const closeMsg = document.getElementById('audit-close-message');
+    if (closeMsg) {
+      closeMsg.innerHTML = '<strong>Not ready to close yet.</strong> Equans still has an open 28-DAP thread. Once their action plan is received and settled, you can close this audit.';
+    }
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function switchAuditLetter(id) {
+    document.querySelectorAll('#audit-letter-tabs .letter-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.letter === id);
+    });
+    ['hmcts', 'equans', 'propdir'].forEach(k => {
+      const el = document.getElementById('audit-letter-' + k);
+      if (el) el.hidden = (k !== id);
+    });
+  }
 
   // ---------------------------------------------------------
   // Close-all-green-CPINs behaviour (CPINs triage screen). Updates
