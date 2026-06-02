@@ -584,6 +584,105 @@
   }
   .activity strong { color: var(--ink); }
 
+  .audit-activity-block { margin-top: 20px; }
+  .audit-activity-block .activity { margin-top: 0; flex-wrap: wrap; }
+  .audit-activity-block .activity .counts {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .audit-activity-block .activity .actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  .audit-inline-panel {
+    margin-top: 10px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .audit-inline-panel h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .audit-quick-log {
+    display: grid;
+    grid-template-columns: 140px 1fr 120px auto;
+    gap: 12px;
+    align-items: end;
+  }
+  .audit-quick-log label,
+  .audit-note-form label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .audit-quick-log select,
+  .audit-quick-log input,
+  .audit-note-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--surface);
+  }
+  .audit-note-form textarea { resize: vertical; min-height: 72px; }
+  .audit-activity-feed {
+    margin-top: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .audit-activity-feed .feed-hd {
+    padding: 10px 16px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    font-weight: 600;
+    border-bottom: 1px solid var(--line-2);
+    background: var(--bg);
+  }
+  .audit-feed-item {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line-2);
+    font-size: 13px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: start;
+  }
+  .audit-feed-item:last-child { border-bottom: none; }
+  .audit-feed-item .meta {
+    font-size: 11px;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .audit-feed-item .body { color: var(--ink-2); }
+  .audit-feed-item .remove {
+    font-size: 12px;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .audit-feed-item .remove:hover { color: var(--red); }
+  .audit-feed-empty {
+    padding: 16px;
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 13px;
+  }
+
   /* CPIN page */
   .cpin-tabs {
     display: flex;
@@ -1312,6 +1411,27 @@
     padding: 2px 6px;
   }
   .holder-card .remove:hover { color: var(--red); }
+
+  .add-holder-btn {
+    text-align: center;
+    padding: 8px;
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    color: var(--ink-3);
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 6px;
+  }
+  .add-holder-btn:hover { border-color: var(--accent); color: var(--accent); }
+  #setup-letter-preview.editing {
+    outline: 2px solid var(--gov-focus);
+    outline-offset: 2px;
+  }
+  #setup-letter-preview.editing p {
+    background: #fffceb;
+    padding: 6px 8px;
+    border-radius: 4px;
+  }
 
   .check-row {
     display: flex;
@@ -2281,14 +2401,66 @@
       </div>
     </div>
 
-    <!-- Activity strip (available at every stage) -->
-    <div class="activity">
-      <strong>Activity</strong>
-      <span>3 notes</span>
-      <span>2 files (site photos)</span>
-      <span>6h 20m logged</span>
-      <button class="btn" style="margin-left:auto;" onclick="show('time')">+ Log time</button>
-      <button class="btn">+ Add note</button>
+    <!-- Activity (inline log time + notes at every stage) -->
+    <div class="audit-activity-block">
+      <div class="activity">
+        <strong>Activity</strong>
+        <div class="counts">
+          <span id="audit-count-notes">3 notes</span>
+          <span>2 files (site photos)</span>
+          <span id="audit-count-time">6h 20m logged</span>
+        </div>
+        <div class="actions">
+          <button class="btn" id="audit-btn-log-time" type="button" onclick="toggleAuditActivityPanel('time')">+ Log time</button>
+          <button class="btn" id="audit-btn-add-note" type="button" onclick="toggleAuditActivityPanel('note')">+ Add note</button>
+        </div>
+      </div>
+
+      <div class="audit-inline-panel" id="audit-panel-time" hidden>
+        <h3>Log time against this audit</h3>
+        <div class="audit-quick-log">
+          <div>
+            <label>Activity</label>
+            <select id="audit-time-activity"></select>
+          </div>
+          <div>
+            <label>What for</label>
+            <input type="text" value="A-2026-0314  ·  Temple Quay House audit" readonly style="background:var(--bg);color:var(--ink-2);" />
+          </div>
+          <div>
+            <label>Duration</label>
+            <select id="audit-time-duration">
+              <option value="15">15m</option>
+              <option value="30">30m</option>
+              <option value="45">45m</option>
+              <option value="60">1h</option>
+              <option value="90" selected>1h 30m</option>
+              <option value="120">2h</option>
+              <option value="180">3h</option>
+              <option value="240">Half day (4h)</option>
+            </select>
+          </div>
+          <button class="btn primary" type="button" onclick="logAuditTime()">Log time</button>
+        </div>
+        <div style="font-size:11px;color:var(--ink-3);margin-top:8px;">Date defaults to today (22 Jun 2026). Logged against Phil Gower on audit A-2026-0314.</div>
+      </div>
+
+      <div class="audit-inline-panel" id="audit-panel-note" hidden>
+        <h3>Add a note</h3>
+        <div class="audit-note-form">
+          <label>Note</label>
+          <textarea id="audit-note-text" placeholder="Calls, emails, site observations, EMM discussion…"></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn primary" type="button" onclick="addAuditNote()">Save note</button>
+            <button class="btn" type="button" onclick="toggleAuditActivityPanel('note', false)">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="audit-activity-feed">
+        <div class="feed-hd">Recent on this audit</div>
+        <div id="audit-activity-feed-list"></div>
+      </div>
     </div>
 
     <div class="footnote">
@@ -2941,10 +3113,14 @@
           <span style="color:var(--ink-3);margin-left:4px;">Triggered from <a onclick="show('cpins')">CPIN-2026-0418</a></span>
         </div>
       </div>
-      <button class="btn">Cancel</button>
+      <button class="btn" onclick="cancelAuditSetup()">Cancel</button>
     </div>
 
-    <div class="inset">
+    <div class="inset" id="setup-draft-notice" hidden>
+      <strong>Draft saved.</strong> <span id="setup-draft-notice-time"></span> You can return and continue later.
+    </div>
+
+    <div class="inset" id="setup-default-notice">
       <strong>Pre-filled from the source.</strong> Because this audit was started from a CPIN, the premises, the Duty Holders and the trigger are already filled in. Review them, set the type, confirm the appointment, then start. You can save a draft at any point.
     </div>
 
@@ -2962,7 +3138,7 @@
               <div class="role">Temple Back East, Bristol BS1  ·  Government office  ·  HMCTS</div>
             </div>
             <span class="pill blue">RBIP score 47</span>
-            <a style="font-size:12px;">Change</a>
+            <a style="font-size:12px;cursor:pointer;" onclick="changeSetupPremises();return false;">Change</a>
           </div>
         </div>
 
@@ -2970,21 +3146,21 @@
         <div class="setup-section">
           <h3>2. Audit type</h3>
           <div class="help">The building type drives the question set, scoring weighting and letter wording. You can switch on the day if scope changes.</div>
-          <div class="radio-row">
-            <button class="radio-btn selected">
+          <div class="radio-row" id="setup-audit-type-row">
+            <button type="button" class="radio-btn selected" data-audit-type="full" onclick="selectAuditType('full')">
               <div class="ttl">Full</div>
               <div class="desc">All articles, all categories. Typical for a high-score premises.</div>
             </button>
-            <button class="radio-btn">
+            <button type="button" class="radio-btn" data-audit-type="short" onclick="selectAuditType('short')">
               <div class="ttl">Short</div>
               <div class="desc">Subset of articles, scoped to the trigger. Faster site visit.</div>
             </button>
-            <button class="radio-btn">
+            <button type="button" class="radio-btn" data-audit-type="themed" onclick="selectAuditType('themed')">
               <div class="ttl">Themed</div>
               <div class="desc">Targeted at one theme across many premises (e.g. fire doors).</div>
             </button>
           </div>
-          <div style="margin-top:8px;font-size:12px;color:var(--ink-3);">Question set <strong style="color:var(--ink);">Government office, full</strong>  ·  <a>preview the questions</a></div>
+          <div style="margin-top:8px;font-size:12px;color:var(--ink-3);">Question set <strong id="setup-question-set" style="color:var(--ink);">Government office, full</strong>  ·  <a onclick="previewSetupQuestions();return false;">preview the questions</a></div>
         </div>
 
         <!-- Team -->
@@ -3000,7 +3176,8 @@
             <span class="pill blue">Lead</span>
             <span style="color:var(--ink-3);font-size:12px;padding:0 6px;">You</span>
           </div>
-          <div style="text-align:center;padding:8px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:12px;cursor:pointer;">+ Add another inspector</div>
+          <div id="setup-team-extra"></div>
+          <div class="add-holder-btn" onclick="addSetupInspector()">+ Add another inspector</div>
         </div>
 
         <!-- Duty Holders -->
@@ -3009,55 +3186,12 @@
           <div class="help">Pre-suggested from this premises. Review and add or remove as needed. Not pre-locked, since who is on site can change.</div>
 
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders (organisations)</div>
-          <div class="holder-card">
-            <div class="avatar-sm">HM</div>
-            <div>
-              <div class="name">HMCTS</div>
-              <div class="role">Government department  ·  Property responsibility</div>
-            </div>
-            <span class="pill blue">From premises</span>
-            <span class="remove" title="Remove">×</span>
-          </div>
-          <div class="holder-card">
-            <div class="avatar-sm">EQ</div>
-            <div>
-              <div class="name">Equans</div>
-              <div class="role">FM company  ·  Maintenance responsibility</div>
-            </div>
-            <span class="pill blue">From premises</span>
-            <span class="remove" title="Remove">×</span>
-          </div>
-          <div class="holder-card">
-            <div class="avatar-sm">PD</div>
-            <div>
-              <div class="name">The Property Directorate</div>
-              <div class="role">Internal  ·  Strategic property responsibility</div>
-            </div>
-            <span class="pill blue">From premises</span>
-            <span class="remove" title="Remove">×</span>
-          </div>
-          <div style="text-align:center;padding:8px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:12px;cursor:pointer;">+ Add a Duty Holder</div>
+          <div id="setup-dh-list"></div>
+          <div class="add-holder-btn" onclick="addSetupDutyHolder()">+ Add a Duty Holder</div>
 
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:16px 0 6px;">Responsible Persons (individuals)</div>
-          <div class="holder-card">
-            <div class="avatar-sm">MS</div>
-            <div>
-              <div class="name">Mark Stevens</div>
-              <div class="role">HMCTS  ·  Property Director</div>
-            </div>
-            <span class="pill blue">From premises</span>
-            <span class="remove" title="Remove">×</span>
-          </div>
-          <div class="holder-card">
-            <div class="avatar-sm">SP</div>
-            <div>
-              <div class="name">Sarah Patel</div>
-              <div class="role">Equans  ·  Maintenance Lead</div>
-            </div>
-            <span class="pill blue">From premises</span>
-            <span class="remove" title="Remove">×</span>
-          </div>
-          <div style="text-align:center;padding:8px;border:1px dashed var(--line);border-radius:6px;color:var(--ink-3);font-size:12px;cursor:pointer;">+ Add a Responsible Person</div>
+          <div id="setup-rp-list"></div>
+          <div class="add-holder-btn" onclick="addSetupResponsiblePerson()">+ Add a Responsible Person</div>
         </div>
 
         <!-- Appointment -->
@@ -3067,33 +3201,33 @@
           <div class="field-row">
             <div class="field">
               <label>Date</label>
-              <input type="date" id="apt-date" value="2026-07-07" min="2026-06-22" onchange="updateApptHelper()" />
+              <input type="date" id="apt-date" value="2026-07-07" min="2026-06-22" onchange="onSetupAppointmentChange()" />
               <div class="date-helper" id="apt-date-helper"><strong>Tuesday</strong>  ·  15 working days from today  ·  no Outlook conflicts</div>
             </div>
             <div class="field">
               <label>Time</label>
-              <input type="time" id="apt-time" value="10:00" step="900" />
-              <div class="date-helper">Inside premises working hours (8am to 5pm)</div>
+              <input type="time" id="apt-time" value="10:00" step="900" onchange="onSetupAppointmentChange()" />
+              <div class="date-helper" id="apt-time-helper">Inside premises working hours (8am to 5pm)</div>
             </div>
             <div class="field">
               <label>Duration (estimated)</label>
-              <select>
-                <option>Half day (4 hours)</option>
-                <option>Full day (7 hours)</option>
-                <option>Two days</option>
-                <option>Custom...</option>
+              <select id="setup-apt-duration" onchange="onSetupAppointmentChange()">
+                <option value="half">Half day (4 hours)</option>
+                <option value="full">Full day (7 hours)</option>
+                <option value="two">Two days</option>
+                <option value="custom">Custom...</option>
               </select>
-              <div class="date-helper">Half day is the default for a Full audit at a non-custodial premises.</div>
+              <div class="date-helper" id="apt-duration-helper">Half day is the default for a Full audit at a non-custodial premises.</div>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--green);margin-top:8px;">✓ No conflicts in Phil's Outlook calendar  ·  ✓ Pushes to Outlook on start</div>
+          <div style="font-size:12px;color:var(--green);margin-top:8px;" id="apt-calendar-status">✓ No conflicts in Phil's Outlook calendar  ·  ✓ Pushes to Outlook on start</div>
         </div>
 
         <!-- Appointment letter preview -->
         <div class="setup-section">
           <h3>6. Appointment letter</h3>
           <div class="help">The system has drafted the appointment letter using the right template for this premises type (Government office, non-custodial). Review, edit if needed, then it sends when you start the audit.</div>
-          <div class="letter-preview" style="padding:18px;font-size:12px;">
+          <div class="letter-preview" id="setup-letter-preview" style="padding:18px;font-size:12px;">
             <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
             <div>22 June 2026</div>
             <div style="margin-top:10px;">
@@ -3101,20 +3235,20 @@
               Property Director, HMCTS<br>
               Temple Quay House, Bristol BS1
             </div>
-            <p style="margin-top:12px;">Following an incident notification received on 12 June 2026, CPFSI will be conducting a <span class="conditional">reactive full fire safety audit</span> at Temple Quay House on <span class="conditional">Tuesday 7 July 2026 at 10:00</span>. We anticipate the visit will take half a day.</p>
-            <p>Please ensure that representatives from <span class="conditional">HMCTS, Equans, and The Property Directorate</span> are available, along with relevant fire safety documentation and access to all premises areas.</p>
+            <p id="setup-letter-p1" style="margin-top:12px;"></p>
+            <p id="setup-letter-p2"></p>
           </div>
           <div style="display:flex;gap:8px;margin-top:10px;">
-            <button class="btn">Edit letter</button>
-            <button class="btn">Preview as PDF</button>
+            <button class="btn" id="setup-edit-letter-btn" type="button" onclick="toggleSetupLetterEdit()">Edit letter</button>
+            <button class="btn" type="button" onclick="previewSetupLetterPdf()">Preview as PDF</button>
             <span style="font-size:11px;color:var(--ink-3);align-self:center;margin-left:auto;">Templates are <a>admin-editable in config</a>, no developer needed.</span>
           </div>
         </div>
 
         <!-- Final actions -->
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-          <button class="btn">Save as draft</button>
-          <button class="btn primary" onclick="startAudit()">Start audit and send appointment letter →</button>
+          <button class="btn" type="button" onclick="saveAuditSetupDraft()">Save as draft</button>
+          <button class="btn primary" type="button" onclick="startAudit()">Start audit and send appointment letter →</button>
         </div>
       </div>
 
@@ -3124,13 +3258,13 @@
           <h3>Summary</h3>
           <div class="row"><span class="k">Trigger</span><span class="v">Reactive (CPIN)</span></div>
           <div class="row"><span class="k">Premises</span><span class="v">Temple Quay House</span></div>
-          <div class="row"><span class="k">Audit type</span><span class="v">Full</span></div>
-          <div class="row"><span class="k">Question set</span><span class="v">Govt office, full</span></div>
+          <div class="row"><span class="k">Audit type</span><span class="v" id="setup-sum-type">Full</span></div>
+          <div class="row"><span class="k">Question set</span><span class="v" id="setup-sum-questionset">Govt office, full</span></div>
           <div class="row"><span class="k">Lead inspector</span><span class="v">Phil Gower</span></div>
-          <div class="row"><span class="k">Other inspectors</span><span class="v pending">none</span></div>
-          <div class="row"><span class="k">Duty Holders</span><span class="v">3</span></div>
-          <div class="row"><span class="k">Responsible Persons</span><span class="v">2</span></div>
-          <div class="row"><span class="k">Appointment</span><span class="v">Tue 7 Jul, 10:00</span></div>
+          <div class="row"><span class="k">Other inspectors</span><span class="v pending" id="setup-sum-inspectors">none</span></div>
+          <div class="row"><span class="k">Duty Holders</span><span class="v" id="setup-sum-dh">3</span></div>
+          <div class="row"><span class="k">Responsible Persons</span><span class="v" id="setup-sum-rp">2</span></div>
+          <div class="row"><span class="k">Appointment</span><span class="v" id="setup-sum-appt">Tue 7 Jul, 10:00</span></div>
 
           <h3 style="margin-top:16px;">When you start</h3>
           <div class="check-row"><span class="tick">✓</span>Audit record A-2026-0314 created</div>
@@ -3360,10 +3494,12 @@
       auditStage = stage;
       render(screen);
       applyAuditStageUI(stage);
+      initAuditActivity();
       return;
     }
 
     render(screen);
+    if (screen === 'auditsetup') initAuditSetupPage();
   }
 
   function render(id) {
@@ -3420,6 +3556,31 @@
     5: 'Action plans',
     6: 'Close'
   };
+
+  const AUDIT_STAGE_ACTIVITY_OPTIONS = {
+    1: ['Pre-audit prep', 'Phone call', 'Meeting', 'Letter drafting'],
+    2: ['Site visit', 'Travel', 'Phone call', 'Desk-based investigation'],
+    3: ['Desk-based investigation', 'Meeting', 'Phone call', 'Scoring review'],
+    4: ['Letter drafting', 'Desk-based investigation', 'Phone call', 'Meeting'],
+    5: ['Desk-based investigation', 'Phone call', 'Meeting', 'Letter drafting'],
+    6: ['Desk-based investigation', 'General admin', 'Phone call']
+  };
+
+  let auditActivityLog = {
+    notes: [
+      { id: 'n1', text: 'Pre-audit call with HMCTS — confirmed Duty Holders attending on 7 Jul.', stage: 1, at: '18 Jun, 14:20', ts: 1718714400000 },
+      { id: 'n2', text: 'Site photos uploaded (corridor fire doors, rear stairwell).', stage: 2, at: '22 Jun, 11:40', ts: 1719049200000 },
+      { id: 'n3', text: 'EMM discussion with line manager — 28-DAP appropriate for HMCTS and Equans.', stage: 3, at: '22 Jun, 15:05', ts: 1719061500000 }
+    ],
+    times: [
+      { id: 't1', activity: 'Pre-audit prep', minutes: 60, stage: 1, at: '18 Jun', ts: 1718710000000 },
+      { id: 't2', activity: 'Site visit', minutes: 240, stage: 2, at: '22 Jun', ts: 1719045600000 },
+      { id: 't3', activity: 'Desk-based investigation', minutes: 80, stage: 2, at: '22 Jun', ts: 1719052800000 }
+    ]
+  };
+
+  let auditActivityPanel = null;
+
   let auditStage = 2;
   let hmctsPlanSettled = false;
 
@@ -3431,6 +3592,8 @@
   };
 
   function startAudit() {
+    if (!validateAuditSetup()) return;
+    localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(getAuditSetupPayload()));
     auditStage = 2;
     window.location.hash = 'audit-stage-2';
   }
@@ -3445,7 +3608,20 @@
     }
   }
 
+  function closeAuditActivityPanels() {
+    auditActivityPanel = null;
+    const timePanel = document.getElementById('audit-panel-time');
+    const notePanel = document.getElementById('audit-panel-note');
+    const timeBtn = document.getElementById('audit-btn-log-time');
+    const noteBtn = document.getElementById('audit-btn-add-note');
+    if (timePanel) timePanel.hidden = true;
+    if (notePanel) notePanel.hidden = true;
+    if (timeBtn) timeBtn.textContent = '+ Log time';
+    if (noteBtn) noteBtn.textContent = '+ Add note';
+  }
+
   function applyAuditStageUI(n) {
+    closeAuditActivityPanels();
     const rail = document.getElementById('audit-stage-rail');
     if (rail) {
       rail.querySelectorAll('.stage').forEach(el => {
@@ -3467,7 +3643,169 @@
         '&nbsp;Stage ' + n + ' of 6  ·  ' + AUDIT_STAGE_NAMES[n] +
         '  ·  Reactive  ·  Triggered by <a>CPIN-2026-0418</a>  ·  Lead inspector: <strong>Phil Gower</strong>';
     }
+    syncAuditActivityForStage(n);
     window.scrollTo(0, 0);
+  }
+
+  function formatAuditMinutes(total) {
+    const h = Math.floor(total / 60);
+    const m = total % 60;
+    if (h && m) return h + 'h ' + m + 'm';
+    if (h) return h + 'h';
+    return m + 'm';
+  }
+
+  function formatDurationLabel(minutes) {
+    const presets = { 15: '15m', 30: '30m', 45: '45m', 60: '1h', 90: '1h 30m', 120: '2h', 180: '3h', 240: 'Half day (4h)' };
+    return presets[minutes] || formatAuditMinutes(minutes);
+  }
+
+  function syncAuditActivityForStage(stage) {
+    const sel = document.getElementById('audit-time-activity');
+    if (!sel) return;
+    const options = AUDIT_STAGE_ACTIVITY_OPTIONS[stage] || AUDIT_STAGE_ACTIVITY_OPTIONS[2];
+    sel.innerHTML = options.map((o, i) =>
+      '<option value="' + escHtml(o) + '"' + (i === 0 ? ' selected' : '') + '>' + escHtml(o) + '</option>'
+    ).join('');
+  }
+
+  function toggleAuditActivityPanel(which, forceOpen) {
+    const timePanel = document.getElementById('audit-panel-time');
+    const notePanel = document.getElementById('audit-panel-note');
+    const timeBtn = document.getElementById('audit-btn-log-time');
+    const noteBtn = document.getElementById('audit-btn-add-note');
+    if (!timePanel || !notePanel) return;
+
+    const open = typeof forceOpen === 'boolean'
+      ? (forceOpen ? which : null)
+      : (auditActivityPanel === which ? null : which);
+
+    auditActivityPanel = open;
+    timePanel.hidden = open !== 'time';
+    notePanel.hidden = open !== 'note';
+    if (timeBtn) timeBtn.textContent = open === 'time' ? '− Log time' : '+ Log time';
+    if (noteBtn) noteBtn.textContent = open === 'note' ? '− Add note' : '+ Add note';
+
+    if (open === 'note') {
+      document.getElementById('audit-note-text')?.focus();
+    }
+    if (open === 'time') {
+      syncAuditActivityForStage(auditStage);
+    }
+  }
+
+  function renderAuditActivity() {
+    const notesEl = document.getElementById('audit-count-notes');
+    const timeEl = document.getElementById('audit-count-time');
+    const feed = document.getElementById('audit-activity-feed-list');
+
+    const noteCount = auditActivityLog.notes.length;
+    const totalMin = auditActivityLog.times.reduce((s, t) => s + t.minutes, 0);
+
+    if (notesEl) notesEl.textContent = noteCount + (noteCount === 1 ? ' note' : ' notes');
+    if (timeEl) timeEl.textContent = formatAuditMinutes(totalMin) + ' logged';
+
+    if (!feed) return;
+
+    const items = [];
+    auditActivityLog.times.forEach(t => {
+      items.push({
+        ts: t.ts || 0,
+        at: t.at,
+        stage: t.stage,
+        body: '<span class="pill blue">Time</span> ' + escHtml(t.activity) + '  ·  <strong>' + formatDurationLabel(t.minutes) + '</strong>',
+        remove: "removeAuditTime('" + t.id + "')"
+      });
+    });
+    auditActivityLog.notes.forEach(n => {
+      items.push({
+        ts: n.ts || 0,
+        at: n.at,
+        stage: n.stage,
+        body: '<span class="pill grey">Note</span> ' + escHtml(n.text),
+        remove: "removeAuditNote('" + n.id + "')"
+      });
+    });
+
+    items.sort((a, b) => b.ts - a.ts);
+
+    if (items.length === 0) {
+      feed.innerHTML = '<div class="audit-feed-empty">No notes or time logged yet on this audit.</div>';
+      return;
+    }
+
+    feed.innerHTML = items.map(item =>
+      '<div class="audit-feed-item">' +
+        '<div class="meta">' + escHtml(item.at) + '<br>Stage ' + item.stage + '</div>' +
+        '<div class="body">' + item.body + '</div>' +
+        '<span class="remove" onclick="' + item.remove + '">Remove</span>' +
+      '</div>'
+    ).join('');
+  }
+
+  function logAuditTime() {
+    const durEl = document.getElementById('audit-time-duration');
+    const actEl = document.getElementById('audit-time-activity');
+    if (!durEl || !actEl) return;
+
+    const minutes = parseInt(durEl.value, 10);
+    const activity = actEl.value;
+    const now = new Date();
+    const at = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' +
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    auditActivityLog.times.unshift({
+      id: 't' + Date.now(),
+      activity,
+      minutes,
+      stage: auditStage,
+      at,
+      ts: Date.now()
+    });
+
+    renderAuditActivity();
+    toggleAuditActivityPanel('time', false);
+  }
+
+  function addAuditNote() {
+    const ta = document.getElementById('audit-note-text');
+    if (!ta) return;
+    const text = ta.value.trim();
+    if (!text) {
+      window.alert('Enter a note before saving.');
+      return;
+    }
+
+    const now = new Date();
+    const at = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' +
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    auditActivityLog.notes.unshift({
+      id: 'n' + Date.now(),
+      text,
+      stage: auditStage,
+      at,
+      ts: Date.now()
+    });
+
+    ta.value = '';
+    renderAuditActivity();
+    toggleAuditActivityPanel('note', false);
+  }
+
+  function removeAuditNote(id) {
+    auditActivityLog.notes = auditActivityLog.notes.filter(n => n.id !== id);
+    renderAuditActivity();
+  }
+
+  function removeAuditTime(id) {
+    auditActivityLog.times = auditActivityLog.times.filter(t => t.id !== id);
+    renderAuditActivity();
+  }
+
+  function initAuditActivity() {
+    syncAuditActivityForStage(auditStage);
+    renderAuditActivity();
   }
 
   function toggleAddFindingForm(open) {
@@ -3645,6 +3983,422 @@
   });
 
   // ---------------------------------------------------------
+  // Audit setup (Stage 1) — interactive form + live summary
+  // ---------------------------------------------------------
+  const SETUP_DRAFT_KEY = 'audit-setup-draft-v1';
+  const SETUP_TODAY = new Date('2026-06-22');
+
+  const QUESTION_SETS = {
+    full: 'Government office, full',
+    short: 'Government office, short (trigger-scoped)',
+    themed: 'Government office, themed (fire doors)'
+  };
+
+  const AUDIT_TYPE_LABELS = {
+    full: 'reactive full fire safety audit',
+    short: 'reactive short fire safety audit',
+    themed: 'reactive themed fire safety audit (fire doors)'
+  };
+
+  const DURATION_LABELS = {
+    half: 'half a day',
+    full: 'a full day',
+    two: 'two days',
+    custom: 'the agreed duration'
+  };
+
+  let auditSetup = {
+    auditType: 'full',
+    dutyHolders: [
+      { id: 'dh1', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM', fromPremises: true },
+      { id: 'dh2', name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ', fromPremises: true },
+      { id: 'dh3', name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD', fromPremises: true }
+    ],
+    responsiblePersons: [
+      { id: 'rp1', name: 'Mark Stevens', role: 'HMCTS  ·  Property Director', initials: 'MS', fromPremises: true },
+      { id: 'rp2', name: 'Sarah Patel', role: 'Equans  ·  Maintenance Lead', initials: 'SP', fromPremises: true }
+    ],
+    inspectors: [],
+    letterCustom: null,
+    letterEditing: false
+  };
+
+  function defaultAuditSetup() {
+    return JSON.parse(JSON.stringify({
+      auditType: 'full',
+      dutyHolders: [
+        { id: 'dh1', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM', fromPremises: true },
+        { id: 'dh2', name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ', fromPremises: true },
+        { id: 'dh3', name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD', fromPremises: true }
+      ],
+      responsiblePersons: [
+        { id: 'rp1', name: 'Mark Stevens', role: 'HMCTS  ·  Property Director', initials: 'MS', fromPremises: true },
+        { id: 'rp2', name: 'Sarah Patel', role: 'Equans  ·  Maintenance Lead', initials: 'SP', fromPremises: true }
+      ],
+      inspectors: [],
+      letterCustom: null,
+      letterEditing: false
+    }));
+  }
+
+  function initAuditSetupPage() {
+    const draft = localStorage.getItem(SETUP_DRAFT_KEY);
+    if (draft) {
+      try {
+        auditSetup = JSON.parse(draft);
+        auditSetup.letterEditing = false;
+      } catch (e) {
+        auditSetup = defaultAuditSetup();
+      }
+    }
+    renderSetupDutyHolders();
+    renderSetupResponsiblePersons();
+    renderSetupInspectors();
+    selectAuditType(auditSetup.auditType, false);
+    const dateEl = document.getElementById('apt-date');
+    const timeEl = document.getElementById('apt-time');
+    const durEl = document.getElementById('setup-apt-duration');
+    if (dateEl && auditSetup.appointmentDate) dateEl.value = auditSetup.appointmentDate;
+    if (timeEl && auditSetup.appointmentTime) timeEl.value = auditSetup.appointmentTime;
+    if (durEl && auditSetup.appointmentDuration) durEl.value = auditSetup.appointmentDuration;
+    onSetupAppointmentChange();
+    showSetupDraftNotice(!!draft);
+  }
+
+  function showSetupDraftNotice(hasDraft) {
+    const notice = document.getElementById('setup-draft-notice');
+    const def = document.getElementById('setup-default-notice');
+    if (!notice || !def) return;
+    if (hasDraft && auditSetup.savedAt) {
+      notice.hidden = false;
+      def.hidden = true;
+      const t = document.getElementById('setup-draft-notice-time');
+      if (t) t.textContent = 'Last saved ' + new Date(auditSetup.savedAt).toLocaleString('en-GB') + '.';
+    } else if (!hasDraft) {
+      notice.hidden = true;
+      def.hidden = false;
+    }
+  }
+
+  function selectAuditType(type, refresh) {
+    auditSetup.auditType = type;
+    document.querySelectorAll('#setup-audit-type-row .radio-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.auditType === type);
+    });
+    const qs = document.getElementById('setup-question-set');
+    if (qs) qs.textContent = QUESTION_SETS[type] || QUESTION_SETS.full;
+    const durHelp = document.getElementById('apt-duration-helper');
+    if (durHelp) {
+      const hints = {
+        full: 'Half day is the default for a Full audit at a non-custodial premises.',
+        short: 'Short audits are often 2–3 hours on site.',
+        themed: 'Themed audits vary; check the theme scope.'
+      };
+      durHelp.textContent = hints[type] || hints.full;
+    }
+    if (refresh !== false && !auditSetup.letterCustom) updateSetupLetter();
+    refreshSetupSummary();
+  }
+
+  function renderSetupDutyHolders() {
+    const list = document.getElementById('setup-dh-list');
+    if (!list) return;
+    list.innerHTML = auditSetup.dutyHolders.map(dh => `
+      <div class="holder-card" data-id="${dh.id}">
+        <div class="avatar-sm">${escHtml(dh.initials)}</div>
+        <div>
+          <div class="name">${escHtml(dh.name)}</div>
+          <div class="role">${escHtml(dh.role)}</div>
+        </div>
+        <span class="pill ${dh.fromPremises ? 'blue' : 'grey'}">${dh.fromPremises ? 'From premises' : 'Added'}</span>
+        <span class="remove" title="Remove" onclick="removeSetupDutyHolder('${dh.id}')">×</span>
+      </div>
+    `).join('');
+    refreshSetupSummary();
+    if (!auditSetup.letterCustom) updateSetupLetter();
+  }
+
+  function renderSetupResponsiblePersons() {
+    const list = document.getElementById('setup-rp-list');
+    if (!list) return;
+    list.innerHTML = auditSetup.responsiblePersons.map(rp => `
+      <div class="holder-card" data-id="${rp.id}">
+        <div class="avatar-sm">${escHtml(rp.initials)}</div>
+        <div>
+          <div class="name">${escHtml(rp.name)}</div>
+          <div class="role">${escHtml(rp.role)}</div>
+        </div>
+        <span class="pill ${rp.fromPremises ? 'blue' : 'grey'}">${rp.fromPremises ? 'From premises' : 'Added'}</span>
+        <span class="remove" title="Remove" onclick="removeSetupResponsiblePerson('${rp.id}')">×</span>
+      </div>
+    `).join('');
+    refreshSetupSummary();
+  }
+
+  function renderSetupInspectors() {
+    const list = document.getElementById('setup-team-extra');
+    if (!list) return;
+    list.innerHTML = auditSetup.inspectors.map(ins => `
+      <div class="holder-card">
+        <div class="avatar-sm">${escHtml(ins.initials)}</div>
+        <div>
+          <div class="name">${escHtml(ins.name)}</div>
+          <div class="role">${escHtml(ins.role)}</div>
+        </div>
+        <span class="remove" title="Remove" onclick="removeSetupInspector('${ins.id}')">×</span>
+      </div>
+    `).join('');
+    refreshSetupSummary();
+  }
+
+  function setupInitials(name) {
+    return name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  function addSetupDutyHolder() {
+    const name = window.prompt('Duty Holder organisation name');
+    if (!name || !name.trim()) return;
+    const role = window.prompt('Role / responsibility (optional)', 'Added for this audit') || 'Added for this audit';
+    auditSetup.dutyHolders.push({
+      id: 'dh' + Date.now(),
+      name: name.trim(),
+      role: role.trim(),
+      initials: setupInitials(name),
+      fromPremises: false
+    });
+    renderSetupDutyHolders();
+  }
+
+  function removeSetupDutyHolder(id) {
+    if (auditSetup.dutyHolders.length <= 1) {
+      window.alert('At least one Duty Holder is required.');
+      return;
+    }
+    auditSetup.dutyHolders = auditSetup.dutyHolders.filter(d => d.id !== id);
+    renderSetupDutyHolders();
+  }
+
+  function addSetupResponsiblePerson() {
+    const name = window.prompt('Responsible Person name');
+    if (!name || !name.trim()) return;
+    const role = window.prompt('Organisation and role (e.g. HMCTS · Property Director)', '') || '';
+    auditSetup.responsiblePersons.push({
+      id: 'rp' + Date.now(),
+      name: name.trim(),
+      role: role.trim(),
+      initials: setupInitials(name),
+      fromPremises: false
+    });
+    renderSetupResponsiblePersons();
+  }
+
+  function removeSetupResponsiblePerson(id) {
+    auditSetup.responsiblePersons = auditSetup.responsiblePersons.filter(r => r.id !== id);
+    renderSetupResponsiblePersons();
+  }
+
+  function addSetupInspector() {
+    const name = window.prompt('Inspector name');
+    if (!name || !name.trim()) return;
+    auditSetup.inspectors.push({
+      id: 'ins' + Date.now(),
+      name: name.trim(),
+      role: 'Fire Safety Inspector',
+      initials: setupInitials(name)
+    });
+    renderSetupInspectors();
+  }
+
+  function removeSetupInspector(id) {
+    auditSetup.inspectors = auditSetup.inspectors.filter(i => i.id !== id);
+    renderSetupInspectors();
+  }
+
+  function formatSetupAppointment() {
+    const dateEl = document.getElementById('apt-date');
+    const timeEl = document.getElementById('apt-time');
+    const durEl = document.getElementById('setup-apt-duration');
+    if (!dateEl || !timeEl) return { label: '—', long: '—', duration: 'half a day' };
+
+    const d = new Date(dateEl.value + 'T' + timeEl.value);
+    const day = dateEl.value
+      ? new Date(dateEl.value).toLocaleDateString('en-GB', { weekday: 'long' })
+      : '';
+    const dateShort = dateEl.value
+      ? new Date(dateEl.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+      : '';
+    const time = timeEl.value ? timeEl.value.slice(0, 5) : '10:00';
+    const durationKey = durEl ? durEl.value : 'half';
+    const duration = DURATION_LABELS[durationKey] || DURATION_LABELS.half;
+
+    return {
+      label: day ? day.slice(0, 3) + ' ' + dateShort + ', ' + time : '—',
+      long: day ? day + ' ' + new Date(dateEl.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + time : '—',
+      duration,
+      durationKey
+    };
+  }
+
+  function onSetupAppointmentChange() {
+    updateApptHelper();
+    const timeEl = document.getElementById('apt-time');
+    const timeHelp = document.getElementById('apt-time-helper');
+    if (timeEl && timeHelp) {
+      const [h] = timeEl.value.split(':').map(Number);
+      const ok = h >= 8 && h < 17;
+      timeHelp.textContent = ok
+        ? 'Inside premises working hours (8am to 5pm)'
+        : 'Outside usual working hours — confirm with premises before sending.';
+      timeHelp.style.color = ok ? 'var(--ink-3)' : 'var(--amber)';
+    }
+    const cal = document.getElementById('apt-calendar-status');
+    if (cal) {
+      const dateEl = document.getElementById('apt-date');
+      const conflict = dateEl && dateEl.value === '2026-06-25';
+      cal.innerHTML = conflict
+        ? '<span style="color:var(--amber);">⚠ Outlook conflict at this time — choose another slot or override.</span>'
+        : '✓ No conflicts in Phil\'s Outlook calendar  ·  ✓ Pushes to Outlook on start';
+      cal.style.color = conflict ? 'var(--amber)' : 'var(--green)';
+    }
+    if (!auditSetup.letterCustom) updateSetupLetter();
+    refreshSetupSummary();
+  }
+
+  function formatDutyHolderList(names) {
+    if (names.length === 0) return 'the relevant Duty Holders';
+    if (names.length === 1) return names[0];
+    if (names.length === 2) return names[0] + ' and ' + names[1];
+    return names.slice(0, -1).join(', ') + ', and ' + names[names.length - 1];
+  }
+
+  function updateSetupLetter() {
+    if (auditSetup.letterEditing) return;
+    const p1 = document.getElementById('setup-letter-p1');
+    const p2 = document.getElementById('setup-letter-p2');
+    if (!p1 || !p2) return;
+
+    if (auditSetup.letterCustom) {
+      p1.innerHTML = auditSetup.letterCustom.p1;
+      p2.innerHTML = auditSetup.letterCustom.p2;
+      return;
+    }
+
+    const appt = formatSetupAppointment();
+    const typeLabel = AUDIT_TYPE_LABELS[auditSetup.auditType] || AUDIT_TYPE_LABELS.full;
+    const dhNames = auditSetup.dutyHolders.map(d => d.name);
+
+    p1.innerHTML =
+      'Following an incident notification received on 12 June 2026, CPFSI will be conducting a ' +
+      '<span class="conditional">' + escHtml(typeLabel) + '</span> at Temple Quay House on ' +
+      '<span class="conditional">' + escHtml(appt.long) + '</span>. We anticipate the visit will take ' +
+      escHtml(appt.duration) + '.';
+
+    p2.innerHTML =
+      'Please ensure that representatives from <span class="conditional">' + escHtml(formatDutyHolderList(dhNames)) +
+      '</span> are available, along with relevant fire safety documentation and access to all premises areas.';
+  }
+
+  function toggleSetupLetterEdit() {
+    const preview = document.getElementById('setup-letter-preview');
+    const btn = document.getElementById('setup-edit-letter-btn');
+    const p1 = document.getElementById('setup-letter-p1');
+    const p2 = document.getElementById('setup-letter-p2');
+    if (!preview || !btn || !p1 || !p2) return;
+
+    auditSetup.letterEditing = !auditSetup.letterEditing;
+    preview.classList.toggle('editing', auditSetup.letterEditing);
+    p1.contentEditable = auditSetup.letterEditing;
+    p2.contentEditable = auditSetup.letterEditing;
+
+    if (auditSetup.letterEditing) {
+      btn.textContent = 'Done editing';
+      p1.focus();
+    } else {
+      btn.textContent = 'Edit letter';
+      auditSetup.letterCustom = { p1: p1.innerHTML, p2: p2.innerHTML };
+    }
+  }
+
+  function refreshSetupSummary() {
+    const typeEl = document.getElementById('setup-sum-type');
+    const qsEl = document.getElementById('setup-sum-questionset');
+    const insEl = document.getElementById('setup-sum-inspectors');
+    const dhEl = document.getElementById('setup-sum-dh');
+    const rpEl = document.getElementById('setup-sum-rp');
+    const apptEl = document.getElementById('setup-sum-appt');
+
+    const typeNames = { full: 'Full', short: 'Short', themed: 'Themed' };
+    if (typeEl) typeEl.textContent = typeNames[auditSetup.auditType] || 'Full';
+    if (qsEl) qsEl.textContent = (QUESTION_SETS[auditSetup.auditType] || '').replace('Government office, ', 'Govt office, ');
+    if (insEl) {
+      if (auditSetup.inspectors.length === 0) {
+        insEl.textContent = 'none';
+        insEl.className = 'v pending';
+      } else {
+        insEl.textContent = auditSetup.inspectors.map(i => i.name).join(', ');
+        insEl.className = 'v';
+      }
+    }
+    if (dhEl) dhEl.textContent = String(auditSetup.dutyHolders.length);
+    if (rpEl) rpEl.textContent = String(auditSetup.responsiblePersons.length);
+    if (apptEl) apptEl.textContent = formatSetupAppointment().label;
+  }
+
+  function getAuditSetupPayload() {
+    const dateEl = document.getElementById('apt-date');
+    const timeEl = document.getElementById('apt-time');
+    const durEl = document.getElementById('setup-apt-duration');
+    return {
+      ...auditSetup,
+      appointmentDate: dateEl ? dateEl.value : '',
+      appointmentTime: timeEl ? timeEl.value : '',
+      appointmentDuration: durEl ? durEl.value : 'half',
+      savedAt: new Date().toISOString()
+    };
+  }
+
+  function saveAuditSetupDraft() {
+    const payload = getAuditSetupPayload();
+    auditSetup = payload;
+    localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(payload));
+    showSetupDraftNotice(true);
+    window.alert('Draft saved. You can return to this setup later from the premises page.');
+  }
+
+  function cancelAuditSetup() {
+    if (window.confirm('Leave audit setup? Unsaved changes will be lost unless you saved a draft.')) {
+      show('premisesdetail');
+    }
+  }
+
+  function changeSetupPremises() {
+    window.alert('Changing premises would restart setup with a new question set. Not wired in this prototype — use Premises to pick another site first.');
+  }
+
+  function previewSetupQuestions() {
+    const qs = QUESTION_SETS[auditSetup.auditType] || QUESTION_SETS.full;
+    window.alert('Question set preview: ' + qs + '\n\nFull article list opens in the live system. This prototype shows the label only.');
+  }
+
+  function previewSetupLetterPdf() {
+    window.alert('PDF preview would open the appointment letter as sent. In the live system this uses the same template as final send.');
+  }
+
+  function validateAuditSetup() {
+    if (auditSetup.dutyHolders.length < 1) {
+      window.alert('Add at least one Duty Holder before starting the audit.');
+      return false;
+    }
+    const dateEl = document.getElementById('apt-date');
+    const timeEl = document.getElementById('apt-time');
+    if (!dateEl?.value || !timeEl?.value) {
+      window.alert('Set an appointment date and time.');
+      return false;
+    }
+    return true;
+  }
+
+  // ---------------------------------------------------------
   // Audit appointment date helper - shows the day name and a
   // working-days-away count when the date changes.
   // ---------------------------------------------------------
@@ -3656,7 +4410,7 @@
     if (isNaN(d)) return;
     const day = d.toLocaleDateString('en-GB', { weekday: 'long' });
     // Working days from a notional "today" of 22 June 2026
-    const today = new Date('2026-06-22');
+    const today = SETUP_TODAY;
     const diffDays = Math.round((d - today) / (1000 * 60 * 60 * 24));
     // Rough working-days estimate
     const workingDays = Math.max(0, Math.floor(diffDays * 5 / 7));
