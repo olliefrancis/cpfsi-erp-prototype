@@ -1210,6 +1210,63 @@
     margin-top: 2px;
     line-height: 1.4;
   }
+  .setup-lookup-search {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--bg);
+  }
+  .setup-lookup-list {
+    max-height: 340px;
+    overflow-y: auto;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .setup-lookup-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+  .setup-lookup-item:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .setup-lookup-item:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: var(--bg);
+  }
+  .setup-lookup-item .avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  .setup-lookup-item .name { font-weight: 600; font-size: 13px; }
+  .setup-lookup-item .role { font-size: 12px; color: var(--ink-3); margin-top: 1px; }
+  .setup-lookup-empty {
+    margin-top: 12px;
+    padding: 20px;
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 13px;
+  }
+
   .new-option .shortcut {
     margin-left: auto;
     color: var(--ink-3);
@@ -3284,6 +3341,24 @@
   </main>
 </div>
 
+<!-- Setup: lookup modal for Duty Holders, RPs, inspectors -->
+<div id="setup-lookup-modal" class="modal-backdrop" onclick="if(event.target===this) closeSetupLookupModal()">
+  <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2 id="setup-lookup-title">Look up and select</h2>
+        <div class="sub" id="setup-lookup-sub">Search the directory, then select someone to add to this audit.</div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeSetupLookupModal()" title="Close (Esc)">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="search" class="setup-lookup-search" id="setup-lookup-search" placeholder="Search by name or organisation…" oninput="filterSetupLookup()" autocomplete="off" />
+      <div class="setup-lookup-list" id="setup-lookup-list"></div>
+      <div class="setup-lookup-empty" id="setup-lookup-empty" hidden>No matches. Try a different search term.</div>
+    </div>
+  </div>
+</div>
+
 <!-- =========================================================
      + NEW QUICK-CREATE MODAL
      Everything CPFSI can create themselves. CPINs are excluded
@@ -3967,12 +4042,20 @@
   }
   function closeNewModal() {
     document.getElementById('new-modal').classList.remove('open');
-    document.body.style.overflow = '';
+    if (!document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
   }
   // Esc closes the modal. 'n' opens it (consistent with the
   // strategy doc's suggested keyboard shortcut).
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeNewModal();
+    if (e.key === 'Escape') {
+      if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
+        closeSetupLookupModal();
+      } else {
+        closeNewModal();
+      }
+    }
     if (e.key === 'n' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
       const onLogin = document.getElementById('login').classList.contains('active');
       if (!onLogin) {
@@ -4155,18 +4238,155 @@
     return name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
   }
 
-  function addSetupDutyHolder() {
-    const name = window.prompt('Duty Holder organisation name');
-    if (!name || !name.trim()) return;
-    const role = window.prompt('Role / responsibility (optional)', 'Added for this audit') || 'Added for this audit';
-    auditSetup.dutyHolders.push({
-      id: 'dh' + Date.now(),
-      name: name.trim(),
-      role: role.trim(),
-      initials: setupInitials(name),
-      fromPremises: false
+  const SETUP_LOOKUP_CATALOG = {
+    dutyHolder: [
+      { key: 'hmcts', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM' },
+      { key: 'equans', name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ' },
+      { key: 'propdir', name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD' },
+      { key: 'moj-prop', name: 'Ministry of Justice Property', role: 'Government department  ·  National portfolio', initials: 'MJ' },
+      { key: 'capita', name: 'Capita Facilities Management', role: 'FM company  ·  Hard services', initials: 'CF' },
+      { key: 'g4s', name: 'G4S Facilities', role: 'FM company  ·  Soft services', initials: 'G4' },
+      { key: 'ccs', name: 'Crown Commercial Service', role: 'Contracting authority', initials: 'CC' },
+      { key: 'mitie', name: 'Mitie', role: 'FM company  ·  Maintenance', initials: 'MI' }
+    ],
+    responsiblePerson: [
+      { key: 'mstevens', name: 'Mark Stevens', role: 'HMCTS  ·  Property Director', initials: 'MS' },
+      { key: 'spatel', name: 'Sarah Patel', role: 'Equans  ·  Maintenance Lead', initials: 'SP' },
+      { key: 'jwong', name: 'James Wong', role: 'Ministry of Justice Property  ·  Portfolio Manager', initials: 'JW' },
+      { key: 'lchen', name: 'Lisa Chen', role: 'Capita FM  ·  Contract Manager', initials: 'LC' },
+      { key: 'rbyrne', name: 'Robert Byrne', role: 'The Property Directorate  ·  Senior Surveyor', initials: 'RB' },
+      { key: 'kallen', name: 'Karen Allen', role: 'HMCTS  ·  Facilities Coordinator', initials: 'KA' },
+      { key: 'dhussain', name: 'David Hussain', role: 'Equans  ·  Electrical Compliance Lead', initials: 'DH' }
+    ],
+    inspector: [
+      { key: 'jcooper', name: 'Jane Cooper', role: 'Fire Safety Inspector  ·  Kent patch', initials: 'JC' },
+      { key: 'trichards', name: 'Tom Richards', role: 'Fire Safety Inspector  ·  Sussex patch', initials: 'TR' },
+      { key: 'ahayes', name: 'Amelia Hayes', role: 'Senior Fire Safety Inspector', initials: 'AH' },
+      { key: 'mchen', name: 'Michael Chen', role: 'Fire Safety Inspector  ·  Surrey patch', initials: 'MC' },
+      { key: 'pgower', name: 'Phil Gower', role: 'Lead Fire Safety Inspector  ·  Already lead on this audit', initials: 'PG' }
+    ]
+  };
+
+  const SETUP_LOOKUP_META = {
+    dutyHolder: {
+      title: 'Add a Duty Holder',
+      sub: 'Search organisations in the directory. Already added parties are shown but cannot be selected again.',
+      placeholder: 'Search organisations…',
+      isAdded: (entry) => auditSetup.dutyHolders.some(d => d.name.toLowerCase() === entry.name.toLowerCase())
+    },
+    responsiblePerson: {
+      title: 'Add a Responsible Person',
+      sub: 'Search people linked to Duty Holders and premises records.',
+      placeholder: 'Search people…',
+      isAdded: (entry) => auditSetup.responsiblePersons.some(r => r.name.toLowerCase() === entry.name.toLowerCase())
+    },
+    inspector: {
+      title: 'Add another inspector',
+      sub: 'Search inspectors in your region. Phil Gower is already the lead inspector.',
+      placeholder: 'Search inspectors…',
+      isAdded: (entry) => entry.key === 'pgower' || auditSetup.inspectors.some(i => i.name.toLowerCase() === entry.name.toLowerCase())
+    }
+  };
+
+  let setupLookupMode = null;
+
+  function openSetupLookupModal(mode) {
+    setupLookupMode = mode;
+    const modal = document.getElementById('setup-lookup-modal');
+    const meta = SETUP_LOOKUP_META[mode];
+    if (!modal || !meta) return;
+
+    document.getElementById('setup-lookup-title').textContent = meta.title;
+    document.getElementById('setup-lookup-sub').textContent = meta.sub;
+    const search = document.getElementById('setup-lookup-search');
+    search.placeholder = meta.placeholder;
+    search.value = '';
+
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    filterSetupLookup();
+    setTimeout(() => search.focus(), 50);
+  }
+
+  function closeSetupLookupModal() {
+    const modal = document.getElementById('setup-lookup-modal');
+    if (modal) modal.classList.remove('open');
+    if (!document.getElementById('new-modal')?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+    setupLookupMode = null;
+  }
+
+  function filterSetupLookup() {
+    if (!setupLookupMode) return;
+    const q = (document.getElementById('setup-lookup-search')?.value || '').trim().toLowerCase();
+    const catalog = SETUP_LOOKUP_CATALOG[setupLookupMode] || [];
+    const meta = SETUP_LOOKUP_META[setupLookupMode];
+    const list = document.getElementById('setup-lookup-list');
+    const empty = document.getElementById('setup-lookup-empty');
+    if (!list || !empty) return;
+
+    const filtered = catalog.filter(entry => {
+      if (!q) return true;
+      return (entry.name + ' ' + entry.role).toLowerCase().includes(q);
     });
-    renderSetupDutyHolders();
+
+    if (filtered.length === 0) {
+      list.innerHTML = '';
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+
+    list.innerHTML = filtered.map(entry => {
+      const added = meta.isAdded(entry);
+      const tag = added ? '<span class="pill grey">Added</span>' : '<span class="pill blue">Select</span>';
+      return '<button type="button" class="setup-lookup-item"' +
+        (added ? ' disabled' : ' onclick="selectSetupLookup(\'' + entry.key + '\')"') + '>' +
+        '<div class="avatar-sm">' + escHtml(entry.initials) + '</div>' +
+        '<div><div class="name">' + escHtml(entry.name) + '</div><div class="role">' + escHtml(entry.role) + '</div></div>' +
+        tag + '</button>';
+    }).join('');
+  }
+
+  function selectSetupLookup(key) {
+    const catalog = SETUP_LOOKUP_CATALOG[setupLookupMode] || [];
+    const entry = catalog.find(e => e.key === key);
+    if (!entry || !setupLookupMode) return;
+
+    if (setupLookupMode === 'dutyHolder') {
+      auditSetup.dutyHolders.push({
+        id: 'dh' + Date.now(),
+        name: entry.name,
+        role: entry.role,
+        initials: entry.initials,
+        fromPremises: false
+      });
+      renderSetupDutyHolders();
+    } else if (setupLookupMode === 'responsiblePerson') {
+      auditSetup.responsiblePersons.push({
+        id: 'rp' + Date.now(),
+        name: entry.name,
+        role: entry.role,
+        initials: entry.initials,
+        fromPremises: false
+      });
+      renderSetupResponsiblePersons();
+    } else if (setupLookupMode === 'inspector') {
+      auditSetup.inspectors.push({
+        id: 'ins' + Date.now(),
+        name: entry.name,
+        role: entry.role.replace('  ·  Already lead on this audit', ''),
+        initials: entry.initials
+      });
+      renderSetupInspectors();
+    }
+
+    closeSetupLookupModal();
+  }
+
+  function addSetupDutyHolder() {
+    openSetupLookupModal('dutyHolder');
   }
 
   function removeSetupDutyHolder(id) {
@@ -4179,17 +4399,7 @@
   }
 
   function addSetupResponsiblePerson() {
-    const name = window.prompt('Responsible Person name');
-    if (!name || !name.trim()) return;
-    const role = window.prompt('Organisation and role (e.g. HMCTS · Property Director)', '') || '';
-    auditSetup.responsiblePersons.push({
-      id: 'rp' + Date.now(),
-      name: name.trim(),
-      role: role.trim(),
-      initials: setupInitials(name),
-      fromPremises: false
-    });
-    renderSetupResponsiblePersons();
+    openSetupLookupModal('responsiblePerson');
   }
 
   function removeSetupResponsiblePerson(id) {
@@ -4198,15 +4408,7 @@
   }
 
   function addSetupInspector() {
-    const name = window.prompt('Inspector name');
-    if (!name || !name.trim()) return;
-    auditSetup.inspectors.push({
-      id: 'ins' + Date.now(),
-      name: name.trim(),
-      role: 'Fire Safety Inspector',
-      initials: setupInitials(name)
-    });
-    renderSetupInspectors();
+    openSetupLookupModal('inspector');
   }
 
   function removeSetupInspector(id) {
