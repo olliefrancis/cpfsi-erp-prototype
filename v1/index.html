@@ -745,6 +745,34 @@
     font-size: 13px;
   }
 
+  .audit-recent-on-audit {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .audit-recent-on-audit .audit-recent-hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .audit-recent-on-audit h3 {
+    margin: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .audit-recent-on-audit .audit-recent-summary {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+
   /* CPIN page */
   .cpin-tabs {
     display: flex;
@@ -2704,6 +2732,19 @@
       </div>
     </div>
 
+    <section class="audit-recent-on-audit" id="audit-recent-on-audit" aria-label="Recently on this audit">
+      <div class="audit-recent-hd">
+        <h3>Recently on this audit</h3>
+        <div class="audit-recent-summary">
+          <span id="audit-recent-count-notes">3 notes</span>
+          <span id="audit-recent-count-time">6h 20m logged</span>
+        </div>
+      </div>
+      <div class="audit-activity-feed">
+        <div id="audit-activity-feed-list"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -3925,13 +3966,19 @@
   function renderAuditActivity() {
     const notesEl = document.getElementById('audit-count-notes');
     const timeEl = document.getElementById('audit-count-time');
+    const recentNotesEl = document.getElementById('audit-recent-count-notes');
+    const recentTimeEl = document.getElementById('audit-recent-count-time');
     const feed = document.getElementById('audit-activity-feed-list');
 
     const noteCount = auditActivityLog.notes.length;
     const totalMin = auditActivityLog.times.reduce((s, t) => s + t.minutes, 0);
+    const notesLabel = noteCount + (noteCount === 1 ? ' note' : ' notes');
+    const timeLabel = formatAuditMinutes(totalMin) + ' logged';
 
-    if (notesEl) notesEl.textContent = noteCount + (noteCount === 1 ? ' note' : ' notes');
-    if (timeEl) timeEl.textContent = formatAuditMinutes(totalMin) + ' logged';
+    if (notesEl) notesEl.textContent = notesLabel;
+    if (timeEl) timeEl.textContent = timeLabel;
+    if (recentNotesEl) recentNotesEl.textContent = notesLabel;
+    if (recentTimeEl) recentTimeEl.textContent = timeLabel;
 
     if (!feed) return;
 
