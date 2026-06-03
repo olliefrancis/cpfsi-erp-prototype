@@ -61,10 +61,11 @@
     height: 56px;
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 16px;
     position: sticky;
     top: 0;
     z-index: 10;
+    min-width: 0;
   }
   .logo {
     font-weight: 700;
@@ -80,19 +81,87 @@
   .logo:hover { color: var(--accent); }
   .logo span { color: var(--ink-3); font-weight: 400; }
   .logo:hover span { color: var(--ink-2); }
-  .nav { display: flex; gap: 4px; flex: 1; }
-  .nav button {
+  .nav-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+  }
+  .nav-main {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .nav-main button,
+  .nav-more-menu button {
     background: none;
     border: none;
     padding: 8px 12px;
     color: var(--ink-2);
     border-radius: 6px;
     font-weight: 500;
+    font-family: inherit;
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  .nav button.active { background: var(--ink); color: white; }
-  .nav button:hover:not(.active) { background: var(--line-2); }
+  .nav-main button.active,
+  .nav-more-menu button.active { background: var(--ink); color: white; }
+  .nav-main button:hover:not(.active),
+  .nav-more-menu button:hover:not(.active) { background: var(--line-2); }
   #nav-concerns { color: var(--ink-3); cursor: default; }
   #nav-concerns:hover { background: none; }
+  .nav-more[hidden] {
+    display: none !important;
+  }
+  .nav-more {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .nav-more-btn {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    color: var(--ink-2);
+    border-radius: 6px;
+    font-weight: 500;
+    font-family: inherit;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .nav-more-btn:hover { background: var(--line-2); }
+  .nav-more-btn.has-active { background: var(--ink); color: white; }
+  .nav-more-menu[hidden] {
+    display: none !important;
+  }
+  .nav-more-menu:not([hidden]) {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 200px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(11, 12, 12, 0.14);
+    padding: 4px;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .nav-more-menu button {
+    width: 100%;
+    text-align: left;
+  }
+  @media (max-width: 960px) {
+    .topbar-user-name { display: none; }
+    .search { flex: 0 1 200px; }
+  }
   .search {
     flex: 0 1 270px;
     position: relative;
@@ -721,7 +790,7 @@
     border-bottom: 1px solid var(--line-2);
     font-size: 13px;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     gap: 12px;
     align-items: start;
   }
@@ -732,12 +801,6 @@
     white-space: nowrap;
   }
   .audit-feed-item .body { color: var(--ink-2); }
-  .audit-feed-item .remove {
-    font-size: 12px;
-    color: var(--ink-3);
-    cursor: pointer;
-  }
-  .audit-feed-item .remove:hover { color: var(--red); }
   .audit-feed-empty {
     padding: 16px;
     text-align: center;
@@ -1932,13 +1995,19 @@
 ========================================================= -->
 <div id="topbar" class="topbar" style="display:none;">
   <button type="button" class="logo" onclick="show('dashboard')" title="Go to dashboard">CPFSI <span>·  Fire Safety MIS</span></button>
-  <div class="nav">
-    <button id="nav-dashboard" onclick="show('dashboard')">Dashboard</button>
-    <button id="nav-premises" onclick="show('premises')">Premises</button>
-    <button id="nav-processes" onclick="show('processes')">Processes</button>
-    <button id="nav-cpins" onclick="show('cpins')">CPINs</button>
-    <button id="nav-concerns" onclick="return false;" title="Coming soon">Safety Concerns</button>
-    <button id="nav-reports" onclick="show('reports')">Reports</button>
+  <div class="nav-wrap">
+    <nav class="nav-main" id="nav-main" aria-label="Main">
+      <button id="nav-dashboard" onclick="show('dashboard')">Dashboard</button>
+      <button id="nav-premises" onclick="show('premises')">Premises</button>
+      <button id="nav-processes" onclick="show('processes')">Processes</button>
+      <button id="nav-cpins" onclick="show('cpins')">CPINs</button>
+      <button id="nav-concerns" onclick="return false;" title="Coming soon">Safety Concerns</button>
+      <button id="nav-reports" onclick="show('reports')">Reports</button>
+    </nav>
+    <div class="nav-more" id="nav-more" hidden>
+      <button type="button" class="nav-more-btn" id="nav-more-btn" aria-expanded="false" aria-haspopup="true" onclick="toggleNavMoreMenu()">More</button>
+      <div class="nav-more-menu" id="nav-more-menu" hidden role="menu"></div>
+    </div>
   </div>
   <div class="search" id="global-search">
     <input
@@ -1955,8 +2024,8 @@
     <div id="global-search-results" class="search-results" hidden role="listbox"></div>
   </div>
   <button class="btn" id="topbar-log-time" type="button" onclick="show('time')" style="flex-shrink:0;">+ Log time</button>
-  <div class="user">
-    <span style="font-size:13px;">Phil Gower</span>
+  <div class="user" style="flex-shrink:0;">
+    <span class="topbar-user-name" style="font-size:13px;">Phil Gower</span>
     <div class="avatar">PG</div>
   </div>
 </div>
@@ -3704,8 +3773,85 @@
     window.alert('Incorrect password.');
   }
 
+  const NAV_ITEM_ORDER = [
+    'nav-dashboard',
+    'nav-premises',
+    'nav-processes',
+    'nav-cpins',
+    'nav-concerns',
+    'nav-reports'
+  ];
+
+  function closeNavMoreMenu() {
+    const menu = document.getElementById('nav-more-menu');
+    const btn = document.getElementById('nav-more-btn');
+    if (menu) menu.hidden = true;
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleNavMoreMenu() {
+    const menu = document.getElementById('nav-more-menu');
+    const btn = document.getElementById('nav-more-btn');
+    if (!menu || !btn) return;
+    const open = menu.hidden;
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  }
+
+  function resetNavItemOrder() {
+    const nav = document.getElementById('nav-main');
+    const menu = document.getElementById('nav-more-menu');
+    if (!nav || !menu) return;
+    NAV_ITEM_ORDER.forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) nav.appendChild(btn);
+    });
+    menu.innerHTML = '';
+  }
+
+  function updateNavMoreActive() {
+    const btn = document.getElementById('nav-more-btn');
+    const menu = document.getElementById('nav-more-menu');
+    if (!btn || !menu) return;
+    btn.classList.toggle('has-active', !!menu.querySelector('button.active'));
+  }
+
+  function layoutResponsiveNav() {
+    const topbar = document.getElementById('topbar');
+    const nav = document.getElementById('nav-main');
+    const moreWrap = document.getElementById('nav-more');
+    const menu = document.getElementById('nav-more-menu');
+    if (!topbar || !nav || !moreWrap || !menu) return;
+    if (getComputedStyle(topbar).display === 'none') return;
+
+    resetNavItemOrder();
+    moreWrap.hidden = true;
+    closeNavMoreMenu();
+
+    let guard = 0;
+    while (nav.scrollWidth > nav.clientWidth + 1 && nav.children.length > 1 && guard < NAV_ITEM_ORDER.length) {
+      const last = nav.lastElementChild;
+      if (last) menu.prepend(last);
+      moreWrap.hidden = false;
+      guard++;
+    }
+    updateNavMoreActive();
+  }
+
+  function initResponsiveNav() {
+    if (document.body.dataset.navLayoutBound) return;
+    document.body.dataset.navLayoutBound = '1';
+    window.addEventListener('resize', layoutResponsiveNav);
+    document.addEventListener('mousedown', (e) => {
+      const more = document.getElementById('nav-more');
+      if (more && !more.contains(e.target)) closeNavMoreMenu();
+    });
+    layoutResponsiveNav();
+  }
+
   function show(id) {
     closeGlobalSearch();
+    closeNavMoreMenu();
     if (id !== 'login' && !isAuthenticated()) {
       id = 'login';
     }
@@ -3774,7 +3920,7 @@
     }
 
     // Update active nav
-    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-main button, .nav-more-menu button').forEach(b => b.classList.remove('active'));
     const navMap = {
       dashboard: 'nav-dashboard',
       premises: 'nav-premises',
@@ -3787,7 +3933,9 @@
       time: 'nav-dashboard'
     };
     const navId = navMap[id];
-    if (navId) document.getElementById(navId).classList.add('active');
+    if (navId) document.getElementById(navId)?.classList.add('active');
+    updateNavMoreActive();
+    requestAnimationFrame(layoutResponsiveNav);
 
     if (id !== 'audit') {
       closeAuditFloatPanel();
@@ -3807,6 +3955,8 @@
   window.addEventListener('load', () => {
     renderFromHash();
     initGlobalSearch();
+    initResponsiveNav();
+    requestAnimationFrame(layoutResponsiveNav);
   });
 
   // ---------------------------------------------------------
@@ -3988,8 +4138,7 @@
         ts: t.ts || 0,
         at: t.at,
         stage: t.stage,
-        body: '<span class="pill blue">Time</span> ' + escHtml(t.activity) + '  ·  <strong>' + formatDurationLabel(t.minutes) + '</strong>',
-        remove: "removeAuditTime('" + t.id + "')"
+        body: '<span class="pill blue">Time</span> ' + escHtml(t.activity) + '  ·  <strong>' + formatDurationLabel(t.minutes) + '</strong>'
       });
     });
     auditActivityLog.notes.forEach(n => {
@@ -3997,8 +4146,7 @@
         ts: n.ts || 0,
         at: n.at,
         stage: n.stage,
-        body: '<span class="pill grey">Note</span> ' + escHtml(n.text),
-        remove: "removeAuditNote('" + n.id + "')"
+        body: '<span class="pill grey">Note</span> ' + escHtml(n.text)
       });
     });
 
@@ -4013,7 +4161,6 @@
       '<div class="audit-feed-item">' +
         '<div class="meta">' + escHtml(item.at) + '<br>Stage ' + item.stage + '</div>' +
         '<div class="body">' + item.body + '</div>' +
-        '<span class="remove" onclick="' + item.remove + '">Remove</span>' +
       '</div>'
     ).join('');
   }
@@ -4066,16 +4213,6 @@
     ta.value = '';
     renderAuditActivity();
     closeAuditFloatPanel();
-  }
-
-  function removeAuditNote(id) {
-    auditActivityLog.notes = auditActivityLog.notes.filter(n => n.id !== id);
-    renderAuditActivity();
-  }
-
-  function removeAuditTime(id) {
-    auditActivityLog.times = auditActivityLog.times.filter(t => t.id !== id);
-    renderAuditActivity();
   }
 
   function initAuditActivity() {
