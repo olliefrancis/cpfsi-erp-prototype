@@ -376,6 +376,26 @@
     height: 100%;
     background: var(--accent);
   }
+  .dash-week-time-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .dash-week-time-item .time-bar {
+    margin: 6px 0 0;
+  }
+  .dash-week-time-hours {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 2px;
+    line-height: 1.2;
+  }
+  .dash-week-time-hours span {
+    font-weight: 400;
+    color: var(--ink-3);
+    font-size: 12px;
+  }
 
   /* Process page layout */
   .process-grid {
@@ -742,7 +762,7 @@
 
   .audit-quick-log {
     display: grid;
-    grid-template-columns: 140px 1fr 120px;
+    grid-template-columns: 240px 1fr 120px;
     gap: 12px;
     align-items: end;
   }
@@ -872,10 +892,7 @@
     grid-template-columns: 76px 1fr auto;
     gap: 16px;
     align-items: center;
-    cursor: pointer;
-    transition: border-color 120ms, background 120ms;
   }
-  .cpin-card:hover { border-color: var(--accent); background: #fdfdfc; }
   .cpin-card.red { border-left: 3px solid var(--red); }
   .cpin-card.amber { border-left: 3px solid var(--amber); }
   .cpin-card.green { border-left: 3px solid var(--green); }
@@ -884,7 +901,6 @@
   .cpin-card .summary { font-size: 13px; color: var(--ink-2); }
   .cpin-card .premises { font-weight: 600; font-size: 13px; }
   .cpin-card .cpin-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .cpin-card .cpin-meta .btn { padding: 5px 10px; font-size: 12px; pointer-events: auto; }
   .cpin-pin {
     background: none;
     border: none;
@@ -924,10 +940,6 @@
     background: #fffdf8;
     border-color: var(--line);
     box-shadow: 0 1px 0 rgba(180, 120, 0, 0.06);
-  }
-  .cpins-pinned-section .cpin-card:hover {
-    border-color: var(--amber);
-    background: #fff9ed;
   }
   .premises-audit-banner {
     background: var(--accent-soft);
@@ -2097,9 +2109,18 @@
           <h3 style="margin:0;">This week</h3>
           <a onclick="show('time')" style="font-size:11px;">Open time page →</a>
         </div>
-        <div style="font-size:12px;color:var(--ink-3);margin-top:8px;">Time logged</div>
-        <div style="font-size:18px;font-weight:600;margin-top:2px;">21.5 <span style="font-weight:400;color:var(--ink-3);font-size:13px;">/ 37 hours</span></div>
-        <div class="time-bar"><div style="width:58%;"></div></div>
+        <div class="dash-week-time-grid">
+          <div class="dash-week-time-item">
+            <div style="font-size:12px;color:var(--ink-3);">My time logged</div>
+            <div class="dash-week-time-hours">21.5 <span>/ 37h</span></div>
+            <div class="time-bar"><div style="width:58%;"></div></div>
+          </div>
+          <div class="dash-week-time-item">
+            <div style="font-size:12px;color:var(--ink-3);">Team time logged</div>
+            <div class="dash-week-time-hours">286 <span>/ 370h</span></div>
+            <div class="time-bar"><div style="width:77%;"></div></div>
+          </div>
+        </div>
         <button class="btn" style="width:100%;margin-top:8px;" onclick="show('time')">+ Log time</button>
 
         <div style="margin-top:16px;font-size:12px;color:var(--ink-3);">Reminders</div>
@@ -2725,7 +2746,6 @@
           </div>
 
           <div class="stage-actions">
-            <button class="btn">Schedule follow-up audit</button>
             <button class="btn primary" onclick="setAuditStage(6)">Mark settled threads complete →</button>
           </div>
         </div>
@@ -3621,6 +3641,16 @@
 
           <button class="new-option" onclick="closeNewModal();">
             <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7.5L8 10L12.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Follow-up audit</div>
+              <div class="desc">Successor audit linked to a previous audit, carrying forward deficient items.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L1.5 15.5H16.5L9 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 7V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="12.5" r="0.8" fill="currentColor"/></svg>
             </div>
             <div>
@@ -3631,21 +3661,21 @@
 
           <button class="new-option" onclick="closeNewModal();">
             <div class="icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="6" cy="6.5" r="2.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 14C1.5 11.79 3.5 10 6 10C8.5 10 10.5 11.79 10.5 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10.5 12C10.5 10.62 11.79 9.5 13 9.5C14.5 9.5 16 10.62 16 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <div class="ttl">Business support</div>
-              <div class="desc">Log advice or support given to a premises. Captures notes, time and outcomes in one record.</div>
-            </div>
-          </button>
-
-          <button class="new-option" onclick="closeNewModal();">
-            <div class="icon">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 2.5H10.5L14.5 6.5V15.5H3.5V2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10.5 2.5V6.5H14.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 9.5H12M6 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </div>
             <div>
               <div class="ttl">Building Control Consultation</div>
               <div class="desc">Set up a new consultation with a 15-day SLA. Documents linked from SharePoint.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="6" cy="6.5" r="2.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 14C1.5 11.79 3.5 10 6 10C8.5 10 10.5 11.79 10.5 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10.5 12C10.5 10.62 11.79 9.5 13 9.5C14.5 9.5 16 10.62 16 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Business support</div>
+              <div class="desc">Log advice or support given to a premises. Captures notes, time and outcomes in one record.</div>
             </div>
           </button>
 
@@ -3666,16 +3696,6 @@
             <div>
               <div class="ttl">Appeals</div>
               <div class="desc">Manage an appeal against an enforcement decision or notice.</div>
-            </div>
-          </button>
-
-          <button class="new-option" onclick="closeNewModal();">
-            <div class="icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7.5L8 10L12.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div>
-              <div class="ttl">Follow-up audit</div>
-              <div class="desc">Successor audit linked to a previous audit, carrying forward deficient items.</div>
             </div>
           </button>
         </div>
@@ -4536,11 +4556,8 @@
     const premisesHtml = item.premises
       ? '<div class="premises">' + escHtml(item.premises) + '</div>'
       : '<div class="premises" style="color:var(--ink-3);font-weight:500;">No premises linked</div>';
-    const actionHtml = item.action
-      ? '<span class="btn" style="pointer-events:none;white-space:nowrap;">' + escHtml(item.action) + '</span>'
-      : '<span class="pill grey">Closed</span>';
 
-    return '<div class="cpin-card ' + item.severity + (pinned ? ' is-pinned' : '') + '" data-cpin-id="' + escHtml(item.id) + '" onclick="navigateCpin(\'' + item.route + '\')">' +
+    return '<div class="cpin-card ' + item.severity + (pinned ? ' is-pinned' : '') + '" data-cpin-id="' + escHtml(item.id) + '">' +
       '<div class="cpin-severity"><span class="pill ' + item.severity + '">' + sevLabel + '</span></div>' +
       '<div class="cpin-body">' +
         '<div style="font-size:12px;color:var(--ink-3);">' + escHtml(item.ref) + '  ·  ' + escHtml(item.when) + '</div>' +
@@ -4548,8 +4565,7 @@
         '<div class="summary">' + escHtml(item.summary) + '</div>' +
       '</div>' +
       '<div class="cpin-meta">' +
-        '<button type="button" class="cpin-pin' + (pinned ? ' pinned' : '') + '" title="' + (pinned ? 'Unpin' : 'Pin') + '" aria-label="' + (pinned ? 'Unpin' : 'Pin') + '" onclick="event.stopPropagation();toggleCpinPin(\'' + item.id + '\')">' + (pinned ? '★' : '☆') + '</button>' +
-        actionHtml +
+        '<button type="button" class="cpin-pin' + (pinned ? ' pinned' : '') + '" title="' + (pinned ? 'Unpin' : 'Pin') + '" aria-label="' + (pinned ? 'Unpin' : 'Pin') + '" onclick="toggleCpinPin(\'' + item.id + '\')">' + (pinned ? '★' : '☆') + '</button>' +
       '</div>' +
     '</div>';
   }
