@@ -10,7 +10,6 @@
       --bg: #f4f5f7;
       --card: #ffffff;
       --text: #1f2937;
-      --muted: #6b7280;
       --border: #d1d5db;
       --link: #0b5fff;
       --link-hover: #003fbf;
@@ -33,14 +32,9 @@
     }
 
     h1 {
-      margin: 0 0 8px;
+      margin: 0 0 24px;
       font-size: 2rem;
       line-height: 1.2;
-    }
-
-    p {
-      margin: 0 0 24px;
-      color: var(--muted);
     }
 
     ul {
@@ -54,7 +48,8 @@
     .prototype-link {
       display: block;
       text-decoration: none;
-      color: inherit;
+      font-weight: 600;
+      color: var(--link);
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -64,37 +59,19 @@
 
     .prototype-link:hover {
       border-color: var(--link);
-      transform: translateY(-1px);
-    }
-
-    .prototype-name {
-      font-weight: 600;
-      color: var(--link);
-      margin-bottom: 2px;
-    }
-
-    .prototype-path {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .prototype-link:hover .prototype-name {
       color: var(--link-hover);
       text-decoration: underline;
+      transform: translateY(-1px);
     }
   </style>
 </head>
 <body>
   <main>
     <h1>CPFSI Prototypes</h1>
-    <p>Select a prototype to open:</p>
 
     <ul>
-      <li>
-        <a class="prototype-link" href="/v1/">
-          <div class="prototype-name">Prototype v1</div>
-        </a>
-      </li>
+      <li><a class="prototype-link" href="/v1/">V1</a></li>
+      <li><a class="prototype-link" href="/v2/">V2</a></li>
     </ul>
   </main>
 </body>
