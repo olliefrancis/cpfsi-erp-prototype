@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,19 +7,21 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f5f7;
+      --bg: #f3f2f1;
       --card: #ffffff;
-      --text: #1f2937;
-      --border: #d1d5db;
-      --link: #0b5fff;
-      --link-hover: #003fbf;
+      --text: #0b0c0c;
+      --muted: #505a5f;
+      --border: #b1b4b6;
+      --link: #1d70b8;
+      --link-hover: #003078;
+      --green: #00703c;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
@@ -45,23 +47,51 @@
       gap: 12px;
     }
 
-    .prototype-link {
-      display: block;
-      text-decoration: none;
-      font-weight: 600;
-      color: var(--link);
+    .prototype-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 16px;
+      align-items: center;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 14px 16px;
-      transition: border-color 120ms ease, transform 120ms ease;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
     }
 
-    .prototype-link:hover {
+    a.prototype-card:hover {
       border-color: var(--link);
+      box-shadow: 0 2px 8px rgba(11, 12, 12, 0.08);
+    }
+
+    a.prototype-card:hover .prototype-version {
       color: var(--link-hover);
       text-decoration: underline;
-      transform: translateY(-1px);
+    }
+
+    .prototype-version {
+      grid-row: 1 / 3;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--link);
+      letter-spacing: -0.02em;
+    }
+
+    .prototype-audience {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .prototype-card--current .prototype-audience {
+      color: var(--green);
+    }
+
+    .prototype-purpose {
+      font-size: 0.875rem;
+      color: var(--muted);
     }
   </style>
 </head>
@@ -70,8 +100,20 @@
     <h1>CPFSI Prototypes</h1>
 
     <ul>
-      <li><a class="prototype-link" href="/v1/">V1</a></li>
-      <li><a class="prototype-link" href="/v2/">V2</a></li>
+      <li>
+        <a class="prototype-card prototype-card--current" href="/v1/">
+          <span class="prototype-version">V1</span>
+          <span class="prototype-audience">Current version</span>
+          <span class="prototype-purpose">For review and feedback.</span>
+        </a>
+      </li>
+      <li>
+        <a class="prototype-card" href="/v2/">
+          <span class="prototype-version">V2</span>
+          <span class="prototype-audience">Next version</span>
+          <span class="prototype-purpose">In test and build.</span>
+        </a>
+      </li>
     </ul>
   </main>
 </body>
