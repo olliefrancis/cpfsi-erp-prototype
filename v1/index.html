@@ -104,9 +104,12 @@
   }
   .nav button.active { background: var(--ink); color: white; }
   .nav button:hover:not(.active) { background: var(--line-2); }
+  #nav-concerns { color: var(--ink-3); cursor: default; }
+  #nav-concerns:hover { background: none; }
   .search {
-    flex: 0 1 320px;
+    flex: 0 1 360px;
     position: relative;
+    z-index: 60;
   }
   .search input {
     width: 100%;
@@ -116,6 +119,12 @@
     font-size: 13px;
     background: var(--bg);
   }
+  .search input:focus {
+    outline: 3px solid var(--gov-focus);
+    outline-offset: 0;
+    box-shadow: 0 3px 0 var(--ink);
+    border-color: var(--ink);
+  }
   .search::before {
     content: '⌕';
     position: absolute;
@@ -123,6 +132,68 @@
     top: 50%;
     transform: translateY(-50%);
     color: var(--ink-3);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .search-results {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    min-width: 400px;
+    max-height: min(420px, 55vh);
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 16px 40px rgba(11, 12, 12, 0.14);
+  }
+  .search-results-hint,
+  .search-results-empty {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .search-results-group + .search-results-group {
+    border-top: 1px solid var(--line-2);
+  }
+  .search-results-label {
+    padding: 10px 14px 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .search-result-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    border-bottom: 1px solid var(--line-2);
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover,
+  .search-result-item:focus-visible {
+    background: var(--accent-soft);
+  }
+  .search-result-item .meta-line {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .search-result-item .title-line {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
   }
   .user {
     display: flex;
@@ -368,6 +439,24 @@
     flex-wrap: wrap;
   }
   .audit-panel[hidden] { display: none; }
+  .audit-type-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+  .audit-type-panel h3 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .audit-type-panel .help {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
   .dh-progress {
     font-size: 12px;
     color: var(--ink-2);
@@ -609,9 +698,10 @@
     font-size: 14px;
     font-weight: 600;
   }
+
   .audit-quick-log {
     display: grid;
-    grid-template-columns: 140px 1fr 120px auto;
+    grid-template-columns: 140px 1fr 120px;
     gap: 12px;
     align-items: end;
   }
@@ -703,6 +793,12 @@
     color: var(--ink);
     border-bottom-color: var(--ink);
   }
+  .cpin-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 12px;
+  }
   .cpin-card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -710,24 +806,183 @@
     padding: 14px 16px;
     margin-bottom: 8px;
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: 76px 1fr auto;
     gap: 16px;
     align-items: center;
+    cursor: pointer;
+    transition: border-color 120ms, background 120ms;
   }
+  .cpin-card:hover { border-color: var(--accent); background: #fdfdfc; }
   .cpin-card.red { border-left: 3px solid var(--red); }
   .cpin-card.amber { border-left: 3px solid var(--amber); }
   .cpin-card.green { border-left: 3px solid var(--green); }
-  .cpin-card .when {
-    font-family: var(--mono);
-    font-size: 12px;
+  .cpin-card .cpin-severity { width: 76px; flex-shrink: 0; }
+  .cpin-card .cpin-body { min-width: 0; }
+  .cpin-card .summary { font-size: 13px; color: var(--ink-2); }
+  .cpin-card .premises { font-weight: 600; font-size: 13px; }
+  .cpin-card .cpin-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .cpin-card .cpin-meta .btn { padding: 5px 10px; font-size: 12px; pointer-events: auto; }
+  .cpin-pin {
+    background: none;
+    border: none;
+    font-size: 18px;
     color: var(--ink-3);
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
   }
-  .cpin-card .summary {
+  .cpin-pin.pinned { color: var(--amber); }
+  .cpins-panel[hidden] { display: none; }
+  .cpins-pinned-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cpins-section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cpins-section-label .star {
+    color: var(--amber);
     font-size: 13px;
+    line-height: 1;
   }
-  .cpin-card .premises { font-weight: 600; }
-  .cpin-card .actions { display: flex; gap: 6px; }
-  .cpin-card .actions .btn { padding: 5px 10px; font-size: 12px; }
+  .cpins-card-stack--rest {
+    margin-top: 4px;
+  }
+  .cpins-pinned-section .cpin-card {
+    background: #fffdf8;
+    border-color: var(--line);
+    box-shadow: 0 1px 0 rgba(180, 120, 0, 0.06);
+  }
+  .cpins-pinned-section .cpin-card:hover {
+    border-color: var(--amber);
+    background: #fff9ed;
+  }
+  .premises-audit-banner {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .premises-audit-banner strong { font-size: 15px; }
+  #audit-float-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 -4px 24px rgba(11, 12, 12, 0.1);
+  }
+  body.audit-activity-bar #audit-float-bar {
+    display: flex;
+  }
+  .audit-float-panel {
+    width: 100%;
+    background: var(--surface);
+    border-top: 1px solid var(--line-2);
+    max-height: 0;
+    padding: 0 24px;
+    overflow: hidden;
+    visibility: hidden;
+    box-sizing: border-box;
+    transition: max-height 220ms ease, padding 220ms ease, visibility 0s 220ms;
+  }
+  .audit-float-panel.open {
+    max-height: min(360px, 55vh);
+    padding: 16px 24px 18px;
+    overflow-y: auto;
+    visibility: visible;
+    transition: max-height 220ms ease, padding 220ms ease, visibility 0s;
+  }
+  .audit-float-panel-hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .audit-float-panel-hd strong {
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .audit-float-bar-strip {
+    width: 100%;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 52px;
+    box-sizing: border-box;
+  }
+  .audit-float-bar-strip .counts {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--ink-2);
+    flex-wrap: wrap;
+  }
+  .audit-float-bar-strip .actions {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .audit-float-bar-strip .actions-secondary {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding-right: 20px;
+    margin-right: 20px;
+    border-right: 1px solid var(--line-2);
+  }
+  .audit-float-bar-strip .actions-primary {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .audit-float-bar-strip .actions .btn {
+    white-space: nowrap;
+  }
+  .audit-float-bar-strip .btn-quiet {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ink-3);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 10px;
+  }
+  .audit-float-bar-strip .btn-quiet:hover {
+    background: var(--bg);
+    border-color: var(--line);
+    color: var(--ink-2);
+  }
+  body.audit-activity-bar #audit > main {
+    padding-bottom: 72px;
+  }
+  body.audit-float-panel-open #audit > main {
+    padding-bottom: min(400px, 55vh);
+  }
 
   /* Premises detail */
   .premises-header {
@@ -830,18 +1085,6 @@
     font-size: 12px;
     color: var(--accent);
     margin-bottom: 16px;
-  }
-
-  /* Footer note */
-  .footnote {
-    margin-top: 32px;
-    padding: 16px;
-    background: var(--surface);
-    border: 1px dashed var(--line);
-    border-radius: 8px;
-    font-size: 12px;
-    color: var(--ink-3);
-    line-height: 1.6;
   }
 
   /* Login screen */
@@ -1168,6 +1411,12 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+  }
+  #new-modal .modal {
+    max-width: 960px;
+  }
+  #new-modal .modal-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
   .new-option {
     display: grid;
@@ -1693,11 +1942,24 @@
     <button id="nav-premises" onclick="show('premises')">Premises</button>
     <button id="nav-processes" onclick="show('processes')">Processes</button>
     <button id="nav-cpins" onclick="show('cpins')">CPINs</button>
+    <button id="nav-concerns" onclick="return false;" title="Coming soon">Safety Concerns</button>
     <button id="nav-reports" onclick="show('reports')">Reports</button>
   </div>
-  <div class="search">
-    <input type="text" placeholder="Search premises, processes, CPINs…">
+  <div class="search" id="global-search">
+    <input
+      type="search"
+      id="global-search-input"
+      placeholder="Search premises, processes, CPINs…"
+      autocomplete="off"
+      aria-autocomplete="list"
+      aria-controls="global-search-results"
+      aria-expanded="false"
+      oninput="renderGlobalSearchResults(this.value)"
+      onfocus="onGlobalSearchFocus()"
+    />
+    <div id="global-search-results" class="search-results" hidden role="listbox"></div>
   </div>
+  <button class="btn" id="topbar-log-time" type="button" onclick="show('time')" style="flex-shrink:0;">+ Log time</button>
   <div class="user">
     <span style="font-size:13px;">Phil Gower</span>
     <div class="avatar">PG</div>
@@ -1728,7 +1990,7 @@
       <div class="card" onclick="show('cpins')" style="cursor:pointer;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;">
           <h3 style="margin:0;">My CPINs</h3>
-          <span style="font-size:11px;color:var(--ink-3);" id="dash-cpin-meta">7 to action  ·  3 unassigned</span>
+          <span style="font-size:11px;color:var(--ink-3);" id="dash-cpin-meta">8 to action  ·  5 unassigned</span>
         </div>
 
         <div class="cpin-hero">
@@ -1740,12 +2002,12 @@
           <div class="cpin-tile amber">
             <div class="lbl"><span class="dot"></span>Amber</div>
             <div class="big">1</div>
-            <div class="sub">Needs enquiry</div>
+            <div class="sub">Review required</div>
           </div>
           <div class="cpin-tile green" id="dash-green-tile">
             <div class="lbl"><span class="dot"></span>Green</div>
-            <div class="big" id="dash-green-count">4</div>
-            <div class="sub" id="dash-green-sub">No action needed</div>
+            <div class="big" id="dash-green-count">5</div>
+            <div class="sub" id="dash-green-sub">Review needed</div>
           </div>
         </div>
 
@@ -1776,7 +2038,7 @@
         <div class="time-bar"><div style="width:58%;"></div></div>
         <button class="btn" style="width:100%;margin-top:8px;" onclick="show('time')">+ Log time</button>
 
-        <div style="margin-top:16px;font-size:12px;color:var(--ink-3);">Upcoming</div>
+        <div style="margin-top:16px;font-size:12px;color:var(--ink-3);">Reminders</div>
         <div style="font-size:13px;margin-top:6px;">
           <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">2 consultations <span style="color:var(--amber);">· SLA approaching</span></div>
           <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">1 follow-up due in 12 days</div>
@@ -1863,9 +2125,6 @@
       </div>
     </div>
 
-    <div class="footnote">
-      <strong>Why this dashboard.</strong> Today's dashboard pulls some incorrect data, hides time spent (so people use Excel), and includes a calendar nobody uses. This one leads with what the team actually log in to see: CPIN triage front and centre, suggested RBIP work for their patch, and their own time card. The unused calendar block is gone; Outlook handles diary, the system pushes deadlines to it.
-    </div>
   </main>
 </div>
 
@@ -1951,9 +2210,6 @@
       </table>
     </div>
 
-    <div class="footnote">
-      <strong>Pattern note.</strong> Filtering uses multi-select chips (replacing today's boolean syntax that breaks on a typo). Sort defaults to worst-score-first when the "My patch" chip is on, matching Phil's mental model. Clicking a row goes to the Premises detail page.
-    </div>
   </main>
 </div>
 
@@ -1969,7 +2225,6 @@
         <h1>Temple Quay House</h1>
         <div class="meta">Temple Back East, Bristol BS1  ·  <strong>HMCTS</strong>  ·  Government office</div>
         <div style="margin-top:12px;display:flex;gap:8px;">
-          <span class="pill blue">Audit in progress</span>
           <span class="pill grey">Sprinkler system</span>
           <span class="pill grey">Smoke ventilation</span>
         </div>
@@ -1982,10 +2237,17 @@
       </div>
     </div>
 
+    <div class="premises-audit-banner">
+      <div>
+        <strong>Audit in progress</strong>
+        <div style="font-size:13px;color:var(--ink-2);margin-top:4px;">A-2026-0314  ·  Reactive (CPIN-2026-0418)  ·  Stage 2 — Site visit</div>
+      </div>
+      <button class="btn primary" onclick="show('audit-stage-2')">Continue audit →</button>
+    </div>
+
     <div class="tabs">
       <button class="active">Overview</button>
       <button>Processes  ·  18</button>
-      <button>Duty Holders  ·  3</button>
       <button>Documents</button>
       <button>History</button>
     </div>
@@ -2019,7 +2281,7 @@
             <div style="color:var(--ink-3);font-size:12px;">12 Jun 2026  ·  Avon Fire & Rescue</div>
           </div>
           <div style="padding:6px 0;border-bottom:1px solid var(--line-2);">
-            <strong>Business support meeting</strong>  ·  Phil Gower
+            <strong>Business support</strong>  ·  Phil Gower
             <div style="color:var(--ink-3);font-size:12px;">02 May 2026  ·  Fire door training discussion</div>
           </div>
           <div style="padding:6px 0;">
@@ -2044,9 +2306,6 @@
       </div>
     </div>
 
-    <div class="footnote">
-      <strong>Pattern note.</strong> The premises page is the spine. Score split three ways (Building / Duty Holder / Total) as Phil suggested. Duty Holder roles are set at this level, not per-process. Recent activity is a unified timeline across all processes; the parent/child "onion" of Themis is collapsed into one chronological stream.
-    </div>
   </main>
 </div>
 
@@ -2110,6 +2369,26 @@
 
         <!-- Stage 2: Site visit and assessment -->
         <div class="audit-panel" id="audit-panel-2">
+          <div class="audit-type-panel">
+            <h3>Audit type</h3>
+            <div class="help">Chosen at site visit. Drives the question set, scoring weighting and letter wording.</div>
+            <div class="radio-row" id="audit-stage-type-row">
+              <button type="button" class="radio-btn selected" data-audit-type="full" onclick="selectAuditType('full')">
+                <div class="ttl">Full</div>
+                <div class="desc">All articles, all categories.</div>
+              </button>
+              <button type="button" class="radio-btn" data-audit-type="short" onclick="selectAuditType('short')">
+                <div class="ttl">Short</div>
+                <div class="desc">Subset scoped to the trigger.</div>
+              </button>
+              <button type="button" class="radio-btn" data-audit-type="themed" onclick="selectAuditType('themed')">
+                <div class="ttl">Themed</div>
+                <div class="desc">Targeted theme (e.g. fire doors).</div>
+              </button>
+            </div>
+            <div style="margin-top:8px;font-size:12px;color:var(--ink-3);">Question set <strong id="audit-stage-question-set" style="color:var(--ink);">Government office, full</strong></div>
+          </div>
+
           <div style="display:flex;justify-content:space-between;align-items:baseline;">
             <h2 style="margin:0;">Site visit and assessment</h2>
             <span style="font-size:12px;color:var(--ink-3);">Full audit  ·  On-site</span>
@@ -2221,7 +2500,6 @@
 
           <div class="stage-actions">
             <button class="btn">Save draft</button>
-            <button class="btn" onclick="document.getElementById('audit-awaiting-banner').hidden=false">Request more info (Article 27)</button>
             <button class="btn primary" onclick="setAuditStage(3)">Mark stage complete →</button>
           </div>
         </div>
@@ -2406,8 +2684,7 @@
           </div>
 
           <div class="stage-actions">
-            <button class="btn" disabled title="Waiting on Duty Holder threads">Close audit</button>
-            <button class="btn">Create follow-up audit (linked)</button>
+            <button class="btn" disabled style="opacity:0.45;cursor:not-allowed;" title="Waiting on Duty Holder threads">Close audit</button>
           </div>
         </div>
 
@@ -2458,71 +2735,6 @@
       </div>
     </div>
 
-    <!-- Activity (inline log time + notes at every stage) -->
-    <div class="audit-activity-block">
-      <div class="activity">
-        <strong>Activity</strong>
-        <div class="counts">
-          <span id="audit-count-notes">3 notes</span>
-          <span>2 files (site photos)</span>
-          <span id="audit-count-time">6h 20m logged</span>
-        </div>
-        <div class="actions">
-          <button class="btn" id="audit-btn-log-time" type="button" onclick="toggleAuditActivityPanel('time')">+ Log time</button>
-          <button class="btn" id="audit-btn-add-note" type="button" onclick="toggleAuditActivityPanel('note')">+ Add note</button>
-        </div>
-      </div>
-
-      <div class="audit-inline-panel" id="audit-panel-time" hidden>
-        <h3>Log time against this audit</h3>
-        <div class="audit-quick-log">
-          <div>
-            <label>Activity</label>
-            <select id="audit-time-activity"></select>
-          </div>
-          <div>
-            <label>What for</label>
-            <input type="text" value="A-2026-0314  ·  Temple Quay House audit" readonly style="background:var(--bg);color:var(--ink-2);" />
-          </div>
-          <div>
-            <label>Duration</label>
-            <select id="audit-time-duration">
-              <option value="15">15m</option>
-              <option value="30">30m</option>
-              <option value="45">45m</option>
-              <option value="60">1h</option>
-              <option value="90" selected>1h 30m</option>
-              <option value="120">2h</option>
-              <option value="180">3h</option>
-              <option value="240">Half day (4h)</option>
-            </select>
-          </div>
-          <button class="btn primary" type="button" onclick="logAuditTime()">Log time</button>
-        </div>
-        <div style="font-size:11px;color:var(--ink-3);margin-top:8px;">Date defaults to today (22 Jun 2026). Logged against Phil Gower on audit A-2026-0314.</div>
-      </div>
-
-      <div class="audit-inline-panel" id="audit-panel-note" hidden>
-        <h3>Add a note</h3>
-        <div class="audit-note-form">
-          <label>Note</label>
-          <textarea id="audit-note-text" placeholder="Calls, emails, site observations, EMM discussion…"></textarea>
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            <button class="btn primary" type="button" onclick="addAuditNote()">Save note</button>
-            <button class="btn" type="button" onclick="toggleAuditActivityPanel('note', false)">Cancel</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="audit-activity-feed">
-        <div class="feed-hd">Recent on this audit</div>
-        <div id="audit-activity-feed-list"></div>
-      </div>
-    </div>
-
-    <div class="footnote">
-      <strong>One process, many Duty Holders.</strong> Each Duty Holder has their own outcome and resolution path inside audit A-2026-0314. No child processes for letters. A follow-up audit is a separate linked successor when needed.
-    </div>
   </main>
 </div>
 
@@ -2541,130 +2753,31 @@
     <div class="cpin-counts" style="margin-top:16px;">
       <div class="count"><div class="dot red"></div><strong>2</strong><span class="label">Red, mine</span></div>
       <div class="count"><div class="dot amber"></div><strong>1</strong><span class="label">Amber, mine</span></div>
-      <div class="count"><div class="dot green"></div><strong>4</strong><span class="label">Green, mine</span></div>
-      <div class="count" style="margin-left:32px;"><strong>3</strong><span class="label">Unassigned</span></div>
+      <div class="count"><div class="dot green"></div><strong>5</strong><span class="label">Green, mine</span></div>
+      <div class="count" style="margin-left:32px;"><strong>5</strong><span class="label">Unassigned</span></div>
     </div>
 
-    <div class="cpin-tabs">
-      <button class="cpin-tab active">My CPINs  ·  7</button>
-      <button class="cpin-tab">Unassigned  ·  3</button>
-      <button class="cpin-tab">Completed</button>
+    <div class="cpin-filters">
+      <button class="chip on" data-cpin-filter="all">All</button>
+      <button class="chip" data-cpin-filter="red">Red</button>
+      <button class="chip" data-cpin-filter="amber">Amber</button>
+      <button class="chip" data-cpin-filter="green">Green</button>
+      <button class="chip" data-cpin-filter="pinned">Pinned</button>
+      <button class="chip" data-cpin-filter="no-premises">No premises linked</button>
+      <button class="chip" data-cpin-filter="patch">My patch</button>
     </div>
 
-    <div class="cpin-card red">
-      <span class="pill red">RED</span>
-      <div>
-        <div class="premises">HMP Lewes  ·  CPIN-2026-0421</div>
-        <div class="summary" style="color:var(--ink-2);">Cell fire, serious injury reported. Avon FRS attended.  <span style="color:var(--ink-3);">21 Jun, 04:22</span></div>
-      </div>
-      <div style="font-size:12px;color:var(--ink-3);">Duty Holder auto-linked: <strong>HMPPS</strong></div>
-      <div class="actions">
-        <button class="btn">Make enquiries</button>
-        <button class="btn primary" onclick="show('auditsetup')">Start audit</button>
-      </div>
+    <div class="cpin-tabs" id="cpin-tabs">
+      <button class="cpin-tab active" data-cpin-tab="mine" onclick="switchCpinsTab('mine')">My CPINs  ·  8</button>
+      <button class="cpin-tab" data-cpin-tab="unassigned" onclick="switchCpinsTab('unassigned')">Unassigned  ·  5</button>
+      <button class="cpin-tab" data-cpin-tab="completed" onclick="switchCpinsTab('completed')">Completed  ·  47</button>
     </div>
 
-    <div class="cpin-card red">
-      <span class="pill red">RED</span>
-      <div>
-        <div class="premises">Belmarsh  ·  CPIN-2026-0420</div>
-        <div class="summary" style="color:var(--ink-2);">Kitchen fire, two staff injured. LFB attended.  <span style="color:var(--ink-3);">20 Jun, 21:14</span></div>
-      </div>
-      <div style="font-size:12px;color:var(--ink-3);">Duty Holder auto-linked: <strong>HMPPS</strong></div>
-      <div class="actions">
-        <button class="btn">Make enquiries</button>
-        <button class="btn primary" onclick="show('auditsetup')">Start audit</button>
-      </div>
-    </div>
-
-    <div class="cpin-card amber">
-      <span class="pill amber">AMBER</span>
-      <div>
-        <div class="premises">Temple Quay House  ·  CPIN-2026-0418</div>
-        <div class="summary" style="color:var(--ink-2);">Suspected electrical fault in plant room, FRS attended, no injuries.  <span style="color:var(--ink-3);">12 Jun, 15:46</span></div>
-      </div>
-      <div style="font-size:12px;color:var(--ink-3);">Audit started, <a onclick="show('audit')">A-2026-0314</a></div>
-      <div class="actions">
-        <span class="pill blue">Escalated</span>
-      </div>
-    </div>
-
-    <div id="green-section">
-      <h2 style="margin-top:28px;" id="green-heading">Green CPINs  ·  <span id="green-count">4</span> ready to close</h2>
-      <div style="font-size:13px;color:var(--ink-2);margin-bottom:12px;">
-        No injury, no FF action required. One click closes all four with a templated note and default time logged.
-      </div>
-
-      <div class="cpin-card green">
-        <span class="pill green">GREEN</span>
-        <div>
-          <div class="premises">DWP Crawley  ·  CPIN-2026-0419</div>
-          <div class="summary" style="color:var(--ink-2);">False alarm, fire alarm panel reset.  <span style="color:var(--ink-3);">18 Jun, 09:02</span></div>
-        </div>
-        <div></div>
-        <div class="actions">
-          <button class="btn">Open</button>
-          <button class="btn primary">Close, no action</button>
-        </div>
-      </div>
-
-      <div class="cpin-card green">
-        <span class="pill green">GREEN</span>
-        <div>
-          <div class="premises">HMRC Stratford  ·  CPIN-2026-0417</div>
-          <div class="summary" style="color:var(--ink-2);">Burnt toast in canteen, no FF action.  <span style="color:var(--ink-3);">17 Jun, 12:39</span></div>
-        </div>
-        <div></div>
-        <div class="actions">
-          <button class="btn">Open</button>
-          <button class="btn primary">Close, no action</button>
-        </div>
-      </div>
-
-      <div class="cpin-card green">
-        <span class="pill green">GREEN</span>
-        <div>
-          <div class="premises">HM Treasury  ·  CPIN-2026-0416</div>
-          <div class="summary" style="color:var(--ink-2);">Toaster set off detector, staff dealt with.  <span style="color:var(--ink-3);">17 Jun, 08:14</span></div>
-        </div>
-        <div></div>
-        <div class="actions">
-          <button class="btn">Open</button>
-          <button class="btn primary">Close, no action</button>
-        </div>
-      </div>
-
-      <div class="cpin-card green">
-        <span class="pill green">GREEN</span>
-        <div>
-          <div class="premises">DVLA Swansea  ·  CPIN-2026-0415</div>
-          <div class="summary" style="color:var(--ink-2);">False alarm, plant room. No FF action.  <span style="color:var(--ink-3);">16 Jun, 14:55</span></div>
-        </div>
-        <div></div>
-        <div class="actions">
-          <button class="btn">Open</button>
-          <button class="btn primary">Close, no action</button>
-        </div>
-      </div>
-
-      <button class="btn primary" style="margin-top:8px;" onclick="closeAllGreen();">Close all 4 Green CPINs in one click</button>
-    </div>
-
-    <!-- Empty state, hidden until close-all is triggered -->
-    <div id="green-empty" style="display:none;margin-top:28px;">
-      <div class="empty-state">
-        <div class="icon">✓</div>
-        <div class="ttl">All Green CPINs closed</div>
-        <div class="sub"><strong>4 CPINs closed in one action</strong>  ·  Templated note "No injury, no FF action required" added to each  ·  2 minutes default time logged against each premises.</div>
-        <span class="undo" onclick="restoreGreen();">Undo</span>
-      </div>
-      <div style="font-size:12px;color:var(--ink-3);font-style:italic;text-align:center;">New Green CPINs will appear here as Fire & Rescue Services submit them.</div>
-    </div>
-
-    <div class="footnote">
-      <strong>Pattern note.</strong> 80%+ of CPINs are Green and need no action. Today, even those take many clicks (spawn an Investigation record, look up the Duty Holder, write a note, log time). Here, one click closes them with a templated note and default time. Red and Amber CPINs get the path the team actually need: make enquiries inline, then either close or escalate to a pre-filled audit. No re-keying, no manual queue management.
-
-      <br><br><strong>What happens when they are all closed.</strong> The Green section collapses into a confirmation tile showing how many were closed and what was auto-logged. Each closure carries the templated note "No injury, no FF action required" and a default 2 minutes against the premises, so the audit trail and the time card both stay clean. An Undo affords the inspector a reversal window in case they batch-closed something they didn't mean to.
+    <div id="cpins-panel-mine" class="cpins-panel" data-cpin-panel="mine"></div>
+    <div id="cpins-panel-unassigned" class="cpins-panel" data-cpin-panel="unassigned" hidden></div>
+    <div id="cpins-panel-completed" class="cpins-panel" data-cpin-panel="completed" hidden>
+      <div id="cpins-completed-list"></div>
+      <button class="btn" id="cpins-load-more" type="button" style="margin-top:12px;" onclick="loadMoreCompletedCpins()">Load more</button>
     </div>
   </main>
 </div>
@@ -2867,13 +2980,6 @@
       </div>
     </div>
 
-    <div class="footnote">
-      <strong>Why this design.</strong> Today, logging time means going to a separate place, picking the date, picking yourself, picking the premises, picking the activity, typing the duration. Five fields when three of them are already known. This quick-log strip leaves only Duration and What-for as real choices. Activity defaults from context where possible (a Site visit auto-defaults if you are logging from inside an audit). The page also retires the "exceptions timecard" name; non-premises work just appears as "General admin" alongside everything else.
-
-      The manager view (top right, role-permissioned) reuses this layout but adds a team-roster column on the left, so a team leader can see workload at a glance without seeing individual performance comparisons.
-
-      A "+ Log time" button appears in every process page's activity strip and pre-fills the What-for field with that process. The intent is that logging time should never feel like a separate task.
-    </div>
   </main>
 </div>
 
@@ -3015,9 +3121,6 @@
           </div>
         </div>
 
-        <div class="footnote">
-          <strong>Pattern notes.</strong> Saved views down the left (pinnable, with shared team views below). Multi-select chips replace today's boolean filter. The list always shows one row per process, never the parent/child onion. Score column shows current and direction of travel since the previous audit. Sort is on score by default ("worst first" matches how the team plans), but switchable. Bulk actions (close, reassign, export) appear when you select rows.
-        </div>
       </div>
     </div>
   </main>
@@ -3146,9 +3249,6 @@
       </div>
     </div>
 
-    <div class="footnote">
-      <strong>Pattern notes.</strong> The library leads with the templated reports the team actually use (the 12 that feed the annual report). Operational reports are the day-to-day. Manager reports are visible only to permissioned roles. Trend reports are signposted now but ship later, because the AI angle Phil and Steve mentioned needs more design work and a cleaner data foundation than v1 will have. "Build a custom report" sits top-right as a route into a builder for the cases the templates do not cover.
-    </div>
   </main>
 </div>
 
@@ -3178,11 +3278,19 @@
     </div>
 
     <div class="inset" id="setup-default-notice">
-      <strong>Pre-filled from the source.</strong> Because this audit was started from a CPIN, the premises, the Duty Holders and the trigger are already filled in. Review them, set the type, confirm the appointment, then start. You can save a draft at any point.
+      <strong>Pre-filled from the source.</strong> Because this audit was started from a CPIN, the premises, the Duty Holders and the trigger are already filled in. Review them, confirm the appointment, then start. Audit type is chosen at Stage 2 (site visit).
     </div>
 
-    <div class="setup-grid">
-      <!-- LEFT: setup form -->
+    <div class="process-grid" style="margin-top:16px;">
+      <div class="stage-rail" id="setup-stage-rail">
+        <div class="stage current">Setup pre-audit</div>
+        <div class="stage future">Site visit and assessment</div>
+        <div class="stage future">Scoring and enforcement</div>
+        <div class="stage future">Outcomes and letters</div>
+        <div class="stage future">Action plans</div>
+        <div class="stage future">Close</div>
+        <div style="margin-top:16px;padding:10px 12px;font-size:11px;color:var(--ink-3);">Stages 2–6 open after you start the audit.</div>
+      </div>
       <div>
         <!-- Premises -->
         <div class="setup-section">
@@ -3199,30 +3307,9 @@
           </div>
         </div>
 
-        <!-- Audit type -->
-        <div class="setup-section">
-          <h3>2. Audit type</h3>
-          <div class="help">The building type drives the question set, scoring weighting and letter wording. You can switch on the day if scope changes.</div>
-          <div class="radio-row" id="setup-audit-type-row">
-            <button type="button" class="radio-btn selected" data-audit-type="full" onclick="selectAuditType('full')">
-              <div class="ttl">Full</div>
-              <div class="desc">All articles, all categories. Typical for a high-score premises.</div>
-            </button>
-            <button type="button" class="radio-btn" data-audit-type="short" onclick="selectAuditType('short')">
-              <div class="ttl">Short</div>
-              <div class="desc">Subset of articles, scoped to the trigger. Faster site visit.</div>
-            </button>
-            <button type="button" class="radio-btn" data-audit-type="themed" onclick="selectAuditType('themed')">
-              <div class="ttl">Themed</div>
-              <div class="desc">Targeted at one theme across many premises (e.g. fire doors).</div>
-            </button>
-          </div>
-          <div style="margin-top:8px;font-size:12px;color:var(--ink-3);">Question set <strong id="setup-question-set" style="color:var(--ink);">Government office, full</strong>  ·  <a onclick="previewSetupQuestions();return false;">preview the questions</a></div>
-        </div>
-
         <!-- Team -->
         <div class="setup-section">
-          <h3>3. Team</h3>
+          <h3>2. Team</h3>
           <div class="help">Lead inspector defaults to you. Add colleagues if this is a two-person audit.</div>
           <div class="holder-card">
             <div class="avatar-sm" style="background:var(--accent);color:white;">PG</div>
@@ -3239,7 +3326,7 @@
 
         <!-- Duty Holders -->
         <div class="setup-section">
-          <h3>4. Duty Holders and Responsible Persons</h3>
+          <h3>3. Duty Holders and Responsible Persons</h3>
           <div class="help">Pre-suggested from this premises. Review and add or remove as needed. Not pre-locked, since who is on site can change.</div>
 
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders (organisations)</div>
@@ -3253,7 +3340,7 @@
 
         <!-- Appointment -->
         <div class="setup-section">
-          <h3>5. Appointment</h3>
+          <h3>4. Appointment</h3>
           <div class="help">Pick a date and time. We will check the lead inspector's calendar and the premises' working hours.</div>
           <div class="field-row">
             <div class="field">
@@ -3282,7 +3369,7 @@
 
         <!-- Appointment letter preview -->
         <div class="setup-section">
-          <h3>6. Appointment letter</h3>
+          <h3>5. Appointment letter</h3>
           <div class="help">The system has drafted the appointment letter using the right template for this premises type (Government office, non-custodial). Review, edit if needed, then it sends when you start the audit.</div>
           <div class="letter-preview" id="setup-letter-preview" style="padding:18px;font-size:12px;">
             <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
@@ -3315,29 +3402,23 @@
           <h3>Summary</h3>
           <div class="row"><span class="k">Trigger</span><span class="v">Reactive (CPIN)</span></div>
           <div class="row"><span class="k">Premises</span><span class="v">Temple Quay House</span></div>
-          <div class="row"><span class="k">Audit type</span><span class="v" id="setup-sum-type">Full</span></div>
-          <div class="row"><span class="k">Question set</span><span class="v" id="setup-sum-questionset">Govt office, full</span></div>
+          <div class="row"><span class="k">Audit type</span><span class="v pending">At site visit (Stage 2)</span></div>
           <div class="row"><span class="k">Lead inspector</span><span class="v">Phil Gower</span></div>
           <div class="row"><span class="k">Other inspectors</span><span class="v pending" id="setup-sum-inspectors">none</span></div>
           <div class="row"><span class="k">Duty Holders</span><span class="v" id="setup-sum-dh">3</span></div>
           <div class="row"><span class="k">Responsible Persons</span><span class="v" id="setup-sum-rp">2</span></div>
           <div class="row"><span class="k">Appointment</span><span class="v" id="setup-sum-appt">Tue 7 Jul, 10:00</span></div>
 
-          <h3 style="margin-top:16px;">When you start</h3>
+          <h3 style="margin-top:16px;">Completed when you started</h3>
+          <div style="font-size:11px;color:var(--ink-3);margin-bottom:8px;">Actions already taken for audit A-2026-0314.</div>
           <div class="check-row"><span class="tick">✓</span>Audit record A-2026-0314 created</div>
           <div class="check-row"><span class="tick">✓</span>Appointment letter sent to all Duty Holders</div>
           <div class="check-row"><span class="tick">✓</span>Calendar event pushed to your Outlook</div>
           <div class="check-row"><span class="tick">✓</span>CPIN-2026-0418 linked to this audit</div>
-          <div class="check-row"><span class="tick">✓</span>Question set loaded for Stage 2</div>
         </div>
       </div>
     </div>
 
-    <div class="footnote">
-      <strong>Pattern notes.</strong> The whole of Becky's Stage 1 is on a single page rather than a wizard. Six small sections, all pre-filled from context where possible, in a logical top-to-bottom order. The live summary on the right shows what will happen when you start; it removes the "what just happened" surprise that today's system frequently produces.
-
-      Three deliberate behaviours: (1) Duty Holders are pre-suggested from the premises but never silently pre-filled into the audit, because who is responsible on the day can change. (2) The appointment letter is generated using conditional text driven by the choices above; if you switch audit type or change Duty Holders, it updates. (3) The Outlook calendar push is the system honouring the team's existing diary habit, rather than reinventing it.
-    </div>
   </main>
 </div>
 
@@ -3355,6 +3436,76 @@
       <input type="search" class="setup-lookup-search" id="setup-lookup-search" placeholder="Search by name or organisation…" oninput="filterSetupLookup()" autocomplete="off" />
       <div class="setup-lookup-list" id="setup-lookup-list"></div>
       <div class="setup-lookup-empty" id="setup-lookup-empty" hidden>No matches. Try a different search term.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating activity bar (audit process) -->
+<div id="audit-float-bar">
+  <div class="audit-float-panel" id="audit-float-panel" aria-hidden="true">
+    <div id="audit-float-time-content">
+      <div class="audit-float-panel-hd">
+        <strong>Log time against this audit</strong>
+        <button type="button" class="btn" onclick="closeAuditFloatPanel()">Close</button>
+      </div>
+      <div class="audit-quick-log">
+        <div>
+          <label>Activity</label>
+          <select id="audit-time-activity"></select>
+        </div>
+        <div>
+          <label>What for</label>
+          <input type="text" value="A-2026-0314  ·  Temple Quay House audit" readonly style="background:var(--bg);color:var(--ink-2);" />
+        </div>
+        <div>
+          <label>Duration</label>
+          <select id="audit-time-duration">
+            <option value="15">15m</option>
+            <option value="30">30m</option>
+            <option value="45">45m</option>
+            <option value="60">1h</option>
+            <option value="90" selected>1h 30m</option>
+            <option value="120">2h</option>
+            <option value="180">3h</option>
+            <option value="240">Half day (4h)</option>
+          </select>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--ink-3);margin-top:8px;">Date defaults to today (22 Jun 2026). Logged against Phil Gower on audit A-2026-0314.</div>
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
+        <button class="btn primary" type="button" onclick="logAuditTime()">Log time</button>
+      </div>
+    </div>
+    <div id="audit-float-note-content" hidden>
+      <div class="audit-float-panel-hd">
+        <strong>Add a note</strong>
+        <button type="button" class="btn" onclick="closeAuditFloatPanel()">Close</button>
+      </div>
+      <div class="audit-note-form">
+        <label>Note</label>
+        <textarea id="audit-note-text" placeholder="Calls, emails, site observations, EMM discussion…"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn primary" type="button" onclick="addAuditNote()">Save note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="audit-float-bar-strip">
+    <strong style="font-size:13px;color:var(--ink);">Activity</strong>
+    <div class="counts">
+      <span id="audit-count-notes">3 notes</span>
+      <span>2 files</span>
+      <span id="audit-count-time">6h 20m logged</span>
+    </div>
+    <div class="actions">
+      <div class="actions-secondary">
+        <button class="btn btn-quiet" type="button">Request more info</button>
+        <button class="btn btn-quiet" type="button">Log interim activity</button>
+      </div>
+      <div class="actions-primary">
+        <button class="btn" type="button" onclick="openAuditFloatPanel('time')">+ Log time</button>
+        <button class="btn" type="button" onclick="openAuditFloatPanel('note')">+ Add note</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3385,8 +3536,8 @@
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7.5L8 10L12.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div>
-              <div class="ttl">Audit  ·  proactive</div>
-              <div class="desc">Routine inspection of a premises on the RBIP. Reactive audits start from a CPIN or Concern.</div>
+              <div class="ttl">Audit</div>
+              <div class="desc">Start an audit at a premises. Reactive audits are usually started from a CPIN or Safety Concern.</div>
             </div>
           </button>
 
@@ -3405,8 +3556,8 @@
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="6" cy="6.5" r="2.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 14C1.5 11.79 3.5 10 6 10C8.5 10 10.5 11.79 10.5 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10.5 12C10.5 10.62 11.79 9.5 13 9.5C14.5 9.5 16 10.62 16 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </div>
             <div>
-              <div class="ttl">Business support meeting</div>
-              <div class="desc">Log a meeting or advice given to a premises. Captures notes, time and outcomes in one record.</div>
+              <div class="ttl">Business support</div>
+              <div class="desc">Log advice or support given to a premises. Captures notes, time and outcomes in one record.</div>
             </div>
           </button>
 
@@ -3417,6 +3568,36 @@
             <div>
               <div class="ttl">Building Control Consultation</div>
               <div class="desc">Set up a new consultation with a 15-day SLA. Documents linked from SharePoint.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 9H12M9 6V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Fire Safety Evaluation</div>
+              <div class="desc">Structured evaluation process for complex premises or policy decisions.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 14L7 5L11 10L14 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Appeals</div>
+              <div class="desc">Manage an appeal against an enforcement decision or notice.</div>
+            </div>
+          </button>
+
+          <button class="new-option" onclick="closeNewModal();">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7.5L8 10L12.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="ttl">Follow-up audit</div>
+              <div class="desc">Successor audit linked to a previous audit, carrying forward deficient items.</div>
             </div>
           </button>
         </div>
@@ -3462,16 +3643,6 @@
       <div class="modal-group">
         <div class="modal-group-label">Other</div>
         <div class="modal-grid">
-          <button class="new-option" onclick="closeNewModal();show('time');">
-            <div class="icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 5.5V9L11.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div>
-              <div class="ttl">Log time</div>
-              <div class="desc">Against a premises, a process you have open, or as general admin time.</div>
-            </div>
-          </button>
-
           <button class="new-option" onclick="closeNewModal();show('reports');">
             <div class="icon">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="3" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 12V8M9 12V6M12 12V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -3525,6 +3696,7 @@
   }
 
   function show(id) {
+    closeGlobalSearch();
     if (id !== 'login' && !isAuthenticated()) {
       id = 'login';
     }
@@ -3570,11 +3742,13 @@
       render(screen);
       applyAuditStageUI(stage);
       initAuditActivity();
+      setAuditActivityBarVisible(true);
       return;
     }
 
     render(screen);
     if (screen === 'auditsetup') initAuditSetupPage();
+    if (screen === 'cpins') initCpinsPage();
   }
 
   function render(id) {
@@ -3610,6 +3784,13 @@
     const navId = navMap[id];
     if (navId) document.getElementById(navId).classList.add('active');
 
+    if (id !== 'audit') {
+      closeAuditFloatPanel();
+      setAuditActivityBarVisible(false);
+    } else {
+      setAuditActivityBarVisible(true);
+    }
+
     window.scrollTo(0, 0);
   }
 
@@ -3618,7 +3799,10 @@
   window.addEventListener('hashchange', renderFromHash);
 
   // Initial load: respect the hash if there is one, else login.
-  window.addEventListener('load', renderFromHash);
+  window.addEventListener('load', () => {
+    renderFromHash();
+    initGlobalSearch();
+  });
 
   // ---------------------------------------------------------
   // Audit process: stage navigation (6-stage lifecycle)
@@ -3683,16 +3867,46 @@
     }
   }
 
-  function closeAuditActivityPanels() {
+  function setAuditActivityBarVisible(visible) {
+    document.body.classList.toggle('audit-activity-bar', visible);
+    if (!visible) document.body.classList.remove('audit-float-panel-open');
+  }
+
+  function openAuditFloatPanel(mode) {
+    const panel = document.getElementById('audit-float-panel');
+    const timeContent = document.getElementById('audit-float-time-content');
+    const noteContent = document.getElementById('audit-float-note-content');
+    if (!panel) return;
+
+    setAuditActivityBarVisible(true);
+
+    if (mode === 'time') {
+      syncAuditActivityForStage(auditStage);
+      requestAnimationFrame(() => document.getElementById('audit-time-duration')?.focus());
+    } else if (mode === 'note') {
+      requestAnimationFrame(() => document.getElementById('audit-note-text')?.focus());
+    }
+
+    if (timeContent) timeContent.hidden = mode !== 'time';
+    if (noteContent) noteContent.hidden = mode !== 'note';
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('audit-float-panel-open');
+    auditActivityPanel = mode;
+  }
+
+  function closeAuditFloatPanel() {
+    const panel = document.getElementById('audit-float-panel');
+    if (panel) {
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+    document.body.classList.remove('audit-float-panel-open');
     auditActivityPanel = null;
-    const timePanel = document.getElementById('audit-panel-time');
-    const notePanel = document.getElementById('audit-panel-note');
-    const timeBtn = document.getElementById('audit-btn-log-time');
-    const noteBtn = document.getElementById('audit-btn-add-note');
-    if (timePanel) timePanel.hidden = true;
-    if (notePanel) notePanel.hidden = true;
-    if (timeBtn) timeBtn.textContent = '+ Log time';
-    if (noteBtn) noteBtn.textContent = '+ Add note';
+  }
+
+  function closeAuditActivityPanels() {
+    closeAuditFloatPanel();
   }
 
   function applyAuditStageUI(n) {
@@ -3742,31 +3956,6 @@
     sel.innerHTML = options.map((o, i) =>
       '<option value="' + escHtml(o) + '"' + (i === 0 ? ' selected' : '') + '>' + escHtml(o) + '</option>'
     ).join('');
-  }
-
-  function toggleAuditActivityPanel(which, forceOpen) {
-    const timePanel = document.getElementById('audit-panel-time');
-    const notePanel = document.getElementById('audit-panel-note');
-    const timeBtn = document.getElementById('audit-btn-log-time');
-    const noteBtn = document.getElementById('audit-btn-add-note');
-    if (!timePanel || !notePanel) return;
-
-    const open = typeof forceOpen === 'boolean'
-      ? (forceOpen ? which : null)
-      : (auditActivityPanel === which ? null : which);
-
-    auditActivityPanel = open;
-    timePanel.hidden = open !== 'time';
-    notePanel.hidden = open !== 'note';
-    if (timeBtn) timeBtn.textContent = open === 'time' ? '− Log time' : '+ Log time';
-    if (noteBtn) noteBtn.textContent = open === 'note' ? '− Add note' : '+ Add note';
-
-    if (open === 'note') {
-      document.getElementById('audit-note-text')?.focus();
-    }
-    if (open === 'time') {
-      syncAuditActivityForStage(auditStage);
-    }
   }
 
   function renderAuditActivity() {
@@ -3839,7 +4028,7 @@
     });
 
     renderAuditActivity();
-    toggleAuditActivityPanel('time', false);
+    closeAuditFloatPanel();
   }
 
   function addAuditNote() {
@@ -3865,7 +4054,7 @@
 
     ta.value = '';
     renderAuditActivity();
-    toggleAuditActivityPanel('note', false);
+    closeAuditFloatPanel();
   }
 
   function removeAuditNote(id) {
@@ -3993,44 +4182,327 @@
   }
 
   // ---------------------------------------------------------
-  // Close-all-green-CPINs behaviour (CPINs triage screen). Updates
-  // the dashboard green tile when closed so counts stay in sync.
+  // CPIN triage — data, filters, tabs, pins, completed load-more
   // ---------------------------------------------------------
-  let greenClosed = false;
+  const CPIN_PIN_KEY = 'cpin-pins-v1';
+  let cpinPins = new Set();
+  let cpinsActiveFilter = 'all';
+  let cpinsActiveTab = 'mine';
+  let completedCpinsShown = 20;
 
-  function closeAllGreen() {
-    greenClosed = true;
-    applyGreenState();
+  const CPINS_MINE = [
+    { id: 'cpin-0418', ref: 'CPIN-2026-0418', severity: 'red', when: '04:22 today', premises: 'HMP Lewes', summary: 'Cell fire, serious injury', route: 'auditsetup', action: 'Review audit', patch: true },
+    { id: 'cpin-0412', ref: 'CPIN-2026-0412', severity: 'red', when: '21:14 yest', premises: 'HMP Belmarsh', summary: 'Kitchen fire, 2 injured', route: 'auditsetup', action: 'Review audit', patch: true },
+    { id: 'cpin-0418-tq', ref: 'CPIN-2026-0418', severity: 'amber', when: '12 Jun', premises: 'Temple Quay House', summary: 'Electrical fault, no injuries', route: 'audit-stage-2', action: 'Continue audit', patch: true },
+    { id: 'cpin-0401', ref: 'CPIN-2026-0401', severity: 'green', when: '18 Jun', premises: 'DWP Canterbury', summary: 'Small bin fire, extinguished on arrival', route: 'auditsetup', action: 'Review audit', patch: true },
+    { id: 'cpin-0398', ref: 'CPIN-2026-0398', severity: 'green', when: '17 Jun', premises: 'HMCTS Maidstone', summary: 'False alarm, cooking fumes', route: 'auditsetup', action: 'Review audit', patch: true },
+    { id: 'cpin-0395', ref: 'CPIN-2026-0395', severity: 'green', when: '16 Jun', premises: 'Jobcentre Plus Crawley', summary: 'External grass fire, no building damage', route: 'auditsetup', action: 'Review audit', patch: true },
+    { id: 'cpin-0392', ref: 'CPIN-2026-0392', severity: 'green', when: '15 Jun', premises: 'HMP Rochester', summary: 'Smoking materials, cell smoke only', route: 'auditsetup', action: 'Review audit', patch: true },
+    { id: 'cpin-0385', ref: 'CPIN-2026-0385', severity: 'green', when: '13 Jun', premises: null, summary: 'Warehouse unit — premises to be confirmed at review', route: 'auditsetup', action: 'Review audit', patch: true }
+  ];
+
+  const CPINS_UNASSIGNED = [
+    { id: 'cpin-u-0440', ref: 'CPIN-2026-0440', severity: 'red', when: '03:10 today', premises: 'HMP Wandsworth', summary: 'Assault-related fire in wing B', route: 'auditsetup', action: 'Review audit', patch: false },
+    { id: 'cpin-u-0436', ref: 'CPIN-2026-0436', severity: 'amber', when: '20 Jun', premises: null, summary: 'Industrial estate — UPRN lookup failed, assign at review', route: 'auditsetup', action: 'Review audit', patch: false },
+    { id: 'cpin-u-0431', ref: 'CPIN-2026-0431', severity: 'green', when: '19 Jun', premises: 'DWP Brighton', summary: 'Minor scorch mark on external wall', route: 'auditsetup', action: 'Review audit', patch: false },
+    { id: 'cpin-u-0428', ref: 'CPIN-2026-0428', severity: 'green', when: '18 Jun', premises: 'HMCTS Guildford', summary: 'Alarm activation, no fire found', route: 'auditsetup', action: 'Review audit', patch: false },
+    { id: 'cpin-u-0422', ref: 'CPIN-2026-0422', severity: 'green', when: '17 Jun', premises: null, summary: 'Retail unit reported by FRS — link premises at review', route: 'auditsetup', action: 'Review audit', patch: false }
+  ];
+
+  const CPINS_COMPLETED_NAMES = [
+    'Temple Quay House', 'HMP Lewes', 'DWP Canterbury', 'HMCTS Maidstone', 'Jobcentre Plus Crawley',
+    'HMP Rochester', 'MoJ Charing Cross House', 'HMP Belmarsh', 'DWP Brighton', 'HMCTS Guildford',
+    'HMP Wandsworth', 'HMP Maidstone', 'Charing Cross House', 'DWP Crawley', 'HMCTS Bristol',
+    'HMP Ford', 'MoJ Croydon', 'DWP Hastings', 'HMCTS Lewes', 'HMP Cookham Wood'
+  ];
+  const CPINS_COMPLETED = Array.from({ length: 47 }, (_, i) => ({
+    id: 'cpin-c-' + (1000 + i),
+    ref: 'CPIN-2025-' + String(1200 + i).padStart(4, '0'),
+    severity: i % 5 === 0 ? 'red' : (i % 3 === 0 ? 'amber' : 'green'),
+    when: (i % 12) + 1 + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May'][i % 5] + ' 2026',
+    premises: CPINS_COMPLETED_NAMES[i % CPINS_COMPLETED_NAMES.length],
+    summary: ['Closed after review', 'No audit required', 'Linked audit closed', 'Transferred to colleague'][i % 4],
+    route: 'premisesdetail',
+    action: '',
+    patch: true
+  }));
+
+  // ---------------------------------------------------------
+  // Global search (premises, processes, CPINs)
+  // ---------------------------------------------------------
+  const GLOBAL_SEARCH_TYPE_LABELS = {
+    premises: 'Premises',
+    process: 'Processes',
+    cpin: 'CPINs'
+  };
+
+  const GLOBAL_SEARCH_PREMISES = [
+    { title: 'Temple Quay House', subtitle: 'Temple Back East, Bristol BS1 · HMCTS · Government office', route: 'premisesdetail', keywords: 'temple quay bristol hmcts government office audit a-2026-0314 cpin-2026-0418' },
+    { title: 'HMP Lewes', subtitle: 'Prison · Cat B · HMPPS · RBIP score 42', route: 'premises', keywords: 'hmp lewes prison hmpps lewes cat b follow-up f-2026-0142' },
+    { title: 'Maidstone Magistrates Court', subtitle: 'Court · HMCTS · RBIP score 34', route: 'premises', keywords: 'maidstone magistrates court hmcts concern sc-2026-0073' },
+    { title: 'Crawley Job Centre Plus', subtitle: 'DWP office · RBIP score 31', route: 'premises', keywords: 'crawley job centre plus dwp a-2026-0298' },
+    { title: 'Folkestone Tribunal Hearing Centre', subtitle: 'Tribunal · HMCTS · RBIP score 22', route: 'premises', keywords: 'folkestone tribunal hearing centre hmcts' }
+  ];
+
+  const GLOBAL_SEARCH_PROCESSES = [
+    { title: 'A-2026-0314', subtitle: 'Audit · Temple Quay House · Stage 2 — Site visit', route: 'audit-stage-2', pill: 'blue', pillLabel: 'Audit', keywords: 'a-2026-0314 temple quay audit site visit reactive cpin-2026-0418' },
+    { title: 'F-2026-0142', subtitle: 'Follow-up · HMP Lewes · Awaiting action plan', route: 'processes', pill: 'purple', pillLabel: 'Follow-up', keywords: 'f-2026-0142 hmp lewes follow-up action plan' },
+    { title: 'A-2026-0301', subtitle: 'Audit · HMP Maidstone · Stage 4 — Outcomes', route: 'processes', pill: 'blue', pillLabel: 'Audit', keywords: 'a-2026-0301 hmp maidstone audit outcomes' },
+    { title: 'C-2026-0089', subtitle: 'Consultation · Charing Cross House refurb · SLA 5 days', route: 'processes', pill: 'grey', pillLabel: 'Consult', keywords: 'c-2026-0089 charing cross consultation building control refurb' },
+    { title: 'SC-2026-0073', subtitle: 'Safety concern · Maidstone Magistrates Court · Awaiting contact', route: 'processes', pill: 'grey', pillLabel: 'Concern', keywords: 'sc-2026-0073 maidstone magistrates safety concern' },
+    { title: 'A-2026-0298', subtitle: 'Audit · DWP Crawley · Stage 5 — Action plan', route: 'processes', pill: 'blue', pillLabel: 'Audit', keywords: 'a-2026-0298 dwp crawley audit action plan' },
+    { title: 'F-2026-0118', subtitle: 'Follow-up · HMP Belmarsh · Awaiting follow-up visit', route: 'processes', pill: 'purple', pillLabel: 'Follow-up', keywords: 'f-2026-0118 hmp belmarsh follow-up' },
+    { title: 'B-2026-0044', subtitle: 'Business support · Royal Courts of Justice · Meeting 25 Jun', route: 'processes', pill: 'grey', pillLabel: 'Support', keywords: 'b-2026-0044 royal courts justice business support meeting' }
+  ];
+
+  function getGlobalSearchIndex() {
+    const cpins = CPINS_MINE.concat(CPINS_UNASSIGNED).map(c => ({
+      type: 'cpin',
+      title: c.ref,
+      subtitle: (c.premises ? c.premises + ' · ' : 'No premises · ') + c.summary,
+      route: c.route,
+      pill: c.severity,
+      pillLabel: { red: 'Red', amber: 'Amber', green: 'Green' }[c.severity],
+      keywords: [c.ref, c.premises, c.summary, c.severity, c.when, 'cpin'].filter(Boolean).join(' ')
+    }));
+    return GLOBAL_SEARCH_PREMISES.map(i => ({ type: 'premises', ...i }))
+      .concat(
+        GLOBAL_SEARCH_PROCESSES.map(i => ({ type: 'process', ...i })),
+        cpins
+      );
   }
-  function restoreGreen() {
-    greenClosed = false;
-    applyGreenState();
+
+  function globalSearchHaystack(item) {
+    return (item.title + ' ' + item.subtitle + ' ' + (item.keywords || '')).toLowerCase();
   }
-  function applyGreenState() {
-    // CPINs triage screen
-    const section = document.getElementById('green-section');
-    const empty = document.getElementById('green-empty');
-    if (section && empty) {
-      section.style.display = greenClosed ? 'none' : '';
-      empty.style.display = greenClosed ? '' : 'none';
+
+  function globalSearchMatches(item, q) {
+    const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!tokens.length) return false;
+    const hay = globalSearchHaystack(item);
+    return tokens.every(t => hay.includes(t));
+  }
+
+  function closeGlobalSearch() {
+    const results = document.getElementById('global-search-results');
+    const input = document.getElementById('global-search-input');
+    if (results) results.hidden = true;
+    if (input) input.setAttribute('aria-expanded', 'false');
+  }
+
+  function openGlobalSearchPanel(contentHtml) {
+    const results = document.getElementById('global-search-results');
+    const input = document.getElementById('global-search-input');
+    if (!results) return;
+    results.innerHTML = contentHtml;
+    results.hidden = false;
+    if (input) input.setAttribute('aria-expanded', 'true');
+  }
+
+  function onGlobalSearchFocus() {
+    const q = document.getElementById('global-search-input')?.value.trim() || '';
+    if (q) renderGlobalSearchResults(q);
+    else openGlobalSearchPanel('<div class="search-results-hint">Type to search premises, processes and CPINs…</div>');
+  }
+
+  function renderGlobalSearchResults(raw) {
+    const q = (raw || '').trim();
+    if (!q) {
+      closeGlobalSearch();
+      return;
     }
 
-    // Dashboard tile
-    const tile = document.getElementById('dash-green-tile');
-    const count = document.getElementById('dash-green-count');
-    const sub = document.getElementById('dash-green-sub');
-    const meta = document.getElementById('dash-cpin-meta');
-    if (greenClosed) {
-      if (tile) tile.classList.add('closed');
-      if (count) count.textContent = '0';
-      if (sub) sub.textContent = 'All closed today';
-      if (meta) meta.textContent = '3 to action  ·  3 unassigned';
+    const matches = getGlobalSearchIndex().filter(item => globalSearchMatches(item, q)).slice(0, 24);
+    if (matches.length === 0) {
+      openGlobalSearchPanel('<div class="search-results-empty">No results for “' + escHtml(q) + '”</div>');
+      return;
+    }
+
+    const groups = { premises: [], process: [], cpin: [] };
+    matches.forEach(m => { groups[m.type].push(m); });
+
+    let html = '';
+    ['premises', 'process', 'cpin'].forEach(type => {
+      const items = groups[type];
+      if (!items.length) return;
+      html += '<div class="search-results-group"><div class="search-results-label">' + GLOBAL_SEARCH_TYPE_LABELS[type] + '</div>';
+      items.forEach(item => {
+        const pill = item.pill
+          ? '<span class="pill ' + escHtml(item.pill) + '">' + escHtml(item.pillLabel || '') + '</span>'
+          : '<span class="pill grey">Premises</span>';
+        html += '<button type="button" class="search-result-item" role="option" onclick="selectGlobalSearchResult(\'' + escHtml(item.route).replace(/'/g, '&#39;') + '\')">' +
+          '<div>' + pill + '</div>' +
+          '<div><div class="title-line">' + escHtml(item.title) + '</div>' +
+          '<div class="meta-line">' + escHtml(item.subtitle) + '</div></div></button>';
+      });
+      html += '</div>';
+    });
+
+    openGlobalSearchPanel(html);
+  }
+
+  function selectGlobalSearchResult(route) {
+    closeGlobalSearch();
+    const input = document.getElementById('global-search-input');
+    if (input) input.value = '';
+    show(route);
+  }
+
+  function initGlobalSearch() {
+    if (document.body.dataset.searchBound) return;
+    document.body.dataset.searchBound = '1';
+    document.addEventListener('mousedown', (e) => {
+      const root = document.getElementById('global-search');
+      if (root && !root.contains(e.target)) closeGlobalSearch();
+    });
+  }
+
+  function loadCpinPins() {
+    try {
+      const raw = localStorage.getItem(CPIN_PIN_KEY);
+      if (raw) cpinPins = new Set(JSON.parse(raw));
+    } catch (e) {
+      cpinPins = new Set();
+    }
+  }
+
+  function saveCpinPins() {
+    localStorage.setItem(CPIN_PIN_KEY, JSON.stringify([...cpinPins]));
+  }
+
+  function navigateCpin(route) {
+    show(route);
+  }
+
+  function cpinMatchesFilter(item) {
+    if (cpinsActiveFilter === 'all') return true;
+    if (cpinsActiveFilter === 'pinned') return cpinPins.has(item.id);
+    if (cpinsActiveFilter === 'no-premises') return !item.premises;
+    if (cpinsActiveFilter === 'patch') return item.patch;
+    return item.severity === cpinsActiveFilter;
+  }
+
+  function buildCpinCard(item) {
+    const pinned = cpinPins.has(item.id);
+    const sevLabel = { red: 'Red', amber: 'Amber', green: 'Green' }[item.severity] || 'Green';
+    const premisesHtml = item.premises
+      ? '<div class="premises">' + escHtml(item.premises) + '</div>'
+      : '<div class="premises" style="color:var(--ink-3);font-weight:500;">No premises linked</div>';
+    const actionHtml = item.action
+      ? '<span class="btn" style="pointer-events:none;white-space:nowrap;">' + escHtml(item.action) + '</span>'
+      : '<span class="pill grey">Closed</span>';
+
+    return '<div class="cpin-card ' + item.severity + (pinned ? ' is-pinned' : '') + '" data-cpin-id="' + escHtml(item.id) + '" onclick="navigateCpin(\'' + item.route + '\')">' +
+      '<div class="cpin-severity"><span class="pill ' + item.severity + '">' + sevLabel + '</span></div>' +
+      '<div class="cpin-body">' +
+        '<div style="font-size:12px;color:var(--ink-3);">' + escHtml(item.ref) + '  ·  ' + escHtml(item.when) + '</div>' +
+        premisesHtml +
+        '<div class="summary">' + escHtml(item.summary) + '</div>' +
+      '</div>' +
+      '<div class="cpin-meta">' +
+        '<button type="button" class="cpin-pin' + (pinned ? ' pinned' : '') + '" title="' + (pinned ? 'Unpin' : 'Pin') + '" aria-label="' + (pinned ? 'Unpin' : 'Pin') + '" onclick="event.stopPropagation();toggleCpinPin(\'' + item.id + '\')">' + (pinned ? '★' : '☆') + '</button>' +
+        actionHtml +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderCpinCardsHtml(items) {
+    const pinned = items.filter(i => cpinPins.has(i.id));
+    const rest = items.filter(i => !cpinPins.has(i.id));
+    let html = '';
+
+    if (pinned.length) {
+      html +=
+        '<section class="cpins-pinned-section" aria-label="Pinned CPINs">' +
+          '<h3 class="cpins-section-label"><span class="star" aria-hidden="true">★</span> Pinned</h3>' +
+          '<div class="cpins-card-stack">' + pinned.map(buildCpinCard).join('') + '</div>' +
+        '</section>';
+    }
+    if (rest.length) {
+      html +=
+        '<div class="cpins-card-stack' + (pinned.length ? ' cpins-card-stack--rest' : '') + '">' +
+          rest.map(buildCpinCard).join('') +
+        '</div>';
+    }
+    return html;
+  }
+
+  function renderCpinPanel(panelId, items, emptyMsg) {
+    const el = document.getElementById(panelId);
+    if (!el) return;
+    const filtered = items.filter(cpinMatchesFilter);
+    if (filtered.length === 0) {
+      el.innerHTML = '<div class="audit-feed-empty" style="margin:24px 0;">' + escHtml(emptyMsg) + '</div>';
+      return;
+    }
+    el.innerHTML = renderCpinCardsHtml(filtered);
+  }
+
+  function renderCompletedCpins() {
+    const el = document.getElementById('cpins-completed-list');
+    const btn = document.getElementById('cpins-load-more');
+    if (!el) return;
+    const filtered = CPINS_COMPLETED.filter(cpinMatchesFilter);
+    const slice = filtered.slice(0, completedCpinsShown);
+    if (slice.length === 0) {
+      el.innerHTML = '<div class="audit-feed-empty" style="margin:24px 0;">No completed CPINs match this filter.</div>';
     } else {
-      if (tile) tile.classList.remove('closed');
-      if (count) count.textContent = '4';
-      if (sub) sub.textContent = 'No action needed';
-      if (meta) meta.textContent = '7 to action  ·  3 unassigned';
+      el.innerHTML = renderCpinCardsHtml(slice);
     }
+    if (btn) btn.hidden = completedCpinsShown >= filtered.length;
+  }
+
+  function renderCpinsLists() {
+    if (cpinsActiveTab === 'mine') {
+      renderCpinPanel('cpins-panel-mine', CPINS_MINE, 'No CPINs match this filter in My CPINs.');
+    } else if (cpinsActiveTab === 'unassigned') {
+      renderCpinPanel('cpins-panel-unassigned', CPINS_UNASSIGNED, 'No unassigned CPINs match this filter.');
+    } else {
+      renderCompletedCpins();
+    }
+  }
+
+  function switchCpinsTab(tab) {
+    cpinsActiveTab = tab;
+    document.querySelectorAll('#cpin-tabs .cpin-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.cpinTab === tab);
+    });
+    document.querySelectorAll('.cpins-panel').forEach(panel => {
+      panel.hidden = panel.dataset.cpinPanel !== tab;
+    });
+    renderCpinsLists();
+  }
+
+  function setCpinFilter(filter) {
+    cpinsActiveFilter = filter;
+    document.querySelectorAll('.cpin-filters .chip').forEach(chip => {
+      chip.classList.toggle('on', chip.dataset.cpinFilter === filter);
+    });
+    renderCpinsLists();
+  }
+
+  function toggleCpinPin(id) {
+    if (cpinPins.has(id)) cpinPins.delete(id);
+    else cpinPins.add(id);
+    saveCpinPins();
+    renderCpinsLists();
+  }
+
+  function loadMoreCompletedCpins() {
+    completedCpinsShown = Math.min(completedCpinsShown + 20, CPINS_COMPLETED.length);
+    renderCompletedCpins();
+  }
+
+  function initCpinsPage() {
+    loadCpinPins();
+    if (!document.querySelector('.cpin-filters')?.dataset.bound) {
+      document.querySelectorAll('.cpin-filters .chip').forEach(chip => {
+        chip.addEventListener('click', () => setCpinFilter(chip.dataset.cpinFilter));
+      });
+      const filters = document.querySelector('.cpin-filters');
+      if (filters) filters.dataset.bound = '1';
+    }
+    switchCpinsTab(cpinsActiveTab);
   }
 
   // ---------------------------------------------------------
@@ -4050,7 +4522,11 @@
   // strategy doc's suggested keyboard shortcut).
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
+      if (!document.getElementById('global-search-results')?.hidden) {
+        closeGlobalSearch();
+      } else if (document.getElementById('audit-float-panel')?.classList.contains('open')) {
+        closeAuditFloatPanel();
+      } else if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
         closeSetupLookupModal();
       } else {
         closeNewModal();
@@ -4165,10 +4641,10 @@
 
   function selectAuditType(type, refresh) {
     auditSetup.auditType = type;
-    document.querySelectorAll('#setup-audit-type-row .radio-btn').forEach(btn => {
-      btn.classList.toggle('selected', btn.dataset.auditType === type);
+    document.querySelectorAll('[data-audit-type]').forEach(btn => {
+      if (btn.dataset.auditType) btn.classList.toggle('selected', btn.dataset.auditType === type);
     });
-    const qs = document.getElementById('setup-question-set');
+    const qs = document.getElementById('audit-stage-question-set');
     if (qs) qs.textContent = QUESTION_SETS[type] || QUESTION_SETS.full;
     const durHelp = document.getElementById('apt-duration-helper');
     if (durHelp) {
@@ -4522,16 +4998,11 @@
   }
 
   function refreshSetupSummary() {
-    const typeEl = document.getElementById('setup-sum-type');
-    const qsEl = document.getElementById('setup-sum-questionset');
     const insEl = document.getElementById('setup-sum-inspectors');
     const dhEl = document.getElementById('setup-sum-dh');
     const rpEl = document.getElementById('setup-sum-rp');
     const apptEl = document.getElementById('setup-sum-appt');
 
-    const typeNames = { full: 'Full', short: 'Short', themed: 'Themed' };
-    if (typeEl) typeEl.textContent = typeNames[auditSetup.auditType] || 'Full';
-    if (qsEl) qsEl.textContent = (QUESTION_SETS[auditSetup.auditType] || '').replace('Government office, ', 'Govt office, ');
     if (insEl) {
       if (auditSetup.inspectors.length === 0) {
         insEl.textContent = 'none';
