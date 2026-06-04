@@ -1,5 +1,5 @@
-function getSlackWebhook() {
-  return process.env.SLACK_FEEDBACK_WEBHOOK || '';
+function getFeedbackWebhook() {
+  return process.env.FEEDBACK_WEBHOOK_URL || process.env.SLACK_FEEDBACK_WEBHOOK || '';
 }
 
 const CORS_HEADERS = {
@@ -7,13 +7,6 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
-
-function slackEscape(text) {
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
 
 async function uploadScreenshot(base64) {
   if (!base64 || typeof base64 !== 'string') return null;
@@ -47,19 +40,21 @@ async function uploadScreenshot(base64) {
   return null;
 }
 
-async function postToSlack(payload) {
-  const webhook = getSlackWebhook();
+async function postToFeedbackWebhook(payload) {
+  const webhook = getFeedbackWebhook();
   if (!webhook) {
-    throw new Error('SLACK_FEEDBACK_WEBHOOK is not configured.');
+    throw new Error('FEEDBACK_WEBHOOK_URL is not configured.');
   }
   const response = await fetch(webhook, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  const text = await response.text();
-  if (!response.ok || text !== 'ok') {
-    throw new Error('Slack webhook failed: ' + text);
+  if (!response.ok) {
+    const text = await response.text().catch(function () {
+      return '';
+    });
+    throw new Error('Webhook failed (' + response.status + '): ' + text);
   }
 }
 
@@ -95,72 +90,21 @@ export default async (request) => {
 
     const screenshotUrl = await uploadScreenshot(screenshotBase64);
 
-    const blocks = [
-      {
-        type: 'header',
-        text: { type: 'plain_text', text: 'Prototype feedback (' + version + ')', emoji: true }
-      },
-      {
-        type: 'section',
-        fields: [
-          { type: 'mrkdwn', text: '*From:*\n' + slackEscape(name) },
-          { type: 'mrkdwn', text: '*Page:*\n' + slackEscape(page) }
-        ]
-      },
-      {
-        type: 'section',
-        text: { type: 'mrkdwn', text: '*Selected:*\n' + slackEscape(friendly) }
-      },
-      {
-        type: 'section',
-        text: { type: 'mrkdwn', text: '*Comment:*\n' + slackEscape(comment) }
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*Technical details*\n```' + slackEscape(technical) + '\n' + slackEscape(selector) + '```'
-        }
-      },
-      {
-        type: 'context',
-        elements: [{ type: 'mrkdwn', text: '<' + url + '|Open page>' }]
-      }
-    ];
-
-    const payload = {
-      text:
-        'CPFSI prototype feedback (' +
-        version +
-        ')\nFrom: ' +
-        name +
-        '\nPage: ' +
-        page +
-        '\nSelected: ' +
-        friendly +
-        '\nTechnical: ' +
-        technical +
-        '\nSelector: ' +
-        selector +
-        '\nURL: ' +
-        url +
-        (screenshotUrl ? '\nScreenshot: ' + screenshotUrl : '\nScreenshot: not attached') +
-        '\n\nComment:\n' +
-        comment,
-      blocks
+    const outbound = {
+      type: 'cpfsi_prototype_feedback',
+      version,
+      name,
+      comment,
+      selected: friendly,
+      technical,
+      selector,
+      page,
+      url,
+      screenshotUrl: screenshotUrl || null,
+      submittedAt: new Date().toISOString()
     };
 
-    if (screenshotUrl) {
-      payload.attachments = [
-        {
-          fallback: 'Screenshot of selected element',
-          image_url: screenshotUrl,
-          alt_text: friendly
-        }
-      ];
-    }
-
-    await postToSlack(payload);
+    await postToFeedbackWebhook(outbound);
 
     return new Response(
       JSON.stringify({ ok: true, screenshotUrl: screenshotUrl || null }),

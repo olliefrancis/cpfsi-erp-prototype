@@ -3078,6 +3078,7 @@
   }
 
 </style>
+<script src="/feedback-config.js"></script>
 </head>
 <body>
 
@@ -6719,8 +6720,14 @@
   // Prototype feedback: pick an element, comment, post to Slack.
   // ---------------------------------------------------------
   const PROTOTYPE_VERSION = 'v2';
-  const FEEDBACK_API_URL =
-    window.CPFSI_FEEDBACK_API_URL || '/.netlify/functions/submit-feedback';
+  function getFeedbackApiUrl() {
+    const configured = (window.CPFSI_FEEDBACK_API_URL || '').trim();
+    if (configured) return configured;
+    if (location.hostname === 'localhost' || location.hostname.endsWith('.netlify.app')) {
+      return '/.netlify/functions/submit-feedback';
+    }
+    return '';
+  }
   const FEEDBACK_NAME_KEY = 'prototype-feedback-name';
 
   const feedbackState = {
@@ -7022,7 +7029,11 @@
   }
 
   async function submitFeedbackToApi(data) {
-    const response = await fetch(FEEDBACK_API_URL, {
+    const apiUrl = getFeedbackApiUrl();
+    if (!apiUrl) {
+      throw new Error('Feedback API URL is not configured.');
+    }
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)

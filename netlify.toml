@@ -4,5 +4,5 @@
 [functions]
   directory = "netlify/functions"
 
-# Set SLACK_FEEDBACK_WEBHOOK in Netlify UI (Site configuration → Environment variables).
-# Do not commit the webhook URL to the repository.
+# Set FEEDBACK_WEBHOOK_URL in Netlify (Site configuration → Environment variables).
+# Point v1/v2 at this site via feedback-config.js on GitHub Pages.
