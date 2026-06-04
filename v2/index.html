@@ -4528,7 +4528,18 @@
 
           <div class="cpin-branch-panel" id="cpin-desk-remote-panel">
             <h3>Remote evaluation (desk-based)</h3>
-            <p style="margin:0 0 10px;font-size:13px;color:var(--ink-2);">Contact premises, national fire safety team, police or FRS where injury is significant. Log calls, notes and time via <strong>Activity</strong> below.</p>
+            <p style="margin:0 0 10px;font-size:13px;color:var(--ink-2);">Contact premises, national fire safety team, police or FRS where injury is significant. Log calls and time as you go; use <strong>Activity</strong> below for notes and time on any stage.</p>
+            <div class="cpin-activity-feed" id="cpin-activity-feed"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+              <input type="text" id="cpin-activity-text" placeholder="Activity note (e.g. call to duty holder)" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;" />
+              <select id="cpin-activity-duration" style="border:1px solid var(--line);border-radius:6px;padding:8px;">
+                <option value="0.25">15m</option>
+                <option value="0.5" selected>30m</option>
+                <option value="1">1h</option>
+                <option value="1.5">1h 30m</option>
+              </select>
+              <button class="btn" type="button" onclick="addCpinDeskActivity()">Log activity</button>
+            </div>
             <div class="form-row">
               <label for="cpin-desk-notes">Evaluation summary</label>
               <textarea id="cpin-desk-notes" rows="3" placeholder="Remote evaluation findings…" onchange="saveCpinDeskNotes()"></textarea>
@@ -7477,6 +7488,7 @@
     renderCpinStage1Actions();
     syncCpinActivityForStage(n);
     if (n === 3) renderCpinDutyHolders(getCpinById(activeCpinId));
+    if (n === 4) renderCpinDeskActivities(getCpinById(activeCpinId));
   }
 
   function renderCpinIntakeGrid(cpin) {
@@ -7630,6 +7642,74 @@
     persistCpinPatch(activeCpinId, { workflow: 'unassigned' });
     cpinStage = 2;
     setCpinStage(2);
+  }
+
+  function renderCpinDeskActivities(cpin) {
+    const feed = document.getElementById('cpin-activity-feed');
+    if (!feed || !cpin) return;
+    const items = [];
+    const seen = new Set();
+
+    function pushItem(when, text, hours, ts) {
+      const key = (text || '') + '|' + (when || '');
+      if (seen.has(key)) return;
+      seen.add(key);
+      items.push({ when: when || '', text: text || '', hours: hours, ts: ts || 0 });
+    }
+
+    (cpin.deskActivities || []).forEach(function (a, i) {
+      pushItem(a.when, a.text, a.hours, Date.now() - i * 1000);
+    });
+
+    const log = cpin.activityLog || loadCpinActivityFromRecord(cpin);
+    (log.times || []).forEach(function (t) {
+      if (t.stage !== 4) return;
+      pushItem(t.at, t.activity, t.minutes / 60, t.ts);
+    });
+
+    items.sort(function (a, b) { return b.ts - a.ts; });
+
+    if (!items.length) {
+      feed.innerHTML = '<div style="font-size:13px;color:var(--ink-3);padding:8px 0;">No remote evaluation activities logged yet.</div>';
+      return;
+    }
+
+    feed.innerHTML = items.map(function (a) {
+      return '<div class="cpin-activity-item"><span class="when">' + escHtml(a.when) + '</span> ' +
+        escHtml(a.text) + ' <span class="dur">(' + escHtml(String(a.hours)) + 'h)</span></div>';
+    }).join('');
+  }
+
+  function addCpinDeskActivity() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    const text = document.getElementById('cpin-activity-text')?.value?.trim();
+    if (!text) return;
+    const hours = parseFloat(document.getElementById('cpin-activity-duration')?.value || '0.5');
+    const when = 'Just now';
+    const acts = (cpin.deskActivities || []).slice();
+    acts.unshift({ text: text, hours: hours, when: when });
+
+    const minutes = Math.round(hours * 60);
+    const ts = Date.now();
+    cpinActivityLog.times.unshift({
+      id: 't' + ts,
+      activity: text,
+      minutes: minutes,
+      stage: 4,
+      at: when,
+      ts: ts
+    });
+
+    persistCpinPatch(activeCpinId, {
+      deskActivities: acts,
+      activityLog: cpinActivityLog,
+      workflow: 'desk_eval'
+    });
+    const inp = document.getElementById('cpin-activity-text');
+    if (inp) inp.value = '';
+    renderCpinDeskActivities(getCpinById(activeCpinId));
+    renderCpinActivity();
   }
 
   function renderCpinStage3Actions() {
@@ -7787,6 +7867,7 @@
       inp.checked = cpin.deskOutcome === inp.value;
     });
     initCpinActivity();
+    renderCpinDeskActivities(cpin);
     const openNew = cpinDetailLastId !== activeCpinId;
     cpinDetailLastId = activeCpinId;
     if (openNew) {
