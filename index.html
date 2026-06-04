@@ -72,7 +72,7 @@
     }
 
     .prototype-version {
-      grid-row: 1 / 3;
+      grid-row: 1 / 4;
       font-size: 1.25rem;
       font-weight: 700;
       color: var(--link);
@@ -93,11 +93,35 @@
       font-size: 0.875rem;
       color: var(--muted);
     }
+
+    .prototype-updated {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .prototype-updated time {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .index-meta {
+      margin: 28px 0 0;
+      font-size: 0.8125rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .index-meta time {
+      font-weight: 600;
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
   <main>
     <h1>CPFSI Prototypes</h1>
+    <p class="index-meta">This page · <span data-build="index"></span></p>
 
     <ul>
       <li>
@@ -105,6 +129,7 @@
           <span class="prototype-version">V1</span>
           <span class="prototype-audience">Current version</span>
           <span class="prototype-purpose">For review and feedback.</span>
+          <span class="prototype-updated" data-build="v1"></span>
         </a>
       </li>
       <li>
@@ -112,9 +137,36 @@
           <span class="prototype-version">V2</span>
           <span class="prototype-audience">Next version</span>
           <span class="prototype-purpose">In test and build.</span>
+          <span class="prototype-updated" data-build="v2"></span>
         </a>
       </li>
     </ul>
   </main>
+  <script>
+    // Bump these when you push — shown on the chooser and each prototype card.
+    const BUILD_STAMPS = {
+      index: '4 Jun 2026, 20:15',
+      v1: '4 Jun 2026, 14:31',
+      v2: '4 Jun 2026, 20:08'
+    };
+
+    document.querySelectorAll('[data-build]').forEach(function (el) {
+      const stamp = BUILD_STAMPS[el.dataset.build];
+      if (!stamp) return;
+      const label = el.closest('.index-meta') ? 'updated ' : 'Updated ';
+      el.innerHTML = label + '<time datetime="' + stampToDatetime(stamp) + '">' + stamp + '</time>';
+    });
+
+    function stampToDatetime(stamp) {
+      const m = stamp.match(/^(\d{1,2})\s+(\w+)\s+(\d{4}),\s*(\d{1,2}):(\d{2})$/);
+      if (!m) return '';
+      const months = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
+        Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12' };
+      const mon = months[m[2]] || '01';
+      const day = m[1].padStart(2, '0');
+      const hour = m[4].padStart(2, '0');
+      return m[3] + '-' + mon + '-' + day + 'T' + hour + ':' + m[5];
+    }
+  </script>
 </body>
 </html>
