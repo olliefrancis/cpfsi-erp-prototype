@@ -1,0 +1,33 @@
+---
+description: Update root index BUILD_STAMPS whenever the prototype changes
+globs: index.html,v1/**,v2/**
+alwaysApply: false
+---
+
+# Prototype build stamps
+
+When you change the CPFSI prototype (`index.html`, `v1/`, or `v2/`), update `BUILD_STAMPS` in the **root** `index.html` before finishing so deploys are easy to verify.
+
+## Format
+
+UK style: `D Mon YYYY, HH:MM` (24-hour), e.g. `4 Jun 2026, 20:24`.
+
+## Which keys to bump
+
+- **`v2`** — any edit under `v2/` (main workstream).
+- **`v1`** — any edit under `v1/`.
+- **`index`** — changes to the chooser page itself, or bump together with v1/v2 updates in the same task.
+
+Use the current local date/time when updating (not a placeholder).
+
+## Example
+
+```javascript
+const BUILD_STAMPS = {
+  index: '4 Jun 2026, 20:24',
+  v1: '4 Jun 2026, 14:31',
+  v2: '4 Jun 2026, 20:24'
+};
+```
+
+Do not skip this step when the user asks for prototype work or when you push substantive UI/flow changes.
