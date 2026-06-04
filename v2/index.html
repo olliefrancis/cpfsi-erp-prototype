@@ -1574,6 +1574,119 @@
     font-weight: 600;
     margin-bottom: 8px;
   }
+
+  /* ---------- Prototype feedback (pick element → Slack) ---------- */
+  body.feedback-pick-mode { cursor: crosshair; }
+  .feedback-pick-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    display: none;
+  }
+  .feedback-pick-overlay.active { display: block; }
+  .feedback-pick-highlight {
+    position: fixed;
+    border: 3px solid var(--gov-focus);
+    border-radius: 2px;
+    box-shadow: 0 0 0 9999px rgba(11, 12, 12, 0.48);
+    pointer-events: none;
+    z-index: 201;
+    display: none;
+  }
+  .feedback-pick-highlight.show { display: block; }
+  .feedback-pick-hint {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 202;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 20px;
+    background: var(--accent-dark);
+    color: #fff;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
+  }
+  .feedback-pick-hint.show { display: flex; }
+  .feedback-pick-hint button {
+    background: #fff;
+    color: var(--accent-dark);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .feedback-pick-hint button:hover { background: var(--accent-soft); }
+  .feedback-screenshot-flash {
+    outline: 3px solid var(--gov-focus) !important;
+    outline-offset: 2px;
+  }
+  #feedback-modal { z-index: 250; }
+  #feedback-modal .modal { max-width: 560px; }
+  .feedback-target-preview {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .feedback-target-preview strong {
+    display: block;
+    color: var(--ink-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .feedback-target-friendly {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .feedback-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .feedback-field input,
+  .feedback-field textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--surface);
+  }
+  .feedback-field textarea { min-height: 100px; resize: vertical; }
+  .feedback-field input:focus,
+  .feedback-field textarea:focus {
+    outline: 3px solid transparent;
+    box-shadow: 0 0 0 3px var(--gov-focus);
+    border-color: var(--ink);
+  }
+  .feedback-field { margin-bottom: 14px; }
+  .feedback-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
   .modal-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -3039,7 +3152,46 @@
 <!-- Phase banner. Sticky directly below the topbar, hidden on login. -->
 <div id="phase-banner" class="phase-banner">
   <span class="phase-tag">Beta</span>
-  <span>This is a new service replacing Themis. <a>Send feedback</a> to help us improve it.</span>
+  <span>This is a new service replacing Themis. <a href="#" id="feedback-open-link">Send feedback</a> to help us improve it.</span>
+</div>
+
+<div id="feedback-pick-overlay" class="feedback-pick-overlay" aria-hidden="true">
+  <div id="feedback-pick-highlight" class="feedback-pick-highlight" aria-hidden="true"></div>
+  <div id="feedback-pick-hint" class="feedback-pick-hint" role="status" aria-live="polite">
+    <span>Click the part of the page your feedback is about.</span>
+    <button type="button" onclick="cancelFeedbackPick()">Cancel</button>
+  </div>
+</div>
+
+<div id="feedback-modal" class="modal-backdrop" onclick="if(event.target===this) closeFeedbackModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Send feedback</h2>
+        <div class="sub">Tell us what to improve on this screen.</div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeFeedbackModal()" title="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="feedback-target-preview" id="feedback-target-preview">
+        <strong>Feedback about</strong>
+        <p id="feedback-target-summary" class="feedback-target-friendly">Nothing selected yet.</p>
+      </div>
+      <button type="button" class="btn" style="margin-bottom:14px;" onclick="changeFeedbackTarget()">Change selection</button>
+      <div class="feedback-field">
+        <label for="feedback-comment">Your comment</label>
+        <textarea id="feedback-comment" placeholder="What should change, and why?"></textarea>
+      </div>
+      <div class="feedback-field">
+        <label for="feedback-name">Your name</label>
+        <input type="text" id="feedback-name" placeholder="e.g. Phil Smith" autocomplete="name" />
+      </div>
+      <div class="feedback-actions">
+        <button type="button" class="btn" onclick="closeFeedbackModal()">Cancel</button>
+        <button type="button" class="btn primary" id="feedback-submit-btn" onclick="submitPrototypeFeedback()">Send feedback</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- =========================================================
@@ -6562,6 +6714,413 @@
     const workingDays = Math.max(0, Math.floor(diffDays * 5 / 7));
     helper.innerHTML = '<strong>' + day + '</strong>  ·  ' + workingDays + ' working days from today  ·  no Outlook conflicts';
   }
+
+  // ---------------------------------------------------------
+  // Prototype feedback: pick an element, comment, post to Slack.
+  // ---------------------------------------------------------
+  const PROTOTYPE_VERSION = 'v2';
+  const FEEDBACK_API_URL =
+    window.CPFSI_FEEDBACK_API_URL || '/.netlify/functions/submit-feedback';
+  const FEEDBACK_NAME_KEY = 'prototype-feedback-name';
+
+  const feedbackState = {
+    picking: false,
+    target: null,
+    hoverEl: null,
+    friendlyLabel: '',
+    technicalLabel: '',
+    selector: ''
+  };
+
+  function initPrototypeFeedback() {
+    const link = document.getElementById('feedback-open-link');
+    if (!link) return;
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      startFeedbackPick();
+    });
+    document.addEventListener('keydown', onFeedbackKeydown);
+    const savedName = localStorage.getItem(FEEDBACK_NAME_KEY);
+    if (savedName) {
+      const nameInput = document.getElementById('feedback-name');
+      if (nameInput) nameInput.value = savedName;
+    }
+  }
+
+  function isFeedbackUiElement(el) {
+    if (!el) return true;
+    return !!el.closest(
+      '#feedback-pick-overlay, #feedback-modal, .modal-backdrop.open'
+    );
+  }
+
+  function isFeedbackPickChrome(el) {
+    return !!el.closest('#feedback-pick-hint, #feedback-pick-highlight');
+  }
+
+  function clearFeedbackHover() {
+    feedbackState.hoverEl = null;
+    const highlight = document.getElementById('feedback-pick-highlight');
+    if (highlight) highlight.classList.remove('show');
+  }
+
+  function positionFeedbackHighlight(el) {
+    const highlight = document.getElementById('feedback-pick-highlight');
+    if (!highlight || !el) return;
+    const rect = el.getBoundingClientRect();
+    highlight.style.top = rect.top + 'px';
+    highlight.style.left = rect.left + 'px';
+    highlight.style.width = rect.width + 'px';
+    highlight.style.height = rect.height + 'px';
+    highlight.classList.add('show');
+  }
+
+  function startFeedbackPick() {
+    closeFeedbackModal();
+    feedbackState.picking = true;
+    feedbackState.target = null;
+    document.body.classList.add('feedback-pick-mode');
+    const overlay = document.getElementById('feedback-pick-overlay');
+    const hint = document.getElementById('feedback-pick-hint');
+    if (overlay) {
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    if (hint) hint.classList.add('show');
+    document.addEventListener('mousemove', onFeedbackMouseMove, true);
+    document.addEventListener('click', onFeedbackPickClick, true);
+  }
+
+  function cancelFeedbackPick() {
+    feedbackState.picking = false;
+    clearFeedbackHover();
+    document.body.classList.remove('feedback-pick-mode');
+    const overlay = document.getElementById('feedback-pick-overlay');
+    const hint = document.getElementById('feedback-pick-hint');
+    if (overlay) {
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    if (hint) hint.classList.remove('show');
+    document.removeEventListener('mousemove', onFeedbackMouseMove, true);
+    document.removeEventListener('click', onFeedbackPickClick, true);
+  }
+
+  function onFeedbackMouseMove(e) {
+    if (!feedbackState.picking) return;
+    if (isFeedbackPickChrome(e.target)) {
+      clearFeedbackHover();
+      return;
+    }
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (!el || isFeedbackUiElement(el)) {
+      clearFeedbackHover();
+      return;
+    }
+    if (el === feedbackState.hoverEl) return;
+    feedbackState.hoverEl = el;
+    positionFeedbackHighlight(el);
+  }
+
+  function onFeedbackPickClick(e) {
+    if (!feedbackState.picking) return;
+    if (isFeedbackPickChrome(e.target)) return;
+    const el = e.target;
+    if (isFeedbackUiElement(el)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const resolved = resolveFeedbackTarget(el);
+    feedbackState.target = resolved.target;
+    feedbackState.friendlyLabel = resolved.friendlyLabel;
+    feedbackState.technicalLabel = resolved.technicalLabel;
+    feedbackState.selector = resolved.selector;
+    cancelFeedbackPick();
+    openFeedbackModal();
+  }
+
+  function onFeedbackKeydown(e) {
+    if (e.key !== 'Escape') return;
+    if (feedbackState.picking) cancelFeedbackPick();
+    else closeFeedbackModal();
+  }
+
+  function getCompactVisibleText(el) {
+    const raw = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!raw) return '';
+    if (raw.length <= 200) return raw;
+    const firstLine = raw.split(/\n| · /)[0]?.trim();
+    if (firstLine && firstLine.length <= 160) return firstLine;
+    return raw.slice(0, 160) + '…';
+  }
+
+  function getFeedbackFriendlyLabel(el) {
+    if (!el) return 'Selected item';
+    const aria = el.getAttribute('aria-label');
+    if (aria?.trim()) return aria.trim();
+    const labelledBy = el.getAttribute('aria-labelledby');
+    if (labelledBy) {
+      const labelEl = document.getElementById(labelledBy.split(/\s+/)[0]);
+      if (labelEl?.innerText?.trim()) return labelEl.innerText.trim().replace(/\s+/g, ' ');
+    }
+    if (el.alt?.trim()) return el.alt.trim();
+    if (el.title?.trim()) return el.title.trim();
+    if (['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(el.tagName)) {
+      if (el.id) {
+        const label = document.querySelector('label[for="' + CSS.escape(el.id) + '"]');
+        if (label?.innerText?.trim()) return label.innerText.trim().replace(/\s+/g, ' ');
+      }
+      if (el.placeholder) return el.placeholder;
+      if (el.value && (el.tagName === 'BUTTON' || el.type === 'submit' || el.type === 'button')) {
+        return el.value;
+      }
+    }
+    let node = el;
+    for (let depth = 0; depth < 8 && node && node !== document.body; depth++) {
+      const text = getCompactVisibleText(node);
+      if (text.length >= 2) return text;
+      node = node.parentElement;
+    }
+    const tag = el.tagName.toLowerCase();
+    return el.id ? tag + ' #' + el.id : tag;
+  }
+
+  function getFeedbackTechnicalLabel(el) {
+    if (!el) return 'unknown';
+    const tag = el.tagName.toLowerCase();
+    const idPart = el.id ? '#' + el.id : '';
+    const classPart =
+      el.className && typeof el.className === 'string'
+        ? '.' + el.className.trim().split(/\s+/).filter(Boolean).slice(0, 5).join('.')
+        : '';
+    return tag + idPart + classPart;
+  }
+
+  function buildFeedbackSelector(el) {
+    const parts = [];
+    let node = el;
+    let depth = 0;
+    while (node && node.nodeType === 1 && depth < 8 && node !== document.body) {
+      let part = node.tagName.toLowerCase();
+      if (node.id) {
+        parts.unshift(part + '#' + node.id);
+        break;
+      }
+      const cls =
+        node.className && typeof node.className === 'string'
+          ? node.className.trim().split(/\s+/).filter(c => c && !c.startsWith('feedback-'))[0]
+          : '';
+      if (cls) part += '.' + cls;
+      const parent = node.parentElement;
+      if (parent) {
+        const sameTag = Array.from(parent.children).filter(c => c.tagName === node.tagName);
+        if (sameTag.length > 1) {
+          part += ':nth-of-type(' + (sameTag.indexOf(node) + 1) + ')';
+        }
+      }
+      parts.unshift(part);
+      node = node.parentElement;
+      depth++;
+    }
+    return parts.join(' > ');
+  }
+
+  function resolveFeedbackTarget(el) {
+    let labelNode = el;
+    let friendlyLabel = '';
+    for (let depth = 0; depth < 8 && labelNode && labelNode !== document.body; depth++) {
+      const text = getCompactVisibleText(labelNode);
+      if (text.length >= 2 && text.length <= 200) {
+        friendlyLabel = text;
+        break;
+      }
+      labelNode = labelNode.parentElement;
+    }
+    if (!friendlyLabel) friendlyLabel = getFeedbackFriendlyLabel(el);
+    return {
+      target: el,
+      friendlyLabel,
+      technicalLabel: getFeedbackTechnicalLabel(el),
+      selector: buildFeedbackSelector(el)
+    };
+  }
+
+  function updateFeedbackTargetPreview() {
+    const summary = document.getElementById('feedback-target-summary');
+    if (!summary) return;
+    if (!feedbackState.target) {
+      summary.textContent = 'Nothing selected yet.';
+      return;
+    }
+    summary.textContent = feedbackState.friendlyLabel || 'Selected item';
+  }
+
+  function loadHtml2Canvas() {
+    return new Promise(function (resolve, reject) {
+      if (window.html2canvas) return resolve(window.html2canvas);
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      script.async = true;
+      script.onload = function () {
+        if (window.html2canvas) resolve(window.html2canvas);
+        else reject(new Error('html2canvas failed to load'));
+      };
+      script.onerror = function () {
+        reject(new Error('html2canvas failed to load'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  function getFeedbackCaptureElement(targetEl) {
+    let el = targetEl;
+    for (let i = 0; i < 4 && el && el !== document.body; i++) {
+      const rect = el.getBoundingClientRect();
+      if (rect.width >= 120 && rect.height >= 48) return el;
+      el = el.parentElement;
+    }
+    return targetEl;
+  }
+
+  async function captureFeedbackScreenshot(targetEl) {
+    const html2canvas = await loadHtml2Canvas();
+    const captureEl = getFeedbackCaptureElement(targetEl);
+    const modal = document.getElementById('feedback-modal');
+    if (modal) modal.classList.remove('open');
+    captureEl.scrollIntoView({ block: 'center', inline: 'nearest' });
+    await new Promise(function (resolve) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(resolve);
+      });
+    });
+    captureEl.classList.add('feedback-screenshot-flash');
+    const scale = Math.min(2, window.devicePixelRatio || 1.5);
+    const canvas = await html2canvas(captureEl, {
+      backgroundColor: '#f4f4f1',
+      scale: scale,
+      logging: false,
+      useCORS: true,
+      ignoreElements: function (node) {
+        return node.id && node.id.indexOf('feedback-') === 0;
+      }
+    });
+    captureEl.classList.remove('feedback-screenshot-flash');
+    if (modal) modal.classList.add('open');
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#ffdd00';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+    const maxWidth = 900;
+    if (canvas.width > maxWidth) {
+      const ratio = maxWidth / canvas.width;
+      const resized = document.createElement('canvas');
+      resized.width = maxWidth;
+      resized.height = Math.round(canvas.height * ratio);
+      resized.getContext('2d').drawImage(canvas, 0, 0, resized.width, resized.height);
+      return resized.toDataURL('image/jpeg', 0.88);
+    }
+    return canvas.toDataURL('image/jpeg', 0.88);
+  }
+
+  async function submitFeedbackToApi(data) {
+    const response = await fetch(FEEDBACK_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json().catch(function () {
+      return {};
+    });
+    if (!response.ok || !result.ok) {
+      throw new Error(result.error || 'Feedback API unavailable');
+    }
+    return result;
+  }
+
+  function openFeedbackModal() {
+    updateFeedbackTargetPreview();
+    const modal = document.getElementById('feedback-modal');
+    if (modal) modal.classList.add('open');
+    document.getElementById('feedback-comment')?.focus();
+  }
+
+  function closeFeedbackModal() {
+    document.getElementById('feedback-modal')?.classList.remove('open');
+  }
+
+  function changeFeedbackTarget() {
+    closeFeedbackModal();
+    startFeedbackPick();
+  }
+
+  async function submitPrototypeFeedback() {
+    const name = document.getElementById('feedback-name')?.value.trim();
+    const comment = document.getElementById('feedback-comment')?.value.trim();
+    if (!feedbackState.target) {
+      window.alert('Select something on the page first (Send feedback → click an element).');
+      changeFeedbackTarget();
+      return;
+    }
+    if (!comment) {
+      window.alert('Please enter a comment.');
+      document.getElementById('feedback-comment')?.focus();
+      return;
+    }
+    if (!name) {
+      window.alert('Please enter your name.');
+      document.getElementById('feedback-name')?.focus();
+      return;
+    }
+
+    localStorage.setItem(FEEDBACK_NAME_KEY, name);
+
+    const friendly = feedbackState.friendlyLabel || 'Selected item';
+    const technical = feedbackState.technicalLabel || getFeedbackTechnicalLabel(feedbackState.target);
+    const selector = feedbackState.selector || buildFeedbackSelector(feedbackState.target);
+    const page = window.location.hash || '#login';
+    const url = window.location.href;
+    const submitBtn = document.getElementById('feedback-submit-btn');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+    }
+
+    const feedbackData = {
+      version: PROTOTYPE_VERSION,
+      name: name,
+      comment: comment,
+      friendly: friendly,
+      technical: technical,
+      selector: selector,
+      page: page,
+      url: url,
+      screenshotBase64: null
+    };
+
+    try {
+      if (submitBtn) submitBtn.textContent = 'Capturing screenshot…';
+      feedbackData.screenshotBase64 = await captureFeedbackScreenshot(feedbackState.target);
+    } catch (err) {
+      console.warn('Screenshot capture failed:', err);
+    }
+
+    try {
+      if (submitBtn) submitBtn.textContent = 'Sending…';
+      await submitFeedbackToApi(feedbackData);
+      document.getElementById('feedback-comment').value = '';
+      closeFeedbackModal();
+      feedbackState.target = null;
+      window.alert('Thank you — your feedback was sent.');
+    } catch (err) {
+      window.alert('Could not send feedback. The feedback service may not be configured yet.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send feedback';
+      }
+    }
+  }
+
+  initPrototypeFeedback();
 </script>
 
 </body>
