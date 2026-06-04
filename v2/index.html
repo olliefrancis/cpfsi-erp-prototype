@@ -1164,6 +1164,49 @@
   }
   .cpin-activity-item:last-child { border-bottom: none; }
   .cpin-activity-item .when { color: var(--ink-3); font-size: 12px; }
+  .cpin-step-list {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cpin-step {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .cpin-step:last-child { border-bottom: none; }
+  .cpin-step-hd {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .cpin-step-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cpin-step.done .cpin-step-num { background: var(--green); }
+  .cpin-step-title { font-weight: 600; font-size: 14px; margin: 0; }
+  .cpin-step-desc { font-size: 12px; color: var(--ink-2); margin: 4px 0 0; }
+  .cpin-step-body { margin-left: 32px; }
+  .cpin-check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    margin: 6px 0;
+    font-weight: 400;
+  }
+  .cpin-check-row input { width: auto; margin-top: 3px; }
+
   .cpin-close-summary {
     background: var(--green-soft);
     border: 1px solid var(--green-soft);
@@ -1189,7 +1232,8 @@
     gap: 16px;
   }
   .premises-audit-banner strong { font-size: 15px; }
-  #audit-float-bar {
+  #audit-float-bar,
+  #cpin-float-bar {
     position: fixed;
     left: 0;
     right: 0;
@@ -1200,7 +1244,8 @@
     flex-direction: column;
     box-shadow: 0 -4px 24px rgba(11, 12, 12, 0.1);
   }
-  body.audit-activity-bar #audit-float-bar {
+  body.audit-activity-bar #audit-float-bar,
+  body.cpin-activity-bar #cpin-float-bar {
     display: flex;
   }
   .audit-float-panel {
@@ -1288,10 +1333,12 @@
     border-color: var(--line);
     color: var(--ink-2);
   }
-  body.audit-activity-bar #audit > main {
+  body.audit-activity-bar #audit > main,
+  body.cpin-activity-bar #cpin > main {
     padding-bottom: 72px;
   }
-  body.audit-float-panel-open #audit > main {
+  body.audit-float-panel-open #audit > main,
+  body.cpin-float-panel-open #cpin > main {
     padding-bottom: min(400px, 55vh);
   }
 
@@ -3087,10 +3134,12 @@
     .audit-quick-log {
       grid-template-columns: 1fr;
     }
-    body.audit-activity-bar #audit > main {
+    body.audit-activity-bar #audit > main,
+    body.cpin-activity-bar #cpin > main {
       padding-bottom: 168px;
     }
-    body.audit-float-panel-open #audit > main {
+    body.audit-float-panel-open #audit > main,
+    body.cpin-float-panel-open #cpin > main {
       padding-bottom: min(520px, 78vh);
     }
     #audit .audit-recent-on-audit {
@@ -4319,7 +4368,7 @@
       <div>
         <h1>CPINs</h1>
         <div class="meta">Reports of fire incidents from Fire &amp; Rescue Services</div>
-        <div class="cpin-queue-hint">FRS use the <a href="cpin-report.html" target="_blank" rel="noopener">external CPIN form</a>. New reports appear under <strong>Incoming</strong>; unmatched premises under <strong>Awaiting premises</strong>.</div>
+        <div class="cpin-queue-hint">FRS use the <a href="cpin-report.html" target="_blank" rel="noopener">external CPIN form</a>. New reports with a matched premises record appear under <strong>Incoming</strong>; unmatched addresses under <strong>Awaiting premises</strong>.</div>
       </div>
     </div>
 
@@ -4376,8 +4425,11 @@
         <div class="stage" data-cpin-stage="1" onclick="setCpinStage(1)">1 · Submission &amp; intake</div>
         <div class="stage" data-cpin-stage="2" onclick="setCpinStage(2, true)">2 · Assignment</div>
         <div class="stage" data-cpin-stage="3" onclick="setCpinStage(3, true)">3 · Triage &amp; decision</div>
-        <div class="stage" data-cpin-stage="4" onclick="setCpinStage(4, true)">4 · Desk evaluation</div>
+        <div class="stage" data-cpin-stage="4" onclick="setCpinStage(4, true)">4 · Examine incident</div>
         <div class="stage" data-cpin-stage="5" onclick="setCpinStage(5, true)">5 · Close</div>
+        <div style="margin-top:16px;padding:10px 12px;font-size:11px;color:var(--ink-3);">
+          Log calls, emails and time at any point via Activity below. Not a stage — available throughout.
+        </div>
       </div>
 
       <div>
@@ -4404,10 +4456,6 @@
                 <option value="Jobcentre Plus Crawley">Jobcentre Plus Crawley</option>
                 <option value="HMP Rochester">HMP Rochester</option>
               </select>
-            </div>
-            <div class="form-row">
-              <label for="cpin-intake-premises-free">Form text (not in system)</label>
-              <input type="text" id="cpin-intake-premises-free" readonly style="background:var(--bg);" />
             </div>
           </div>
           <div class="cpin-branch-panel">
@@ -4446,16 +4494,10 @@
         <!-- Stage 3: Triage and decision -->
         <div class="stage-content cpin-panel" id="cpin-panel-3" hidden>
           <h2 style="margin:0 0 8px;">Stage 3 — Triage and decision</h2>
-          <p style="font-size:13px;color:var(--ink-2);margin:0 0 16px;">Review what happened, the RAG flag, the premises and duty holder responsibilities — then decide if further action or an audit is required.</p>
+          <p style="font-size:13px;color:var(--ink-2);margin:0 0 16px;">Review what happened, the RAG flag and the premises — then decide if further action is needed. Duty Holders are confirmed only when action is required.</p>
           <div class="form-row" style="margin-bottom:14px;">
             <label for="cpin-review-notes">Review notes</label>
-            <textarea id="cpin-review-notes" rows="3" placeholder="What happened, premises, duty holder responsibilities…" onchange="saveCpinReviewNotes()"></textarea>
-          </div>
-          <div class="cpin-branch-panel" id="cpin-dh-panel">
-            <h3>Duty Holders</h3>
-            <p style="margin:0 0 8px;font-size:13px;color:var(--ink-2);">Suggested from premises data when you reach this stage. Accept, reject or remove each Duty Holder. At least one accepted holder is required when further action is needed.</p>
-            <ul class="cpin-dh-list" id="cpin-dh-list"></ul>
-            <p id="cpin-dh-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
+            <textarea id="cpin-review-notes" rows="3" placeholder="What happened, premises, context for the decision…" onchange="saveCpinReviewNotes()"></textarea>
           </div>
           <div class="cpin-branch-panel" id="cpin-further-action-panel">
             <h3>Does this incident need any further action?</h3>
@@ -4466,65 +4508,137 @@
               </label>
               <label class="cpin-decision-option">
                 <input type="radio" name="cpin-further-action" value="yes" onchange="saveCpinFurtherAction()" />
-                <div><strong>Yes — action required</strong><span>Serious incidents: injuries, fire fought, rescue, or fatality → Stage 4 desk evaluation.</span></div>
+                <div><strong>Yes — action required</strong><span>Amber or Red incidents → Stage 4 desk evaluation. Audit decision is made there.</span></div>
               </label>
             </div>
           </div>
-          <div class="cpin-branch-panel" id="cpin-audit-required-panel" hidden>
-            <h3>Does the incident require an audit?</h3>
-            <div class="cpin-decision-options">
-              <label class="cpin-decision-option">
-                <input type="radio" name="cpin-audit-required" value="no" onchange="saveCpinAuditRequired()" />
-                <div><strong>No audit required</strong><span>Go to Stage 5 — close with reason (one-click close).</span></div>
-              </label>
-              <label class="cpin-decision-option">
-                <input type="radio" name="cpin-audit-required" value="yes" onchange="saveCpinAuditRequired()" />
-                <div><strong>Yes — audit required</strong><span>A new audit process will be created when you close (or after desk evaluation).</span></div>
-              </label>
-            </div>
+          <div class="cpin-branch-panel" id="cpin-dh-panel" hidden>
+            <h3>Duty Holders</h3>
+            <p style="margin:0 0 8px;font-size:13px;color:var(--ink-2);">Suggested from premises data. Accept, reject or remove each Duty Holder. At least one accepted holder is required before Stage 4 on Amber or Red CPINs.</p>
+            <ul class="cpin-dh-list" id="cpin-dh-list"></ul>
+            <p id="cpin-dh-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
           </div>
           <div class="stage-actions" id="cpin-stage3-actions" style="margin-top:20px;"></div>
         </div>
 
-        <!-- Stage 4: Desk-based examination -->
+        <!-- Stage 4: Desk-based examination + on-site / audit branches -->
         <div class="stage-content cpin-panel" id="cpin-panel-4" hidden>
-          <h2 style="margin:0 0 8px;">Stage 4 — Examine the incident (desk-based)</h2>
-          <p style="font-size:13px;color:var(--ink-2);margin:0 0 12px;">Remote evaluation: contact premises, national fire safety team, police or FRS investigation where injury is significant. Log calls and time as you go.</p>
-          <div class="cpin-activity-feed" id="cpin-activity-feed"></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-            <input type="text" id="cpin-activity-text" placeholder="Activity note (e.g. call to duty holder)" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;" />
-            <select id="cpin-activity-duration" style="border:1px solid var(--line);border-radius:6px;padding:8px;">
-              <option value="0.25">15m</option>
-              <option value="0.5" selected>30m</option>
-              <option value="1">1h</option>
-              <option value="1.5">1h 30m</option>
-            </select>
-            <button class="btn" type="button" onclick="addCpinDeskActivity()">Log activity</button>
+          <h2 style="margin:0 0 8px;">Stage 4 — Examine the incident</h2>
+          <p style="font-size:13px;color:var(--ink-2);margin:0 0 16px;">Remote evaluation first, then follow the path that matches your decision — on-site evaluation, direct audit, or close with no further action.</p>
+
+          <div class="cpin-branch-panel" id="cpin-desk-remote-panel">
+            <h3>Remote evaluation (desk-based)</h3>
+            <p style="margin:0 0 10px;font-size:13px;color:var(--ink-2);">Contact premises, national fire safety team, police or FRS where injury is significant. Log calls, notes and time via <strong>Activity</strong> below.</p>
+            <div class="form-row">
+              <label for="cpin-desk-notes">Evaluation summary</label>
+              <textarea id="cpin-desk-notes" rows="3" placeholder="Remote evaluation findings…" onchange="saveCpinDeskNotes()"></textarea>
+            </div>
           </div>
-          <div class="form-row" style="margin-bottom:14px;">
-            <label for="cpin-desk-notes">Evaluation summary</label>
-            <textarea id="cpin-desk-notes" rows="3" placeholder="Remote evaluation findings…" onchange="saveCpinDeskNotes()"></textarea>
-          </div>
-          <div class="cpin-branch-panel">
+
+          <div class="cpin-branch-panel" id="cpin-desk-outcome-panel">
             <h3>What does the incident need?</h3>
             <div class="cpin-decision-options">
               <label class="cpin-decision-option">
                 <input type="radio" name="cpin-desk-outcome" value="no_action" onchange="saveCpinDeskOutcome()" />
-                <div><strong>No further action</strong><span>→ Stage 5 Close</span></div>
+                <div><strong>No further action</strong><span>Log evaluation and close at Stage 5.</span></div>
               </label>
               <label class="cpin-decision-option">
                 <input type="radio" name="cpin-desk-outcome" value="onsite_eval" onchange="saveCpinDeskOutcome()" />
-                <div><strong>On-site Fire Safety Evaluation needed</strong><span>Physical visit within 24–48h; may still lead to audit at close.</span></div>
+                <div><strong>On-site Fire Safety Evaluation needed</strong><span>Physical visit within 24–48h — CCTV, discussions, then decide if an audit is required.</span></div>
               </label>
               <label class="cpin-decision-option">
                 <input type="radio" name="cpin-desk-outcome" value="audit" onchange="saveCpinDeskOutcome()" />
-                <div><strong>Audit required</strong><span>Premises clearly needs auditing — successor audit at close.</span></div>
+                <div><strong>Audit required (no on-site evaluation first)</strong><span>Premises clearly needs auditing — schedule audit at close.</span></div>
               </label>
             </div>
           </div>
-          <div class="stage-actions" style="margin-top:20px;">
-            <button class="btn primary" type="button" onclick="advanceCpinToClose()">Continue to Close →</button>
+
+          <div class="cpin-branch-panel" id="cpin-stage4-no-action-panel" hidden>
+            <p style="margin:0;font-size:13px;color:var(--ink-2);">No further action after remote evaluation. Continue to Stage 5 to close with a reason.</p>
           </div>
+
+          <div class="cpin-branch-panel" id="cpin-stage4-audit-direct-panel" hidden>
+            <h3>Schedule audit</h3>
+            <p style="margin:0 0 12px;font-size:13px;color:var(--ink-2);">Audit required without an on-site evaluation first. Complete before closing.</p>
+            <label class="cpin-check-row"><input type="checkbox" id="cpin-audit-scheduled" onchange="saveCpinAuditPrep()" /> Schedule the audit</label>
+            <label class="cpin-check-row"><input type="checkbox" id="cpin-audit-notify-dh" onchange="saveCpinAuditPrep()" /> Notify duty holders</label>
+            <label class="cpin-check-row"><input type="checkbox" id="cpin-audit-reminder" onchange="saveCpinAuditPrep()" /> Set a reminder</label>
+          </div>
+
+          <div class="cpin-branch-panel" id="cpin-stage4-onsite-panel" hidden>
+            <h3>On-site Fire Safety Evaluation</h3>
+            <p style="margin:0 0 12px;font-size:13px;color:var(--ink-2);">Serious cases (significant injury, fatality) typically within 24–48 hours. Appointment may be confirmed by telephone; letter can be skipped when urgent.</p>
+            <ol class="cpin-step-list">
+              <li class="cpin-step" id="cpin-onsite-step-1">
+                <div class="cpin-step-hd">
+                  <span class="cpin-step-num">1</span>
+                  <div>
+                    <p class="cpin-step-title">Confirm the appointment</p>
+                    <p class="cpin-step-desc">Agree date and time for the on-site visit with premises / duty holder.</p>
+                  </div>
+                </div>
+                <div class="cpin-step-body">
+                  <label class="cpin-check-row"><input type="checkbox" id="cpin-onsite-appointment" onchange="saveCpinOnsiteEval()" /> Appointment confirmed</label>
+                </div>
+              </li>
+              <li class="cpin-step" id="cpin-onsite-step-2">
+                <div class="cpin-step-hd">
+                  <span class="cpin-step-num">2</span>
+                  <div>
+                    <p class="cpin-step-title">Send the appointment letter</p>
+                    <p class="cpin-step-desc">Skippable when already confirmed by phone — keep for audit trail within 12–48h.</p>
+                  </div>
+                </div>
+                <div class="cpin-step-body">
+                  <label class="cpin-check-row"><input type="checkbox" id="cpin-onsite-letter-sent" onchange="saveCpinOnsiteEval()" /> Appointment letter sent</label>
+                  <label class="cpin-check-row"><input type="checkbox" id="cpin-onsite-letter-skipped" onchange="saveCpinOnsiteEval()" /> Skipped (confirmed by telephone)</label>
+                </div>
+              </li>
+              <li class="cpin-step" id="cpin-onsite-step-3">
+                <div class="cpin-step-hd">
+                  <span class="cpin-step-num">3</span>
+                  <div>
+                    <p class="cpin-step-title">Attend site — collect findings</p>
+                    <p class="cpin-step-desc">Evaluate failings; store files against this CPIN and premises record.</p>
+                  </div>
+                </div>
+                <div class="cpin-step-body">
+                  <div class="form-row" style="margin-bottom:10px;">
+                    <label for="cpin-onsite-findings">Site visit notes</label>
+                    <textarea id="cpin-onsite-findings" rows="3" placeholder="Findings, failings, evidence collected…" onchange="saveCpinOnsiteEval()"></textarea>
+                  </div>
+                  <label class="cpin-check-row"><input type="checkbox" id="cpin-onsite-visit-done" onchange="saveCpinOnsiteEval()" /> Site visit complete — evaluation logged</label>
+                </div>
+              </li>
+              <li class="cpin-step" id="cpin-onsite-step-4">
+                <div class="cpin-step-hd">
+                  <span class="cpin-step-num">4</span>
+                  <div>
+                    <p class="cpin-step-title">Decision: is an audit required?</p>
+                  </div>
+                </div>
+                <div class="cpin-step-body">
+                  <div class="cpin-decision-options" style="margin-top:0;">
+                    <label class="cpin-decision-option">
+                      <input type="radio" name="cpin-onsite-audit" value="no" onchange="saveCpinOnsiteAuditDecision()" />
+                      <div><strong>No</strong><span>Log evaluation against premises → Stage 5 Close</span></div>
+                    </label>
+                    <label class="cpin-decision-option">
+                      <input type="radio" name="cpin-onsite-audit" value="yes" onchange="saveCpinOnsiteAuditDecision()" />
+                      <div><strong>Yes</strong><span>Schedule audit, notify duty holders, set reminder → Stage 5 and new audit process</span></div>
+                    </label>
+                  </div>
+                  <div id="cpin-onsite-audit-prep" hidden style="margin-top:12px;">
+                    <label class="cpin-check-row"><input type="checkbox" id="cpin-onsite-audit-scheduled" onchange="saveCpinOnsiteEval()" /> Schedule the audit</label>
+                    <label class="cpin-check-row"><input type="checkbox" id="cpin-onsite-audit-notify" onchange="saveCpinOnsiteEval()" /> Notify duty holders</label>
+                    <label class="cpin-check-row"><input type="checkbox" id="cpin-onsite-audit-reminder" onchange="saveCpinOnsiteEval()" /> Set a reminder</label>
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="stage-actions" id="cpin-stage4-actions" style="margin-top:20px;"></div>
         </div>
 
         <!-- Stage 5: Close -->
@@ -4552,6 +4666,20 @@
         </div>
       </div>
     </div>
+
+    <section class="audit-recent-on-audit" id="cpin-recent-on-cpin" aria-label="Recently on this CPIN">
+      <div class="audit-recent-hd">
+        <h3>Recently on this CPIN</h3>
+        <div class="audit-recent-summary">
+          <span id="cpin-recent-count-notes">0 notes</span>
+          <span id="cpin-recent-count-time">0m logged</span>
+        </div>
+      </div>
+      <div class="audit-activity-feed">
+        <div id="cpin-activity-feed-list"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -5349,6 +5477,76 @@
   </div>
 </div>
 
+<!-- Floating activity bar (CPIN process) -->
+<div id="cpin-float-bar">
+  <div class="audit-float-panel" id="cpin-float-panel" aria-hidden="true">
+    <div id="cpin-float-time-content">
+      <div class="audit-float-panel-hd">
+        <strong>Log time against this CPIN</strong>
+        <button type="button" class="btn" onclick="closeCpinFloatPanel()">Close</button>
+      </div>
+      <div class="audit-quick-log">
+        <div>
+          <label>Activity</label>
+          <select id="cpin-time-activity"></select>
+        </div>
+        <div>
+          <label>What for</label>
+          <input type="text" id="cpin-time-what" readonly style="background:var(--bg);color:var(--ink-2);" />
+        </div>
+        <div>
+          <label>Duration</label>
+          <select id="cpin-time-duration">
+            <option value="15">15m</option>
+            <option value="30">30m</option>
+            <option value="45">45m</option>
+            <option value="60">1h</option>
+            <option value="90" selected>1h 30m</option>
+            <option value="120">2h</option>
+            <option value="180">3h</option>
+            <option value="240">Half day (4h)</option>
+          </select>
+        </div>
+      </div>
+      <div id="cpin-float-time-hint" style="font-size:11px;color:var(--ink-3);margin-top:8px;"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
+        <button class="btn primary" type="button" onclick="logCpinTime()">Log time</button>
+      </div>
+    </div>
+    <div id="cpin-float-note-content" hidden>
+      <div class="audit-float-panel-hd">
+        <strong>Add a note</strong>
+        <button type="button" class="btn" onclick="closeCpinFloatPanel()">Close</button>
+      </div>
+      <div class="audit-note-form">
+        <label>Note</label>
+        <textarea id="cpin-note-text" placeholder="Calls, emails, duty holder contact, site observations…"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn primary" type="button" onclick="addCpinNote()">Save note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="audit-float-bar-strip">
+    <strong class="audit-float-bar-title" style="font-size:13px;color:var(--ink);">Activity</strong>
+    <div class="counts">
+      <span id="cpin-count-notes">0 notes</span>
+      <span id="cpin-count-files">0 files</span>
+      <span id="cpin-count-time">0m logged</span>
+    </div>
+    <div class="actions">
+      <div class="actions-secondary">
+        <button class="btn btn-quiet" type="button">Request more info</button>
+        <button class="btn btn-quiet" type="button">Log interim activity</button>
+      </div>
+      <div class="actions-primary">
+        <button class="btn" type="button" onclick="openCpinFloatPanel('time')">+ Log time</button>
+        <button class="btn" type="button" onclick="openCpinFloatPanel('note')">+ Add note</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- =========================================================
      + NEW QUICK-CREATE MODAL
      Everything CPFSI can create themselves. CPINs are excluded
@@ -5802,6 +6000,7 @@
       }
       activeCpinId = cpinId;
       render(screen);
+      setCpinActivityBarVisible(true);
       initCpinDetailPage();
       return;
     }
@@ -5853,6 +6052,11 @@
       setAuditActivityBarVisible(false);
     } else {
       setAuditActivityBarVisible(true);
+    }
+
+    if (id !== 'cpin') {
+      closeCpinFloatPanel();
+      setCpinActivityBarVisible(false);
     }
 
     window.scrollTo(0, 0);
@@ -6394,7 +6598,7 @@
     unassigned: 'Unassigned',
     assigned: 'Assigned',
     triage: 'Triage',
-    desk_eval: 'Desk evaluation',
+    desk_eval: 'Examine incident',
     awaiting_info: 'Awaiting info',
     audit_spawned: 'Audit created',
     closed: 'Closed',
@@ -6424,13 +6628,13 @@
   let cpinDetailLastId = null;
 
   const CPINS_INCOMING = [
-    { id: 'cpin-in-0445', ref: 'CPIN-2026-0445', severity: 'green', when: '12 min ago', premises: null, summary: 'Automatic alarm — cause not confirmed at report', patch: false, workflow: 'incoming', assignee: null, intake: { incidentNumber: 'FRS-8841', incidentDate: '02/06/2026', incidentTime: '09:12', frs: 'Kent FRS', contact: 'FF Adams', email: 'adams@kent.test', incidentStatus: 'Incident Dealt with by Staff - No Known Injuries', description: 'Alarm actuation. FRS attendance cancelled en route — security investigating on site.', premisesFree: '' } },
-    { id: 'cpin-in-0446', ref: 'CPIN-2026-0446', severity: 'amber', when: '38 min ago', premises: null, summary: 'Smouldering waste in loading bay — premises to be identified', patch: false, workflow: 'incoming', assignee: null, intake: { incidentNumber: 'FRS-8842', incidentDate: '02/06/2026', incidentTime: '08:46', frs: 'Surrey FRS', contact: 'WM Hughes', email: 'hughes@surrey.test', incidentStatus: 'Fire Service Fought Fire or Carried Out Rescues', description: 'Smouldering waste in loading bay. Crown occupancy suspected; UPRN not yet confirmed.', premisesFree: '' } },
-    { id: 'cpin-in-0447', ref: 'CPIN-2026-0447', severity: 'red', when: '1 hr ago', premises: null, summary: 'Serious injuries suspected — urgent intake review', patch: false, workflow: 'incoming', assignee: null, intake: { incidentNumber: 'FRS-8843', incidentDate: '02/06/2026', incidentTime: '08:05', frs: 'London Fire Brigade', contact: 'SM Okonkwo', email: 'okonkwo@london.test', incidentStatus: 'Serious or Fatal Injuries Suspected as Result of Fire', description: 'Fire in secure wing. Casualty count unconfirmed; FRS urgent line notified.', premisesFree: '' } }
+    { id: 'cpin-in-0445', ref: 'CPIN-2026-0445', severity: 'green', when: '12 min ago', premises: 'HMCTS Maidstone', summary: 'Automatic alarm — HMCTS Maidstone', patch: false, workflow: 'incoming', assignee: null, intake: { incidentNumber: 'FRS-8841', incidentDate: '02/06/2026', incidentTime: '09:12', frs: 'Kent FRS', contact: 'FF Adams', email: 'adams@kent.test', incidentStatus: 'Incident Dealt with by Staff - No Known Injuries', description: 'Alarm actuation. FRS attendance cancelled en route — security investigating on site.', premisesFree: '' } },
+    { id: 'cpin-in-0446', ref: 'CPIN-2026-0446', severity: 'amber', when: '38 min ago', premises: 'Temple Quay House', summary: 'Smouldering waste — Temple Quay House loading bay', patch: false, workflow: 'incoming', assignee: null, intake: { incidentNumber: 'FRS-8842', incidentDate: '02/06/2026', incidentTime: '08:46', frs: 'Surrey FRS', contact: 'WM Hughes', email: 'hughes@surrey.test', incidentStatus: 'Fire Service Fought Fire or Carried Out Rescues', description: 'Smouldering waste in loading bay. Premises matched from form UPRN.', premisesFree: '' } },
+    { id: 'cpin-in-0447', ref: 'CPIN-2026-0447', severity: 'red', when: '1 hr ago', premises: 'HMP Wandsworth', summary: 'Serious injuries suspected — HMP Wandsworth', patch: false, workflow: 'incoming', assignee: null, intake: { incidentNumber: 'FRS-8843', incidentDate: '02/06/2026', incidentTime: '08:05', frs: 'London Fire Brigade', contact: 'SM Okonkwo', email: 'okonkwo@london.test', incidentStatus: 'Serious or Fatal Injuries Suspected as Result of Fire', description: 'Fire in secure wing. Casualty count unconfirmed; FRS urgent line notified.', premisesFree: '' } }
   ];
 
   const CPINS_MINE = [
-    { id: 'cpin-0418', ref: 'CPIN-2026-0418', severity: 'red', when: '04:22 today', premises: 'HMP Lewes', summary: 'Cell fire, serious injury', patch: true, workflow: 'desk_eval', assignee: 'Phil Gower', furtherAction: 'yes', auditRequired: null, deskOutcome: null, dutyHolders: [{ name: 'HMPPS — South East', status: 'accepted' }], deskActivities: [{ text: 'Call to duty holder — night staff', hours: 0.5, when: '04:45 today' }], intake: { incidentNumber: 'FRS-8821', incidentDate: '22/06/2026', incidentTime: '04:18', frs: 'East Sussex FRS', contact: 'Watch Manager Lee', email: 'lee@esfrs.test', incidentStatus: 'Injuries as a result of fire', description: 'Cell fire during night roll. One prisoner serious burns.' } },
+    { id: 'cpin-0418', ref: 'CPIN-2026-0418', severity: 'red', when: '04:22 today', premises: 'HMP Lewes', summary: 'Cell fire, serious injury', patch: true, workflow: 'desk_eval', assignee: 'Phil Gower', furtherAction: 'yes', auditRequired: null, deskOutcome: 'onsite_eval', dutyHolders: [{ name: 'HMPPS — South East', status: 'accepted' }], activityLog: { notes: [{ id: 'cn1', text: 'Night duty holder briefed — on-site evaluation within 24h.', stage: 4, at: '04:40 today', ts: 1719048000000 }], times: [{ id: 'ct1', activity: 'Phone call', minutes: 30, stage: 4, at: '04:45 today', ts: 1719048300000 }] }, deskNotes: 'Serious injury — on-site evaluation within 24h.', onsiteEval: { appointmentConfirmed: true, letterSkipped: true, letterSent: false }, intake: { incidentNumber: 'FRS-8821', incidentDate: '22/06/2026', incidentTime: '04:18', frs: 'East Sussex FRS', contact: 'Watch Manager Lee', email: 'lee@esfrs.test', incidentStatus: 'Injuries as a result of fire', description: 'Cell fire during night roll. One prisoner serious burns.' } },
     { id: 'cpin-0412', ref: 'CPIN-2026-0412', severity: 'red', when: '21:14 yest', premises: 'HMP Belmarsh', summary: 'Kitchen fire, 2 injured', patch: true, workflow: 'triage', assignee: 'Phil Gower', furtherAction: null, auditRequired: null, intake: { incidentNumber: 'FRS-8810', incidentDate: '21/06/2026', incidentTime: '21:05', frs: 'London Fire Brigade', contact: 'Station Manager Ali', email: 'ali@london.test', incidentStatus: 'Injuries as a result of fire', description: 'Kitchen extraction fire. Two staff treated for smoke inhalation.' } },
     { id: 'cpin-0418-tq', ref: 'CPIN-2026-0417', severity: 'amber', when: '12 Jun', premises: 'Temple Quay House', summary: 'Electrical fault, no injuries', patch: true, workflow: 'closed', assignee: 'Phil Gower', closeReason: 'Audit required — reactive audit A-2026-0314 created.', spawnedAuditId: 'A-2026-0314', auditRequired: 'yes', intake: { incidentNumber: 'FRS-8702', incidentDate: '12/06/2026', incidentTime: '14:22', frs: 'Avon FRS', contact: 'Crew Manager Patel', email: 'patel@avon.test', incidentStatus: 'Fire Service Fought Fire or Carried Out Rescues', description: 'Electrical cupboard smouldering. Isolated and ventilated.' } },
     { id: 'cpin-0401', ref: 'CPIN-2026-0401', severity: 'green', when: '18 Jun', premises: 'DWP Canterbury', summary: 'Small bin fire, extinguished on arrival', patch: true, workflow: 'triage', assignee: 'Phil Gower', furtherAction: 'no', auditRequired: 'no', intake: { incidentNumber: 'FRS-8755', incidentDate: '18/06/2026', incidentTime: '11:40', frs: 'Kent FRS', contact: 'FF Brown', email: 'brown@kent.test', incidentStatus: 'Incident Dealt with by Staff - No Known Injuries', description: 'Waste bin fire in car park. Extinguished by staff before arrival.' } },
@@ -6551,12 +6755,20 @@
     if (!cpin) return false;
     if (cpin.assignee) return true;
     if (['assigned', 'triage', 'desk_eval', 'closed', 'in_review', 'audit', 'audit_spawned'].indexOf(cpin.workflow) >= 0) return true;
-    if (cpin.premises && cpin.workflow === 'unassigned') return true;
+    if (cpin.premises && (cpin.workflow === 'unassigned' || cpin.workflow === 'incoming')) return true;
     return false;
   }
 
-  function cpinRequiresDutyHolders(cpin) {
+  function cpinNeedsDeskEval(cpin) {
+    return cpin && cpin.furtherAction === 'yes' && (cpin.severity === 'red' || cpin.severity === 'amber');
+  }
+
+  function cpinShowsDutyHolders(cpin) {
     return cpin && cpin.furtherAction === 'yes';
+  }
+
+  function cpinRequiresDutyHolders(cpin) {
+    return cpinShowsDutyHolders(cpin) && cpinNeedsDeskEval(cpin);
   }
 
   function getCpinDutyHolders(cpin) {
@@ -6579,15 +6791,291 @@
     return cpinHasAcceptedDutyHolders(cpin);
   }
 
+  function cpinSeverityRank(severity) {
+    return { red: 0, amber: 1, green: 2 }[severity] ?? 3;
+  }
+
+  function sortCpinsBySeverity(items) {
+    return items.slice().sort(function (a, b) {
+      return cpinSeverityRank(a.severity) - cpinSeverityRank(b.severity);
+    });
+  }
+
+  function getCpinOnsiteEval(cpin) {
+    return (cpin && cpin.onsiteEval) ? cpin.onsiteEval : {};
+  }
+
+  function getCpinAuditPrep(cpin) {
+    return (cpin && cpin.auditPrep) ? cpin.auditPrep : {};
+  }
+
+  function cpinAuditRequiredForClose(cpin) {
+    if (!cpin) return false;
+    if (cpin.deskOutcome === 'audit') return true;
+    if (getCpinOnsiteEval(cpin).auditRequired === 'yes') return true;
+    return cpin.auditRequired === 'yes';
+  }
+
+  function cpinStage4Ready(cpin) {
+    if (!cpin || !cpin.deskOutcome) return false;
+    if (cpin.deskOutcome === 'no_action') return true;
+    if (cpin.deskOutcome === 'audit') {
+      const p = getCpinAuditPrep(cpin);
+      return !!(p.scheduled && p.dutyHoldersNotified && p.reminderSet);
+    }
+    if (cpin.deskOutcome === 'onsite_eval') {
+      const o = getCpinOnsiteEval(cpin);
+      if (!o.appointmentConfirmed) return false;
+      if (!o.letterSent && !o.letterSkipped) return false;
+      if (!o.siteVisitDone) return false;
+      if (o.auditRequired !== 'yes' && o.auditRequired !== 'no') return false;
+      if (o.auditRequired === 'yes') {
+        return !!(o.auditScheduled && o.dutyHoldersNotified && o.reminderSet);
+      }
+      return true;
+    }
+    return false;
+  }
+
   function cpinWorkflowStage(cpin) {
     if (!cpin) return 1;
     if (cpin.workflow === 'closed') return 5;
     if (cpin.workflow === 'desk_eval') return 4;
-    if (cpin.workflow === 'triage' || cpin.workflow === 'in_review' || cpin.furtherAction || cpin.auditRequired) return 3;
+    if (cpin.workflow === 'triage' || cpin.workflow === 'in_review' || cpin.furtherAction) return 3;
     if (cpin.workflow === 'assigned') return 2;
     if (cpin.workflow === 'unassigned') return cpinStage1Complete(cpin) ? 2 : 1;
     if (cpin.workflow === 'awaiting_premises' || cpin.workflow === 'incoming') return 1;
     return 1;
+  }
+
+  const CPIN_STAGE_ACTIVITY_OPTIONS = {
+    1: ['Intake review', 'Premises lookup', 'Phone call', 'General admin'],
+    2: ['Assignment', 'Phone call', 'Email', 'General admin'],
+    3: ['Triage review', 'Phone call', 'Duty holder contact', 'Meeting'],
+    4: ['Desk-based investigation', 'Phone call', 'Site visit', 'Duty holder contact'],
+    5: ['Close and wrap-up', 'Phone call', 'General admin']
+  };
+
+  const CPIN_STAGE_NAMES = {
+    1: 'Submission & intake',
+    2: 'Assignment',
+    3: 'Triage & decision',
+    4: 'Examine incident',
+    5: 'Close'
+  };
+
+  let cpinActivityLog = { notes: [], times: [] };
+  let cpinActivityPanel = null;
+
+  function loadCpinActivityFromRecord(cpin) {
+    if (!cpin) return { notes: [], times: [] };
+    if (cpin.activityLog) {
+      return {
+        notes: (cpin.activityLog.notes || []).slice(),
+        times: (cpin.activityLog.times || []).slice()
+      };
+    }
+    const times = (cpin.deskActivities || []).map(function (a, i) {
+      return {
+        id: 'legacy-t' + i,
+        activity: a.text || 'Desk activity',
+        minutes: Math.round((a.hours || 0.5) * 60),
+        stage: 4,
+        at: a.when || '',
+        ts: Date.now() - i * 60000
+      };
+    });
+    return { notes: [], times: times };
+  }
+
+  function saveCpinActivityLogToRecord() {
+    if (!activeCpinId) return;
+    persistCpinPatch(activeCpinId, { activityLog: cpinActivityLog });
+  }
+
+  function setCpinActivityBarVisible(visible) {
+    document.body.classList.toggle('cpin-activity-bar', visible);
+    if (!visible) document.body.classList.remove('cpin-float-panel-open');
+  }
+
+  function openCpinFloatPanel(mode) {
+    const panel = document.getElementById('cpin-float-panel');
+    const timeContent = document.getElementById('cpin-float-time-content');
+    const noteContent = document.getElementById('cpin-float-note-content');
+    if (!panel) return;
+
+    setCpinActivityBarVisible(true);
+    syncCpinActivityForStage(cpinStage);
+
+    if (mode === 'time') {
+      requestAnimationFrame(function () { document.getElementById('cpin-time-duration')?.focus(); });
+    } else if (mode === 'note') {
+      requestAnimationFrame(function () { document.getElementById('cpin-note-text')?.focus(); });
+    }
+
+    if (timeContent) timeContent.hidden = mode !== 'time';
+    if (noteContent) noteContent.hidden = mode !== 'note';
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('cpin-float-panel-open');
+    cpinActivityPanel = mode;
+  }
+
+  function closeCpinFloatPanel() {
+    const panel = document.getElementById('cpin-float-panel');
+    if (panel) {
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+    document.body.classList.remove('cpin-float-panel-open');
+    cpinActivityPanel = null;
+  }
+
+  function syncCpinActivityForStage(stage) {
+    const sel = document.getElementById('cpin-time-activity');
+    const what = document.getElementById('cpin-time-what');
+    const hint = document.getElementById('cpin-float-time-hint');
+    const cpin = getCpinById(activeCpinId);
+    if (sel) {
+      const options = CPIN_STAGE_ACTIVITY_OPTIONS[stage] || CPIN_STAGE_ACTIVITY_OPTIONS[3];
+      sel.innerHTML = options.map(function (o, i) {
+        return '<option value="' + escHtml(o) + '"' + (i === 0 ? ' selected' : '') + '>' + escHtml(o) + '</option>';
+      }).join('');
+    }
+    if (what && cpin) {
+      what.value = cpin.ref + (cpin.premises ? '  ·  ' + cpin.premises : '');
+    }
+    if (hint) {
+      hint.textContent = 'Stage ' + stage + ' — ' + (CPIN_STAGE_NAMES[stage] || '') + '. Logged against Phil Gower on this CPIN process.';
+    }
+  }
+
+  function renderCpinActivity() {
+    const notesEl = document.getElementById('cpin-count-notes');
+    const timeEl = document.getElementById('cpin-count-time');
+    const recentNotesEl = document.getElementById('cpin-recent-count-notes');
+    const recentTimeEl = document.getElementById('cpin-recent-count-time');
+    const feed = document.getElementById('cpin-activity-feed-list');
+
+    const noteCount = cpinActivityLog.notes.length;
+    const totalMin = cpinActivityLog.times.reduce(function (s, t) { return s + t.minutes; }, 0);
+    const notesLabel = noteCount + (noteCount === 1 ? ' note' : ' notes');
+    const timeLabel = formatAuditMinutes(totalMin) + ' logged';
+
+    if (notesEl) notesEl.textContent = notesLabel;
+    if (timeEl) timeEl.textContent = timeLabel;
+    if (recentNotesEl) recentNotesEl.textContent = notesLabel;
+    if (recentTimeEl) recentTimeEl.textContent = timeLabel;
+
+    if (!feed) return;
+
+    const items = [];
+    cpinActivityLog.times.forEach(function (t) {
+      items.push({
+        ts: t.ts || 0,
+        at: t.at,
+        stage: t.stage,
+        type: 'time',
+        activity: t.activity,
+        minutes: t.minutes
+      });
+    });
+    cpinActivityLog.notes.forEach(function (n) {
+      items.push({
+        ts: n.ts || 0,
+        at: n.at,
+        stage: n.stage,
+        type: 'note',
+        text: n.text
+      });
+    });
+
+    items.sort(function (a, b) { return b.ts - a.ts; });
+
+    if (items.length === 0) {
+      feed.innerHTML = '<div class="audit-feed-empty">No notes or time logged yet on this CPIN.</div>';
+      return;
+    }
+
+    feed.innerHTML = items.map(function (item) {
+      const isTime = item.type === 'time';
+      const pillClass = isTime ? 'blue' : 'grey';
+      const pillLabel = isTime ? 'Time' : 'Note';
+      const textHtml = isTime
+        ? escHtml(item.activity) + ' · <strong>' + escHtml(formatDurationLabel(item.minutes)) + '</strong>'
+        : escHtml(item.text);
+      return (
+        '<div class="audit-feed-item">' +
+          '<div class="audit-feed-meta">' +
+            '<span class="audit-feed-when">' + escHtml(item.at) + '</span>' +
+            '<span class="audit-feed-stage">Stage ' + item.stage + '</span>' +
+          '</div>' +
+          '<div class="audit-feed-body">' +
+            '<span class="pill ' + pillClass + '">' + pillLabel + '</span>' +
+            '<span class="audit-feed-text">' + textHtml + '</span>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+  }
+
+  function logCpinTime() {
+    const durEl = document.getElementById('cpin-time-duration');
+    const actEl = document.getElementById('cpin-time-activity');
+    if (!durEl || !actEl || !activeCpinId) return;
+
+    const minutes = parseInt(durEl.value, 10);
+    const activity = actEl.value;
+    const now = new Date();
+    const at = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' +
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    cpinActivityLog.times.unshift({
+      id: 't' + Date.now(),
+      activity: activity,
+      minutes: minutes,
+      stage: cpinStage,
+      at: at,
+      ts: Date.now()
+    });
+
+    saveCpinActivityLogToRecord();
+    renderCpinActivity();
+    closeCpinFloatPanel();
+  }
+
+  function addCpinNote() {
+    const ta = document.getElementById('cpin-note-text');
+    if (!ta || !activeCpinId) return;
+    const text = ta.value.trim();
+    if (!text) {
+      window.alert('Enter a note before saving.');
+      return;
+    }
+
+    const now = new Date();
+    const at = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' +
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    cpinActivityLog.notes.unshift({
+      id: 'n' + Date.now(),
+      text: text,
+      stage: cpinStage,
+      at: at,
+      ts: Date.now()
+    });
+
+    ta.value = '';
+    saveCpinActivityLogToRecord();
+    renderCpinActivity();
+    closeCpinFloatPanel();
+  }
+
+  function initCpinActivity() {
+    const cpin = getCpinById(activeCpinId);
+    cpinActivityLog = loadCpinActivityFromRecord(cpin);
+    syncCpinActivityForStage(cpinStage);
+    renderCpinActivity();
   }
 
   function persistCpinPatch(id, patch) {
@@ -6786,8 +7274,8 @@
   }
 
   function renderCpinCardsHtml(items) {
-    const pinned = items.filter(i => cpinPins.has(i.id));
-    const rest = items.filter(i => !cpinPins.has(i.id));
+    const pinned = sortCpinsBySeverity(items.filter(i => cpinPins.has(i.id)));
+    const rest = sortCpinsBySeverity(items.filter(i => !cpinPins.has(i.id)));
     let html = '';
 
     if (pinned.length) {
@@ -6939,23 +7427,40 @@
   function setCpinStage(n, fromRail) {
     const cpin = getCpinById(activeCpinId);
     if (n > 1 && cpin && !cpinStage1Complete(cpin)) {
-      if (fromRail) alert('Link premises in Stage 1 before continuing to Assignment.');
+      if (fromRail) alert('Confirm premises in Stage 1 before continuing to Assignment.');
       n = 1;
     }
-    if (n > 3 && cpin && !cpinStage3DutyHoldersOk(cpin)) {
-      if (fromRail) alert('Accept at least one Duty Holder in Stage 3 when further action is required.');
+    if (n > 1 && cpin && cpin.workflow === 'incoming' && cpin.premises) {
+      persistCpinPatch(activeCpinId, { workflow: 'unassigned' });
+      cpin = getCpinById(activeCpinId);
+    }
+    if (n === 4 && cpin && !cpinNeedsDeskEval(cpin) && cpin.workflow !== 'desk_eval') {
+      if (fromRail) alert('Stage 4 desk evaluation applies to Amber or Red CPINs where further action is required.');
       n = 3;
     }
+    if (n > 3 && cpin && cpinRequiresDutyHolders(cpin) && !cpinStage3DutyHoldersOk(cpin)) {
+      if (fromRail) alert('Select Yes — action required and accept at least one Duty Holder in Stage 3 before continuing.');
+      n = 3;
+    }
+    if (n > 4 && cpin && cpin.workflow === 'desk_eval' && !cpinStage4Ready(cpin)) {
+      if (fromRail) alert('Complete all required Stage 4 steps for your chosen path before closing.');
+      n = 4;
+    }
+    closeCpinFloatPanel();
     cpinStage = n;
     const rail = document.getElementById('cpin-stage-rail');
     if (rail) {
       const intakeDone = cpin && cpinStage1Complete(cpin);
-      const triageDhOk = cpin && cpinStage3DutyHoldersOk(cpin);
+      const triageDhOk = !cpin || !cpinRequiresDutyHolders(cpin) || cpinStage3DutyHoldersOk(cpin);
+      const deskOk = !cpin || cpin.workflow !== 'desk_eval' || cpinStage4Ready(cpin);
+      const canReachDesk = cpin && (cpin.workflow === 'desk_eval' || cpinNeedsDeskEval(cpin));
       rail.querySelectorAll('.stage').forEach(el => {
         const s = parseInt(el.dataset.cpinStage, 10);
         el.classList.remove('done', 'current', 'future', 'locked');
         if (s > 1 && !intakeDone) el.classList.add('locked');
-        else if (s > 3 && !triageDhOk) el.classList.add('locked');
+        else if (s === 4 && !canReachDesk) el.classList.add('locked');
+        else if (s > 3 && cpinRequiresDutyHolders(cpin) && !triageDhOk) el.classList.add('locked');
+        else if (s > 4 && !deskOk) el.classList.add('locked');
         else if (s < n) el.classList.add('done');
         else if (s === n) el.classList.add('current');
         else el.classList.add('future');
@@ -6966,8 +7471,11 @@
       if (panel) panel.hidden = i !== n;
     }
     renderCpinStage3Actions();
+    renderCpinStage4Branches(cpin);
+    renderCpinStage4Actions();
     renderCpinClosePanel();
     renderCpinStage1Actions();
+    syncCpinActivityForStage(n);
     if (n === 3) renderCpinDutyHolders(getCpinById(activeCpinId));
   }
 
@@ -6983,7 +7491,6 @@
       ['Point of contact', i.contact],
       ['FRS contact email', i.email],
       ['Address of premises', cpin.premises || '—'],
-      ['Premises not in system', i.premisesFree || '—'],
       ['Incident status', i.incidentStatus],
       ['Description', i.description]
     ];
@@ -6996,14 +7503,14 @@
   function renderCpinPremisesPanel(cpin) {
     const status = document.getElementById('cpin-premises-status');
     const sel = document.getElementById('cpin-intake-premises');
-    const free = document.getElementById('cpin-intake-premises-free');
     if (sel) sel.value = cpin.premises || '';
-    if (free) free.value = (cpin.intake && cpin.intake.premisesFree) || '';
     if (status) {
-      if (cpin.premises) {
+      if (cpin.premises && cpin.workflow === 'incoming') {
+        status.textContent = 'Auto-matched from the FRS form: ' + cpin.premises + '. Confirm or override below.';
+      } else if (cpin.premises) {
         status.textContent = 'Anchored to premises record: ' + cpin.premises + '.';
       } else if (cpin.workflow === 'awaiting_premises') {
-        status.textContent = 'Awaiting premises confirmation — link a record or confirm free-text address.';
+        status.textContent = 'Awaiting premises confirmation — link a premises record.';
       } else {
         status.textContent = 'No premises linked yet. Select a record to move to Unassigned.';
       }
@@ -7022,7 +7529,7 @@
 
   function ensureCpinDutyHolderSuggestions() {
     const cpin = getCpinById(activeCpinId);
-    if (!cpin || !cpin.premises || cpinStage !== 3) return false;
+    if (!cpin || !cpin.premises || cpinStage !== 3 || !cpinShowsDutyHolders(cpin)) return false;
     const fromMap = CPIN_DH_BY_PREMISES[cpin.premises] || [];
     const rejected = new Set(cpin.rejectedDutyHolders || []);
     const holders = getCpinDutyHolders(cpin).slice();
@@ -7041,9 +7548,16 @@
   }
 
   function renderCpinDutyHolders(cpin) {
+    const panel = document.getElementById('cpin-dh-panel');
     const list = document.getElementById('cpin-dh-list');
     const hint = document.getElementById('cpin-dh-hint');
     if (!list) return;
+    cpin = getCpinById(activeCpinId) || cpin;
+    if (panel) panel.hidden = !cpinShowsDutyHolders(cpin);
+    if (!cpinShowsDutyHolders(cpin)) {
+      if (hint) hint.textContent = '';
+      return;
+    }
     if (cpinStage === 3) ensureCpinDutyHolderSuggestions();
     cpin = getCpinById(activeCpinId) || cpin;
     const holders = getCpinDutyHolders(cpin);
@@ -7100,27 +7614,22 @@
     const el = document.getElementById('cpin-stage1-actions');
     const cpin = getCpinById(activeCpinId);
     if (!el || !cpin) return;
-    if (cpinStage1Complete(cpin) && cpin.workflow !== 'awaiting_premises' && cpin.workflow !== 'incoming') {
-      el.innerHTML = '<button class="btn primary" type="button" onclick="setCpinStage(2)">Continue to Assignment →</button>';
-    } else if (cpin.workflow === 'awaiting_premises' || cpin.workflow === 'incoming') {
+    if (cpin.workflow === 'awaiting_premises' || (cpin.workflow === 'incoming' && !cpin.premises)) {
       el.innerHTML = '<p style="margin:0;font-size:13px;color:var(--ink-3);">Link a premises record above to continue.</p>';
+    } else if (cpinStage1Complete(cpin)) {
+      const advanceFn = cpin.workflow === 'incoming' ? 'advanceCpinFromIntake()' : 'setCpinStage(2)';
+      el.innerHTML = '<button class="btn primary" type="button" onclick="' + advanceFn + '">Continue to Assignment →</button>';
     } else {
       el.innerHTML = '';
     }
   }
 
-  function renderCpinDeskActivities(cpin) {
-    const feed = document.getElementById('cpin-activity-feed');
-    if (!feed) return;
-    const acts = cpin.deskActivities || [];
-    if (!acts.length) {
-      feed.innerHTML = '<div style="font-size:13px;color:var(--ink-3);padding:8px 0;">No activities logged yet.</div>';
-      return;
-    }
-    feed.innerHTML = acts.map(a =>
-      '<div class="cpin-activity-item"><span class="when">' + escHtml(a.when || '') + '</span> ' +
-      escHtml(a.text) + ' <span class="dur">(' + escHtml(String(a.hours)) + 'h)</span></div>'
-    ).join('');
+  function advanceCpinFromIntake() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin || !cpin.premises) return;
+    persistCpinPatch(activeCpinId, { workflow: 'unassigned' });
+    cpinStage = 2;
+    setCpinStage(2);
   }
 
   function renderCpinStage3Actions() {
@@ -7131,19 +7640,79 @@
     const dhBlock = cpinRequiresDutyHolders(cpin) && !cpinHasAcceptedDutyHolders(cpin);
     if (cpin.furtherAction === 'no') {
       html = '<button class="btn primary" type="button" onclick="advanceCpinToClose()">Continue to Close →</button>';
-    } else if (cpin.furtherAction === 'yes' && cpin.auditRequired === 'no') {
-      html = '<button class="btn primary" type="button"' + (dhBlock ? ' disabled style="opacity:0.5;"' : '') + ' onclick="advanceCpinToClose()">Continue to Close →</button>';
-    } else if (cpin.furtherAction === 'yes' && cpin.auditRequired === 'yes') {
-      html = '<button class="btn primary" type="button"' + (dhBlock ? ' disabled style="opacity:0.5;"' : '') + ' onclick="advanceCpinToClose()">Continue to Close (audit) →</button>';
+    } else if (cpinNeedsDeskEval(cpin)) {
+      html = '<button class="btn primary" type="button"' + (dhBlock ? ' disabled style="opacity:0.5;"' : '') + ' onclick="advanceCpinToDeskEval()">Continue to Stage 4 →</button>';
     } else if (cpin.furtherAction === 'yes') {
-      html = '<button class="btn primary" type="button"' + (dhBlock ? ' disabled style="opacity:0.5;"' : '') + ' onclick="advanceCpinToDeskEval()">Continue to Desk evaluation →</button>';
+      html = '<button class="btn primary" type="button" onclick="advanceCpinToClose()">Continue to Close →</button>';
+      html += '<p style="margin:8px 0 0;font-size:13px;color:var(--ink-3);">Green CPINs with further action are closed here; Amber and Red go to desk evaluation.</p>';
     }
     if (dhBlock) {
-      html += '<p style="margin:8px 0 0;font-size:13px;color:var(--ink-3);">Accept at least one Duty Holder above before continuing.</p>';
+      html += '<p style="margin:8px 0 0;font-size:13px;color:var(--ink-3);">Accept at least one Duty Holder above before desk evaluation.</p>';
     }
     el.innerHTML = html;
-    const auditPanel = document.getElementById('cpin-audit-required-panel');
-    if (auditPanel) auditPanel.hidden = cpin.furtherAction !== 'yes';
+  }
+
+  function renderCpinStage4Branches(cpin) {
+    const outcome = cpin.deskOutcome;
+    const noPanel = document.getElementById('cpin-stage4-no-action-panel');
+    const auditPanel = document.getElementById('cpin-stage4-audit-direct-panel');
+    const onsitePanel = document.getElementById('cpin-stage4-onsite-panel');
+    if (noPanel) noPanel.hidden = outcome !== 'no_action';
+    if (auditPanel) auditPanel.hidden = outcome !== 'audit';
+    if (onsitePanel) onsitePanel.hidden = outcome !== 'onsite_eval';
+
+    const prep = getCpinAuditPrep(cpin);
+    const sched = document.getElementById('cpin-audit-scheduled');
+    const notify = document.getElementById('cpin-audit-notify-dh');
+    const remind = document.getElementById('cpin-audit-reminder');
+    if (sched) sched.checked = !!prep.scheduled;
+    if (notify) notify.checked = !!prep.dutyHoldersNotified;
+    if (remind) remind.checked = !!prep.reminderSet;
+
+    const o = getCpinOnsiteEval(cpin);
+    const appt = document.getElementById('cpin-onsite-appointment');
+    const letterSent = document.getElementById('cpin-onsite-letter-sent');
+    const letterSkip = document.getElementById('cpin-onsite-letter-skipped');
+    const findings = document.getElementById('cpin-onsite-findings');
+    const visitDone = document.getElementById('cpin-onsite-visit-done');
+    const auditPrepBox = document.getElementById('cpin-onsite-audit-prep');
+    if (appt) appt.checked = !!o.appointmentConfirmed;
+    if (letterSent) letterSent.checked = !!o.letterSent;
+    if (letterSkip) letterSkip.checked = !!o.letterSkipped;
+    if (findings && o.siteVisitNotes) findings.value = o.siteVisitNotes;
+    if (visitDone) visitDone.checked = !!o.siteVisitDone;
+    document.querySelectorAll('input[name="cpin-onsite-audit"]').forEach(function (inp) {
+      inp.checked = o.auditRequired === inp.value;
+    });
+    if (auditPrepBox) auditPrepBox.hidden = o.auditRequired !== 'yes';
+    const oSched = document.getElementById('cpin-onsite-audit-scheduled');
+    const oNotify = document.getElementById('cpin-onsite-audit-notify');
+    const oRemind = document.getElementById('cpin-onsite-audit-reminder');
+    if (oSched) oSched.checked = !!o.auditScheduled;
+    if (oNotify) oNotify.checked = !!o.dutyHoldersNotified;
+    if (oRemind) oRemind.checked = !!o.reminderSet;
+
+    function markStep(id, done) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('done', !!done);
+    }
+    markStep('cpin-onsite-step-1', o.appointmentConfirmed);
+    markStep('cpin-onsite-step-2', o.letterSent || o.letterSkipped);
+    markStep('cpin-onsite-step-3', o.siteVisitDone);
+    markStep('cpin-onsite-step-4', o.auditRequired === 'yes' || o.auditRequired === 'no');
+  }
+
+  function renderCpinStage4Actions() {
+    const el = document.getElementById('cpin-stage4-actions');
+    const cpin = getCpinById(activeCpinId);
+    if (!el || !cpin) return;
+    const blocked = !cpinStage4Ready(cpin);
+    let hint = 'Select what the incident needs, then complete the steps for that path.';
+    if (cpin.deskOutcome === 'onsite_eval') hint = 'Complete on-site evaluation steps and the audit decision.';
+    else if (cpin.deskOutcome === 'audit') hint = 'Confirm schedule, duty holder notification and reminder.';
+    el.innerHTML =
+      '<button class="btn primary" type="button"' + (blocked ? ' disabled style="opacity:0.5;"' : '') + ' onclick="advanceCpinToClose()">Continue to Close →</button>' +
+      (blocked ? '<p style="margin:8px 0 0;font-size:13px;color:var(--ink-3);">' + escHtml(hint) + '</p>' : '');
   }
 
   function renderCpinClosePanel() {
@@ -7156,8 +7725,7 @@
     open.hidden = isClosed;
     done.hidden = !isClosed;
     if (spawnBtn) {
-      const showAudit = cpin.auditRequired === 'yes' || cpin.deskOutcome === 'audit' || cpin.deskOutcome === 'onsite_eval';
-      spawnBtn.hidden = !showAudit;
+      spawnBtn.hidden = !cpinAuditRequiredForClose(cpin);
     }
     if (isClosed) {
       const txt = document.getElementById('cpin-close-done-text');
@@ -7191,7 +7759,7 @@
         (cpin.assignee ? '  ·  ' + escHtml(cpin.assignee) : '');
     }
     if (hint) {
-      const stages = ['', 'Submission & intake', 'Assignment', 'Triage & decision', 'Desk evaluation', 'Close'];
+      const stages = ['', 'Submission & intake', 'Assignment', 'Triage & decision', 'Examine the incident', 'Close'];
       hint.textContent = 'Process stage ' + cpinWorkflowStage(cpin) + ' — ' + stages[cpinWorkflowStage(cpin)];
     }
     if (actions) {
@@ -7215,13 +7783,10 @@
     document.querySelectorAll('input[name="cpin-further-action"]').forEach(inp => {
       inp.checked = cpin.furtherAction === inp.value;
     });
-    document.querySelectorAll('input[name="cpin-audit-required"]').forEach(inp => {
-      inp.checked = cpin.auditRequired === inp.value;
-    });
     document.querySelectorAll('input[name="cpin-desk-outcome"]').forEach(inp => {
       inp.checked = cpin.deskOutcome === inp.value;
     });
-    renderCpinDeskActivities(cpin);
+    initCpinActivity();
     const openNew = cpinDetailLastId !== activeCpinId;
     cpinDetailLastId = activeCpinId;
     if (openNew) {
@@ -7241,7 +7806,7 @@
     const premises = document.getElementById('cpin-intake-premises')?.value || null;
     let workflow = cpin.workflow;
     if (premises) {
-      workflow = cpin.workflow === 'incoming' || cpin.workflow === 'awaiting_premises' ? 'unassigned' : cpin.workflow;
+      workflow = cpin.workflow === 'awaiting_premises' ? 'unassigned' : (cpin.workflow === 'incoming' ? 'incoming' : cpin.workflow);
     } else if (cpin.workflow !== 'incoming') {
       workflow = 'awaiting_premises';
     }
@@ -7350,46 +7915,31 @@
     if (!cpin) return;
     const picked = document.querySelector('input[name="cpin-further-action"]:checked');
     if (!picked) return;
-    const patch = { furtherAction: picked.value, workflow: 'triage' };
-    if (picked.value === 'no') patch.auditRequired = 'no';
+    const patch = {
+      furtherAction: picked.value,
+      workflow: 'triage',
+      auditRequired: picked.value === 'no' ? 'no' : null,
+      deskOutcome: picked.value === 'no' ? null : cpin.deskOutcome
+    };
     persistCpinPatch(activeCpinId, patch);
-    initCpinDetailPage();
-  }
-
-  function saveCpinAuditRequired() {
-    const cpin = getCpinById(activeCpinId);
-    if (!cpin) return;
-    const picked = document.querySelector('input[name="cpin-audit-required"]:checked');
-    if (!picked) return;
-    persistCpinPatch(activeCpinId, { auditRequired: picked.value, workflow: 'triage' });
-    initCpinDetailPage();
+    refreshCpinDetailPage();
   }
 
   function advanceCpinToDeskEval() {
     const cpin = getCpinById(activeCpinId);
+    if (!cpinNeedsDeskEval(cpin)) {
+      alert('Desk evaluation (Stage 4) applies when further action is required on an Amber or Red CPIN.');
+      return;
+    }
     if (!cpinStage3DutyHoldersOk(cpin)) {
       alert('Accept at least one Duty Holder in Stage 3 before desk evaluation.');
       cpinStage = 3;
       refreshCpinDetailPage();
       return;
     }
-    persistCpinPatch(activeCpinId, { workflow: 'desk_eval' });
+    persistCpinPatch(activeCpinId, { workflow: 'desk_eval', auditRequired: null });
     cpinStage = 4;
     refreshCpinDetailPage();
-  }
-
-  function addCpinDeskActivity() {
-    const cpin = getCpinById(activeCpinId);
-    if (!cpin) return;
-    const text = document.getElementById('cpin-activity-text')?.value?.trim();
-    if (!text) return;
-    const hours = parseFloat(document.getElementById('cpin-activity-duration')?.value || '0.5');
-    const acts = (cpin.deskActivities || []).slice();
-    acts.unshift({ text: text, hours: hours, when: 'Just now' });
-    persistCpinPatch(activeCpinId, { deskActivities: acts, workflow: 'desk_eval' });
-    const inp = document.getElementById('cpin-activity-text');
-    if (inp) inp.value = '';
-    initCpinDetailPage();
   }
 
   function saveCpinDeskNotes() {
@@ -7407,25 +7957,84 @@
     const picked = document.querySelector('input[name="cpin-desk-outcome"]:checked');
     if (!picked) return;
     const patch = { deskOutcome: picked.value, workflow: 'desk_eval' };
-    if (picked.value === 'audit') patch.auditRequired = 'yes';
+    if (picked.value === 'audit') {
+      patch.auditRequired = 'yes';
+      patch.onsiteEval = null;
+    } else if (picked.value === 'no_action') {
+      patch.auditRequired = 'no';
+      patch.onsiteEval = null;
+      patch.auditPrep = null;
+    } else {
+      patch.auditRequired = null;
+      patch.auditPrep = null;
+      if (!cpin.onsiteEval) patch.onsiteEval = {};
+    }
     persistCpinPatch(activeCpinId, patch);
-    initCpinDetailPage();
+    refreshCpinDetailPage();
+  }
+
+  function saveCpinAuditPrep() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    persistCpinPatch(activeCpinId, {
+      auditPrep: {
+        scheduled: !!document.getElementById('cpin-audit-scheduled')?.checked,
+        dutyHoldersNotified: !!document.getElementById('cpin-audit-notify-dh')?.checked,
+        reminderSet: !!document.getElementById('cpin-audit-reminder')?.checked
+      },
+      workflow: 'desk_eval'
+    });
+    refreshCpinDetailPage();
+  }
+
+  function saveCpinOnsiteEval() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    const letterSkipped = !!document.getElementById('cpin-onsite-letter-skipped')?.checked;
+    const o = Object.assign({}, getCpinOnsiteEval(cpin), {
+      appointmentConfirmed: !!document.getElementById('cpin-onsite-appointment')?.checked,
+      letterSkipped: letterSkipped,
+      letterSent: letterSkipped ? false : !!document.getElementById('cpin-onsite-letter-sent')?.checked,
+      siteVisitNotes: document.getElementById('cpin-onsite-findings')?.value || '',
+      siteVisitDone: !!document.getElementById('cpin-onsite-visit-done')?.checked,
+      auditScheduled: !!document.getElementById('cpin-onsite-audit-scheduled')?.checked,
+      dutyHoldersNotified: !!document.getElementById('cpin-onsite-audit-notify')?.checked,
+      reminderSet: !!document.getElementById('cpin-onsite-audit-reminder')?.checked
+    });
+    persistCpinPatch(activeCpinId, { onsiteEval: o, workflow: 'desk_eval' });
+    refreshCpinDetailPage();
+  }
+
+  function saveCpinOnsiteAuditDecision() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    const picked = document.querySelector('input[name="cpin-onsite-audit"]:checked');
+    if (!picked) return;
+    const o = Object.assign({}, getCpinOnsiteEval(cpin), { auditRequired: picked.value });
+    const patch = { onsiteEval: o, workflow: 'desk_eval', auditRequired: picked.value === 'yes' ? 'yes' : 'no' };
+    persistCpinPatch(activeCpinId, patch);
+    refreshCpinDetailPage();
   }
 
   function advanceCpinToClose() {
     const cpin = getCpinById(activeCpinId);
     if (!cpin) return;
-    if (!cpinStage3DutyHoldersOk(cpin)) {
-      alert('Accept at least one Duty Holder in Stage 3 when further action is required.');
+    if (cpinNeedsDeskEval(cpin) && cpin.workflow !== 'desk_eval') {
+      alert('Complete Stage 4 desk evaluation for this Amber or Red CPIN before closing.');
       cpinStage = 3;
       refreshCpinDetailPage();
       return;
     }
-    if (cpin.furtherAction === 'yes' && !cpin.auditRequired && cpin.workflow !== 'desk_eval') {
-      alert('Answer whether an audit is required, or complete desk evaluation.');
+    if (cpin.workflow === 'desk_eval' && !cpinStage4Ready(cpin)) {
+      alert('Complete all required Stage 4 steps for your chosen path before closing.');
+      cpinStage = 4;
+      refreshCpinDetailPage();
       return;
     }
-    persistCpinPatch(activeCpinId, { workflow: cpin.workflow === 'desk_eval' ? 'desk_eval' : 'triage' });
+    persistCpinPatch(activeCpinId, {
+      workflow: cpin.workflow === 'desk_eval' ? 'desk_eval' : 'triage',
+      auditRequired: cpin.furtherAction === 'no' ? 'no' : cpin.auditRequired
+    });
     cpinStage = 5;
     setCpinStage(5);
   }
@@ -7510,6 +8119,8 @@
         closeUserMenu();
       } else if (document.getElementById('audit-float-panel')?.classList.contains('open')) {
         closeAuditFloatPanel();
+      } else if (document.getElementById('cpin-float-panel')?.classList.contains('open')) {
+        closeCpinFloatPanel();
       } else if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
         closeSetupLookupModal();
       } else {

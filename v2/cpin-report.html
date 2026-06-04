@@ -156,7 +156,7 @@
 
 <main>
   <p class="prototype-note">
-    Prototype intake form (separate from the signed-in MIS). Submissions are stored in this browser and appear under <strong>Incoming</strong>, <strong>Awaiting premises</strong>, or <strong>Unassigned</strong> depending on premises match.
+    Prototype intake form (separate from the signed-in MIS). Submissions with a matched premises record appear under <strong>Incoming</strong>; unmatched addresses under <strong>Awaiting premises</strong>.
     <a href="index.html#cpins">Open CPFSI prototype</a>
   </p>
 
@@ -311,7 +311,7 @@
       premises: premises || null,
       summary: description.length > 72 ? description.slice(0, 72) + '…' : description,
       patch: false,
-      workflow: matched ? 'unassigned' : (premisesFree ? 'awaiting_premises' : 'incoming'),
+      workflow: matched ? 'incoming' : (premisesFree ? 'awaiting_premises' : 'incoming'),
       assignee: null,
       intake: {
         incidentNumber: fd.get('incidentNumber'),
@@ -337,16 +337,16 @@
     document.getElementById('success-ref').textContent = 'Reference: ' + record.ref;
     const hint = document.getElementById('success-queue-hint');
     const link = document.getElementById('success-queue-link');
-    if (record.workflow === 'unassigned') {
-      hint.textContent = 'Premises matched — appears under Unassigned.';
-      link.href = 'index.html#cpins';
-      link.textContent = 'Go to CPINs — Unassigned';
+    if (record.premises && record.workflow === 'incoming') {
+      hint.textContent = 'Premises matched — appears under Incoming for intake review.';
+      link.href = 'index.html#cpins-incoming';
+      link.textContent = 'Go to CPINs — Incoming';
     } else if (record.workflow === 'awaiting_premises') {
       hint.textContent = 'Premises not matched — admin must confirm under Awaiting premises.';
       link.href = 'index.html#cpins-awaiting-premises';
       link.textContent = 'Go to CPINs — Awaiting premises';
     } else {
-      hint.textContent = 'New submission — appears under Incoming until premises is linked.';
+      hint.textContent = 'New submission — appears under Incoming; link premises in Stage 1.';
       link.href = 'index.html#cpins-incoming';
       link.textContent = 'Go to CPINs — Incoming';
     }
