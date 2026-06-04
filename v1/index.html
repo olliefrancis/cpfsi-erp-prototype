@@ -1493,13 +1493,19 @@
     display: none;
   }
   .feedback-pick-overlay.active { display: block; }
+  .feedback-pick-dim {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 12, 12, 0.36);
+    pointer-events: none;
+    z-index: 201;
+  }
   .feedback-pick-highlight {
     position: fixed;
     border: 3px solid var(--gov-focus);
     border-radius: 2px;
-    box-shadow: 0 0 0 9999px rgba(11, 12, 12, 0.48);
     pointer-events: none;
-    z-index: 201;
+    z-index: 202;
     display: none;
   }
   .feedback-pick-highlight.show { display: block; }
@@ -1508,7 +1514,7 @@
     left: 0;
     right: 0;
     top: 0;
-    z-index: 202;
+    z-index: 203;
     display: none;
     align-items: center;
     justify-content: center;
@@ -1534,10 +1540,6 @@
     cursor: pointer;
   }
   .feedback-pick-hint button:hover { background: var(--accent-soft); }
-  .feedback-screenshot-flash {
-    outline: 3px solid var(--gov-focus) !important;
-    outline-offset: 2px;
-  }
   #feedback-modal { z-index: 250; }
   #feedback-modal .modal { max-width: 560px; }
   .feedback-target-preview {
@@ -1594,6 +1596,43 @@
     gap: 8px;
     justify-content: flex-end;
     margin-top: 4px;
+  }
+  .feedback-modal-panel[hidden] {
+    display: none !important;
+  }
+  .feedback-modal-status {
+    padding: 28px 8px 20px;
+    text-align: center;
+  }
+  .feedback-modal-status h3 {
+    margin: 0 0 8px;
+    font-size: 1.125rem;
+  }
+  .feedback-modal-status p {
+    margin: 0 0 20px;
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .feedback-modal-status .feedback-status-detail {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-bottom: 16px;
+  }
+  .feedback-modal-spinner {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 16px;
+    border: 3px solid var(--line-2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: feedback-spin 0.8s linear infinite;
+  }
+  @keyframes feedback-spin {
+    to { transform: rotate(360deg); }
+  }
+  .feedback-modal-status.is-error p {
+    color: var(--red);
   }
   .modal-grid {
     display: grid;
@@ -2163,6 +2202,7 @@
 </div>
 
 <div id="feedback-pick-overlay" class="feedback-pick-overlay" aria-hidden="true">
+  <div class="feedback-pick-dim" aria-hidden="true"></div>
   <div id="feedback-pick-highlight" class="feedback-pick-highlight" aria-hidden="true"></div>
   <div id="feedback-pick-hint" class="feedback-pick-hint" role="status" aria-live="polite">
     <span>Click the part of the page your feedback is about.</span>
@@ -2180,22 +2220,40 @@
       <button type="button" class="modal-close" onclick="closeFeedbackModal()" title="Close">×</button>
     </div>
     <div class="modal-body">
-      <div class="feedback-target-preview" id="feedback-target-preview">
-        <strong>Feedback about</strong>
-        <p id="feedback-target-summary" class="feedback-target-friendly">Nothing selected yet.</p>
+      <div id="feedback-panel-form" class="feedback-modal-panel">
+        <div class="feedback-target-preview" id="feedback-target-preview">
+          <strong>Feedback about</strong>
+          <p id="feedback-target-summary" class="feedback-target-friendly">Nothing selected yet.</p>
+        </div>
+        <button type="button" class="btn" style="margin-bottom:14px;" onclick="changeFeedbackTarget()">Change selection</button>
+        <div class="feedback-field">
+          <label for="feedback-comment">Your comment</label>
+          <textarea id="feedback-comment" placeholder="What should change, and why?"></textarea>
+        </div>
+        <div class="feedback-field">
+          <label for="feedback-name">Your name</label>
+          <input type="text" id="feedback-name" placeholder="e.g. Phil Smith" autocomplete="name" />
+        </div>
+        <div class="feedback-actions">
+          <button type="button" class="btn" onclick="closeFeedbackModal()">Cancel</button>
+          <button type="button" class="btn primary" id="feedback-submit-btn" onclick="submitPrototypeFeedback()">Send feedback</button>
+        </div>
       </div>
-      <button type="button" class="btn" style="margin-bottom:14px;" onclick="changeFeedbackTarget()">Change selection</button>
-      <div class="feedback-field">
-        <label for="feedback-comment">Your comment</label>
-        <textarea id="feedback-comment" placeholder="What should change, and why?"></textarea>
+      <div id="feedback-panel-sending" class="feedback-modal-panel feedback-modal-status" hidden>
+        <div class="feedback-modal-spinner" aria-hidden="true"></div>
+        <h3>Sending feedback</h3>
+        <p id="feedback-sending-message">Capturing your selection…</p>
       </div>
-      <div class="feedback-field">
-        <label for="feedback-name">Your name</label>
-        <input type="text" id="feedback-name" placeholder="e.g. Phil Smith" autocomplete="name" />
+      <div id="feedback-panel-success" class="feedback-modal-panel feedback-modal-status" hidden>
+        <h3>Thank you</h3>
+        <p>Your feedback was sent. We’ll use it to improve this prototype.</p>
+        <p class="feedback-status-detail" id="feedback-success-detail"></p>
+        <button type="button" class="btn primary" onclick="closeFeedbackModal()">Done</button>
       </div>
-      <div class="feedback-actions">
-        <button type="button" class="btn" onclick="closeFeedbackModal()">Cancel</button>
-        <button type="button" class="btn primary" id="feedback-submit-btn" onclick="submitPrototypeFeedback()">Send feedback</button>
+      <div id="feedback-panel-error" class="feedback-modal-panel feedback-modal-status is-error" hidden>
+        <h3>Could not send</h3>
+        <p id="feedback-error-message">Something went wrong. Please try again.</p>
+        <button type="button" class="btn primary" onclick="showFeedbackFormPanel()">Try again</button>
       </div>
     </div>
   </div>
@@ -5453,7 +5511,15 @@
   }
 
   function isFeedbackPickChrome(el) {
-    return !!el.closest('#feedback-pick-hint, #feedback-pick-highlight');
+    return !!el.closest('#feedback-pick-hint, #feedback-pick-highlight, .feedback-pick-dim');
+  }
+
+  function getElementUnderPointer(clientX, clientY) {
+    const overlay = document.getElementById('feedback-pick-overlay');
+    if (overlay) overlay.style.pointerEvents = 'none';
+    const el = document.elementFromPoint(clientX, clientY);
+    if (overlay) overlay.style.pointerEvents = '';
+    return el;
   }
 
   function clearFeedbackHover() {
@@ -5510,7 +5576,7 @@
       clearFeedbackHover();
       return;
     }
-    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const el = getElementUnderPointer(e.clientX, e.clientY);
     if (!el || isFeedbackUiElement(el)) {
       clearFeedbackHover();
       return;
@@ -5523,8 +5589,8 @@
   function onFeedbackPickClick(e) {
     if (!feedbackState.picking) return;
     if (isFeedbackPickChrome(e.target)) return;
-    const el = e.target;
-    if (isFeedbackUiElement(el)) return;
+    const el = getElementUnderPointer(e.clientX, e.clientY);
+    if (!el || isFeedbackUiElement(el)) return;
     e.preventDefault();
     e.stopPropagation();
     const resolved = resolveFeedbackTarget(el);
@@ -5622,18 +5688,54 @@
     return parts.join(' > ');
   }
 
-  function resolveFeedbackTarget(el) {
-    let labelNode = el;
-    let friendlyLabel = '';
-    for (let depth = 0; depth < 8 && labelNode && labelNode !== document.body; depth++) {
-      const text = getCompactVisibleText(labelNode);
-      if (text.length >= 2 && text.length <= 200) {
-        friendlyLabel = text;
-        break;
-      }
-      labelNode = labelNode.parentElement;
+  function getPrimaryFeedbackLabel(el) {
+    if (!el) return 'Selected item';
+
+    const columnCell = el.closest(
+      '.prem-name, .prem-type, .prem-dept, .prem-score, .prem-audit, .prem-trailing, ' +
+        '.proc-line-primary > .ptype, .proc-line-primary > .premises, .proc-line-primary > .proc-score, ' +
+        '.proc-line-primary > .score-cell, .proc-line-secondary > div, ' +
+        'button, a, h1, h2, h3, h4, label, .pill, .cpin-tile, .card h3'
+    );
+    if (columnCell) {
+      const colText = getCompactVisibleText(columnCell).split(/\n/)[0].trim();
+      if (colText.length >= 1 && colText.length <= 80) return colText;
     }
-    if (!friendlyLabel) friendlyLabel = getFeedbackFriendlyLabel(el);
+
+    const listRow = el.closest('.prem-row, .proc-row');
+    if (listRow) {
+      const firstCol =
+        listRow.querySelector('.prem-name') ||
+        listRow.querySelector('.proc-line-primary .ptype') ||
+        listRow.querySelector('.proc-line-primary .premises');
+      if (firstCol) {
+        const rowText = getCompactVisibleText(firstCol).split(/\n/)[0].trim();
+        if (rowText) return rowText;
+      }
+    }
+
+    let node = el;
+    for (let depth = 0; depth < 6 && node && node !== document.body; depth++) {
+      const childLabels = Array.from(node.children)
+        .map(function (child) {
+          return getCompactVisibleText(child).split(/\n/)[0].trim();
+        })
+        .filter(function (text) {
+          return text.length >= 1 && text.length <= 60;
+        });
+      if (childLabels.length >= 2) {
+        return childLabels[0];
+      }
+      const own = getCompactVisibleText(node);
+      if (own.length >= 1 && own.length <= 80) return own.split(/\n/)[0].trim();
+      node = node.parentElement;
+    }
+
+    return getFeedbackFriendlyLabel(el);
+  }
+
+  function resolveFeedbackTarget(el) {
+    const friendlyLabel = getPrimaryFeedbackLabel(el);
     return {
       target: el,
       friendlyLabel,
@@ -5682,15 +5784,12 @@
   async function captureFeedbackScreenshot(targetEl) {
     const html2canvas = await loadHtml2Canvas();
     const captureEl = getFeedbackCaptureElement(targetEl);
-    const modal = document.getElementById('feedback-modal');
-    if (modal) modal.classList.remove('open');
     captureEl.scrollIntoView({ block: 'center', inline: 'nearest' });
     await new Promise(function (resolve) {
       requestAnimationFrame(function () {
         requestAnimationFrame(resolve);
       });
     });
-    captureEl.classList.add('feedback-screenshot-flash');
     const scale = Math.min(2, window.devicePixelRatio || 1.5);
     const canvas = await html2canvas(captureEl, {
       backgroundColor: '#f4f4f1',
@@ -5701,12 +5800,6 @@
         return node.id && node.id.indexOf('feedback-') === 0;
       }
     });
-    captureEl.classList.remove('feedback-screenshot-flash');
-    if (modal) modal.classList.add('open');
-    const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#ffdd00';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
     const maxWidth = 900;
     if (canvas.width > maxWidth) {
       const ratio = maxWidth / canvas.width;
@@ -5733,13 +5826,37 @@
       return {};
     });
     if (!response.ok || !result.ok) {
-      throw new Error(result.error || 'Feedback API unavailable');
+      throw new Error(result.error || 'Feedback could not be sent (service returned an error).');
     }
     return result;
   }
 
+  function setFeedbackModalPanel(panelId) {
+    document.querySelectorAll('.feedback-modal-panel').forEach(function (panel) {
+      panel.hidden = panel.id !== panelId;
+    });
+    const headerSub = document.querySelector('#feedback-modal .modal-header .sub');
+    if (headerSub) {
+      headerSub.textContent =
+        panelId === 'feedback-panel-form'
+          ? 'Tell us what to improve on this screen.'
+          : '';
+    }
+  }
+
+  function showFeedbackFormPanel() {
+    setFeedbackModalPanel('feedback-panel-form');
+    document.getElementById('feedback-comment')?.focus();
+  }
+
+  function setFeedbackSendingMessage(message) {
+    const el = document.getElementById('feedback-sending-message');
+    if (el) el.textContent = message;
+  }
+
   function openFeedbackModal() {
     updateFeedbackTargetPreview();
+    showFeedbackFormPanel();
     const modal = document.getElementById('feedback-modal');
     if (modal) modal.classList.add('open');
     document.getElementById('feedback-comment')?.focus();
@@ -5747,6 +5864,27 @@
 
   function closeFeedbackModal() {
     document.getElementById('feedback-modal')?.classList.remove('open');
+    showFeedbackFormPanel();
+    const submitBtn = document.getElementById('feedback-submit-btn');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send feedback';
+    }
+  }
+
+  function showFeedbackSuccessPanel(friendly) {
+    const detail = document.getElementById('feedback-success-detail');
+    if (detail) {
+      detail.textContent = friendly ? 'About: ' + friendly : '';
+      detail.hidden = !friendly;
+    }
+    setFeedbackModalPanel('feedback-panel-success');
+  }
+
+  function showFeedbackErrorPanel(message) {
+    const el = document.getElementById('feedback-error-message');
+    if (el) el.textContent = message || 'Something went wrong. Please try again.';
+    setFeedbackModalPanel('feedback-panel-error');
   }
 
   function changeFeedbackTarget() {
@@ -5780,12 +5918,6 @@
     const selector = feedbackState.selector || buildFeedbackSelector(feedbackState.target);
     const page = window.location.hash || '#login';
     const url = window.location.href;
-    const submitBtn = document.getElementById('feedback-submit-btn');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending…';
-    }
-
     const feedbackData = {
       version: PROTOTYPE_VERSION,
       name: name,
@@ -5798,27 +5930,23 @@
       screenshotBase64: null
     };
 
-    try {
-      if (submitBtn) submitBtn.textContent = 'Capturing screenshot…';
-      feedbackData.screenshotBase64 = await captureFeedbackScreenshot(feedbackState.target);
-    } catch (err) {
-      console.warn('Screenshot capture failed:', err);
-    }
+    setFeedbackModalPanel('feedback-panel-sending');
+    setFeedbackSendingMessage('Capturing your selection…');
 
     try {
-      if (submitBtn) submitBtn.textContent = 'Sending…';
+      try {
+        feedbackData.screenshotBase64 = await captureFeedbackScreenshot(feedbackState.target);
+      } catch (err) {
+        console.warn('Screenshot capture failed:', err);
+      }
+
+      setFeedbackSendingMessage('Sending your feedback…');
       await submitFeedbackToApi(feedbackData);
       document.getElementById('feedback-comment').value = '';
-      closeFeedbackModal();
       feedbackState.target = null;
-      window.alert('Thank you — your feedback was sent.');
+      showFeedbackSuccessPanel(friendly);
     } catch (err) {
-      window.alert('Could not send feedback. The feedback service may not be configured yet.');
-    } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send feedback';
-      }
+      showFeedbackErrorPanel(err.message || 'Could not send feedback. Please try again.');
     }
   }
 
