@@ -1484,7 +1484,16 @@
   }
 
   /* ---------- Prototype feedback (pick element → Slack) ---------- */
-  body.feedback-pick-mode { cursor: crosshair; }
+  body.feedback-pick-mode {
+    cursor: crosshair;
+    --feedback-pick-hint-height: 0px;
+  }
+  body.feedback-pick-mode .topbar {
+    top: var(--feedback-pick-hint-height);
+  }
+  body.feedback-pick-mode .phase-banner.show {
+    top: calc(56px + var(--feedback-pick-hint-height));
+  }
   .feedback-pick-overlay {
     position: fixed;
     inset: 0;
@@ -1495,7 +1504,10 @@
   .feedback-pick-overlay.active { display: block; }
   .feedback-pick-dim {
     position: fixed;
-    inset: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: var(--feedback-pick-hint-height, 0);
     background: rgba(11, 12, 12, 0.36);
     pointer-events: none;
     z-index: 201;
@@ -1510,12 +1522,12 @@
   }
   .feedback-pick-highlight.show { display: block; }
   .feedback-pick-hint {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: 203;
     display: none;
+    position: sticky;
+    top: 0;
+    z-index: 210;
+    width: 100%;
+    box-sizing: border-box;
     align-items: center;
     justify-content: center;
     gap: 12px;
@@ -2155,6 +2167,11 @@
   </div>
 </div>
 
+<div id="feedback-pick-hint" class="feedback-pick-hint" role="status" aria-live="polite" hidden>
+  <span>Click the part of the page your feedback is about.</span>
+  <button type="button" onclick="cancelFeedbackPick()">Cancel</button>
+</div>
+
 <!-- =========================================================
      TOP BAR (shared across all signed-in screens)
 ========================================================= -->
@@ -2204,10 +2221,6 @@
 <div id="feedback-pick-overlay" class="feedback-pick-overlay" aria-hidden="true">
   <div class="feedback-pick-dim" aria-hidden="true"></div>
   <div id="feedback-pick-highlight" class="feedback-pick-highlight" aria-hidden="true"></div>
-  <div id="feedback-pick-hint" class="feedback-pick-hint" role="status" aria-live="polite">
-    <span>Click the part of the page your feedback is about.</span>
-    <button type="button" onclick="cancelFeedbackPick()">Cancel</button>
-  </div>
 </div>
 
 <div id="feedback-modal" class="modal-backdrop" onclick="if(event.target===this) closeFeedbackModal()">
@@ -5506,7 +5519,7 @@
   function isFeedbackUiElement(el) {
     if (!el) return true;
     return !!el.closest(
-      '#feedback-pick-overlay, #feedback-modal, .modal-backdrop.open'
+      '#feedback-pick-overlay, #feedback-pick-hint, #feedback-modal, .modal-backdrop.open'
     );
   }
 
@@ -5539,6 +5552,16 @@
     highlight.classList.add('show');
   }
 
+  function syncFeedbackPickLayout() {
+    const hint = document.getElementById('feedback-pick-hint');
+    const height =
+      hint && hint.classList.contains('show') ? hint.offsetHeight : 0;
+    document.body.style.setProperty(
+      '--feedback-pick-hint-height',
+      height + 'px'
+    );
+  }
+
   function startFeedbackPick() {
     closeFeedbackModal();
     feedbackState.picking = true;
@@ -5550,7 +5573,11 @@
       overlay.classList.add('active');
       overlay.setAttribute('aria-hidden', 'false');
     }
-    if (hint) hint.classList.add('show');
+    if (hint) {
+      hint.hidden = false;
+      hint.classList.add('show');
+    }
+    requestAnimationFrame(syncFeedbackPickLayout);
     document.addEventListener('mousemove', onFeedbackMouseMove, true);
     document.addEventListener('click', onFeedbackPickClick, true);
   }
@@ -5565,7 +5592,11 @@
       overlay.classList.remove('active');
       overlay.setAttribute('aria-hidden', 'true');
     }
-    if (hint) hint.classList.remove('show');
+    if (hint) {
+      hint.classList.remove('show');
+      hint.hidden = true;
+    }
+    syncFeedbackPickLayout();
     document.removeEventListener('mousemove', onFeedbackMouseMove, true);
     document.removeEventListener('click', onFeedbackPickClick, true);
   }
