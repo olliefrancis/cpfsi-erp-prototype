@@ -105,23 +105,11 @@
       color: var(--text);
     }
 
-    .index-meta {
-      margin: 28px 0 0;
-      font-size: 0.8125rem;
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .index-meta time {
-      font-weight: 600;
-      color: var(--text);
-    }
   </style>
 </head>
 <body>
   <main>
     <h1>CPFSI Prototypes</h1>
-    <p class="index-meta">This page · <span data-build="index"></span></p>
 
     <ul>
       <li>
@@ -145,7 +133,6 @@
   <script>
     // BUILD_STAMPS — update whenever you change the prototype (see .cursor/rules/prototype-build-stamps.mdc).
     const BUILD_STAMPS = {
-      index: '4 Jun 2026, 20:24',
       v1: '4 Jun 2026, 14:31',
       v2: '4 Jun 2026, 20:24'
     };
@@ -153,8 +140,7 @@
     document.querySelectorAll('[data-build]').forEach(function (el) {
       const stamp = BUILD_STAMPS[el.dataset.build];
       if (!stamp) return;
-      const label = el.closest('.index-meta') ? 'updated ' : 'Updated ';
-      el.innerHTML = label + '<time datetime="' + stampToDatetime(stamp) + '">' + stamp + '</time>';
+      el.innerHTML = 'Updated <time datetime="' + stampToDatetime(stamp) + '">' + stamp + '</time>';
     });
 
     function stampToDatetime(stamp) {

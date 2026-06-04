@@ -16,7 +16,8 @@ UK style: `D Mon YYYY, HH:MM` (24-hour), e.g. `4 Jun 2026, 20:24`.
 
 - **`v2`** — any edit under `v2/` (main workstream).
 - **`v1`** — any edit under `v1/`.
-- **`index`** — changes to the chooser page itself, or bump together with v1/v2 updates in the same task.
+
+Only V1 and V2 cards show stamps; do not add a chooser-page stamp.
 
 Use the current local date/time when updating (not a placeholder).
 
@@ -24,7 +25,6 @@ Use the current local date/time when updating (not a placeholder).
 
 ```javascript
 const BUILD_STAMPS = {
-  index: '4 Jun 2026, 20:24',
   v1: '4 Jun 2026, 14:31',
   v2: '4 Jun 2026, 20:24'
 };
