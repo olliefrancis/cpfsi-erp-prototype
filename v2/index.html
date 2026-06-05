@@ -1276,12 +1276,14 @@
     color: var(--ink-3);
     margin-bottom: 14px;
   }
+  .log-type-row,
   .cpin-log-type-row {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 14px;
   }
+  .log-type-row .chip,
   .cpin-log-type-row .chip {
     cursor: pointer;
     border: 1px solid var(--line);
@@ -1292,6 +1294,7 @@
     font-weight: 600;
     color: var(--ink-2);
   }
+  .log-type-row .chip.active,
   .cpin-log-type-row .chip.active {
     background: var(--accent-soft);
     border-color: var(--accent);
@@ -5682,50 +5685,71 @@
 <!-- Floating activity bar (audit process) -->
 <div id="audit-float-bar">
   <div class="audit-float-panel" id="audit-float-panel" aria-hidden="true">
-    <div id="audit-float-time-content">
+    <div id="audit-float-log-content">
       <div class="audit-float-panel-hd">
-        <strong>Log time against this audit</strong>
+        <strong>Log on this audit</strong>
         <button type="button" class="btn" onclick="closeAuditFloatPanel()">Close</button>
       </div>
-      <div class="audit-quick-log">
-        <div>
-          <label>Activity</label>
-          <select id="audit-time-activity"></select>
-        </div>
-        <div>
-          <label>What for</label>
-          <input type="text" value="A-2026-0314  ·  Temple Quay House audit" readonly style="background:var(--bg);color:var(--ink-2);" />
-        </div>
-        <div>
-          <label>Duration</label>
-          <select id="audit-time-duration">
-            <option value="15">15m</option>
-            <option value="30">30m</option>
-            <option value="45">45m</option>
-            <option value="60">1h</option>
-            <option value="90" selected>1h 30m</option>
-            <option value="120">2h</option>
-            <option value="180">3h</option>
-            <option value="240">Half day (4h)</option>
-          </select>
+      <div class="log-type-row" id="audit-log-type-row" role="tablist" aria-label="Log type">
+        <button type="button" class="chip active" data-audit-log-type="time" onclick="setAuditLogType('time')">Time</button>
+        <button type="button" class="chip" data-audit-log-type="note" onclick="setAuditLogType('note')">Note</button>
+        <button type="button" class="chip" data-audit-log-type="interim" onclick="setAuditLogType('interim')">Interim activity</button>
+        <button type="button" class="chip" data-audit-log-type="file" onclick="setAuditLogType('file')">File</button>
+      </div>
+      <div id="audit-log-fields-time">
+        <div class="audit-quick-log">
+          <div>
+            <label>Activity</label>
+            <select id="audit-time-activity"></select>
+          </div>
+          <div>
+            <label>What for</label>
+            <input type="text" id="audit-time-what" readonly style="background:var(--bg);color:var(--ink-2);" />
+          </div>
+          <div>
+            <label>Duration</label>
+            <select id="audit-time-duration">
+              <option value="15">15m</option>
+              <option value="30">30m</option>
+              <option value="45">45m</option>
+              <option value="60">1h</option>
+              <option value="90" selected>1h 30m</option>
+              <option value="120">2h</option>
+              <option value="180">3h</option>
+              <option value="240">Half day (4h)</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div style="font-size:11px;color:var(--ink-3);margin-top:8px;">Date defaults to today (22 Jun 2026). Logged against Phil Gower on audit A-2026-0314.</div>
+      <div id="audit-log-fields-note" hidden>
+        <div class="audit-note-form">
+          <label for="audit-note-text">Note</label>
+          <textarea id="audit-note-text" placeholder="Calls, emails, site observations, EMM discussion…"></textarea>
+        </div>
+      </div>
+      <div id="audit-log-fields-interim" hidden>
+        <div class="audit-note-form" style="margin-bottom:12px;">
+          <label for="audit-interim-desc">Description</label>
+          <textarea id="audit-interim-desc" placeholder="e.g. Awaiting action plan from Equans"></textarea>
+        </div>
+        <div class="audit-note-form">
+          <label for="audit-interim-text">Details (optional)</label>
+          <textarea id="audit-interim-text" placeholder="What happened, who was contacted, next steps…"></textarea>
+        </div>
+      </div>
+      <div id="audit-log-fields-file" hidden>
+        <div class="audit-note-form" style="margin-bottom:12px;">
+          <label for="audit-file-desc">Description</label>
+          <textarea id="audit-file-desc" placeholder="e.g. Site photo — corridor fire doors, 22 Jun 2026"></textarea>
+        </div>
+        <div class="audit-note-form">
+          <label for="audit-file-input">File</label>
+          <input type="file" id="audit-file-input" />
+        </div>
+      </div>
+      <div id="audit-float-log-hint" style="font-size:11px;color:var(--ink-3);margin-top:8px;"></div>
       <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
-        <button class="btn primary" type="button" onclick="logAuditTime()">Log time</button>
-      </div>
-    </div>
-    <div id="audit-float-note-content" hidden>
-      <div class="audit-float-panel-hd">
-        <strong>Add a note</strong>
-        <button type="button" class="btn" onclick="closeAuditFloatPanel()">Close</button>
-      </div>
-      <div class="audit-note-form">
-        <label>Note</label>
-        <textarea id="audit-note-text" placeholder="Calls, emails, site observations, EMM discussion…"></textarea>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn primary" type="button" onclick="addAuditNote()">Save note</button>
-        </div>
+        <button class="btn primary" type="button" onclick="submitAuditLog()">Save log</button>
       </div>
     </div>
   </div>
@@ -5733,17 +5757,15 @@
     <strong class="audit-float-bar-title" style="font-size:13px;color:var(--ink);">Activity</strong>
     <div class="counts">
       <span id="audit-count-notes">3 notes</span>
-      <span>2 files</span>
+      <span id="audit-count-files">0 files</span>
       <span id="audit-count-time">6h 20m logged</span>
     </div>
     <div class="actions">
       <div class="actions-secondary">
         <button class="btn btn-quiet" type="button">Request more info</button>
-        <button class="btn btn-quiet" type="button">Log interim activity</button>
       </div>
       <div class="actions-primary">
-        <button class="btn" type="button" onclick="openAuditFloatPanel('time')">+ Log time</button>
-        <button class="btn" type="button" onclick="openAuditFloatPanel('note')">+ Add note</button>
+        <button class="btn" type="button" onclick="openAuditFloatPanel()">+ Log</button>
       </div>
     </div>
   </div>
@@ -5757,7 +5779,7 @@
         <strong>Log on this CPIN</strong>
         <button type="button" class="btn" onclick="closeCpinFloatPanel()">Close</button>
       </div>
-      <div class="cpin-log-type-row" id="cpin-log-type-row" role="tablist" aria-label="Log type">
+      <div class="log-type-row" id="cpin-log-type-row" role="tablist" aria-label="Log type">
         <button type="button" class="chip active" data-cpin-log-type="time" onclick="setCpinLogType('time')">Time</button>
         <button type="button" class="chip" data-cpin-log-type="note" onclick="setCpinLogType('note')">Note</button>
         <button type="button" class="chip" data-cpin-log-type="interim" onclick="setCpinLogType('interim')">Interim activity</button>
@@ -6413,10 +6435,13 @@
       { id: 't1', activity: 'Pre-audit prep', minutes: 60, stage: 1, at: '18 Jun', ts: 1718710000000 },
       { id: 't2', activity: 'Site visit', minutes: 240, stage: 2, at: '22 Jun', ts: 1719045600000 },
       { id: 't3', activity: 'Desk-based investigation', minutes: 80, stage: 2, at: '22 Jun', ts: 1719052800000 }
-    ]
+    ],
+    interim: [],
+    files: []
   };
 
   let auditActivityPanel = null;
+  let auditLogType = 'time';
 
   let auditStage = 2;
   let hmctsPlanSettled = false;
@@ -6555,27 +6580,39 @@
     if (!visible) document.body.classList.remove('audit-float-panel-open');
   }
 
+  function setAuditLogType(type) {
+    auditLogType = type || 'time';
+    document.querySelectorAll('#audit-log-type-row .chip').forEach(function (chip) {
+      chip.classList.toggle('active', chip.dataset.auditLogType === auditLogType);
+    });
+    ['time', 'note', 'interim', 'file'].forEach(function (t) {
+      const el = document.getElementById('audit-log-fields-' + t);
+      if (el) el.hidden = t !== auditLogType;
+    });
+  }
+
   function openAuditFloatPanel(mode) {
     const panel = document.getElementById('audit-float-panel');
-    const timeContent = document.getElementById('audit-float-time-content');
-    const noteContent = document.getElementById('audit-float-note-content');
     if (!panel) return;
 
     setAuditActivityBarVisible(true);
+    syncAuditActivityForStage(auditStage);
+    setAuditLogType(mode || auditLogType || 'time');
 
-    if (mode === 'time') {
-      syncAuditActivityForStage(auditStage);
-      requestAnimationFrame(() => document.getElementById('audit-time-duration')?.focus());
-    } else if (mode === 'note') {
-      requestAnimationFrame(() => document.getElementById('audit-note-text')?.focus());
+    if (auditLogType === 'time') {
+      requestAnimationFrame(function () { document.getElementById('audit-time-duration')?.focus(); });
+    } else if (auditLogType === 'note') {
+      requestAnimationFrame(function () { document.getElementById('audit-note-text')?.focus(); });
+    } else if (auditLogType === 'interim') {
+      requestAnimationFrame(function () { document.getElementById('audit-interim-desc')?.focus(); });
+    } else if (auditLogType === 'file') {
+      requestAnimationFrame(function () { document.getElementById('audit-file-desc')?.focus(); });
     }
 
-    if (timeContent) timeContent.hidden = mode !== 'time';
-    if (noteContent) noteContent.hidden = mode !== 'note';
     panel.classList.add('open');
     panel.setAttribute('aria-hidden', 'false');
     document.body.classList.add('audit-float-panel-open');
-    auditActivityPanel = mode;
+    auditActivityPanel = 'log';
   }
 
   function closeAuditFloatPanel() {
@@ -6641,26 +6678,39 @@
 
   function syncAuditActivityForStage(stage) {
     const sel = document.getElementById('audit-time-activity');
-    if (!sel) return;
-    const options = AUDIT_STAGE_ACTIVITY_OPTIONS[stage] || AUDIT_STAGE_ACTIVITY_OPTIONS[2];
-    sel.innerHTML = options.map((o, i) =>
-      '<option value="' + escHtml(o) + '"' + (i === 0 ? ' selected' : '') + '>' + escHtml(o) + '</option>'
-    ).join('');
+    const what = document.getElementById('audit-time-what');
+    const hint = document.getElementById('audit-float-log-hint');
+    if (sel) {
+      const options = AUDIT_STAGE_ACTIVITY_OPTIONS[stage] || AUDIT_STAGE_ACTIVITY_OPTIONS[2];
+      sel.innerHTML = options.map((o, i) =>
+        '<option value="' + escHtml(o) + '"' + (i === 0 ? ' selected' : '') + '>' + escHtml(o) + '</option>'
+      ).join('');
+    }
+    if (what) {
+      what.value = 'A-2026-0314  ·  Temple Quay House audit';
+    }
+    if (hint) {
+      hint.textContent = 'Logged against Phil Gower on this audit process.';
+    }
   }
 
   function renderAuditActivity() {
     const notesEl = document.getElementById('audit-count-notes');
+    const filesEl = document.getElementById('audit-count-files');
     const timeEl = document.getElementById('audit-count-time');
     const recentNotesEl = document.getElementById('audit-recent-count-notes');
     const recentTimeEl = document.getElementById('audit-recent-count-time');
     const feed = document.getElementById('audit-activity-feed-list');
 
-    const noteCount = auditActivityLog.notes.length;
+    const noteCount = auditActivityLog.notes.length + auditActivityLog.interim.length;
+    const fileCount = auditActivityLog.files.length;
     const totalMin = auditActivityLog.times.reduce((s, t) => s + t.minutes, 0);
     const notesLabel = noteCount + (noteCount === 1 ? ' note' : ' notes');
+    const filesLabel = fileCount + (fileCount === 1 ? ' file' : ' files');
     const timeLabel = formatAuditMinutes(totalMin) + ' logged';
 
     if (notesEl) notesEl.textContent = notesLabel;
+    if (filesEl) filesEl.textContent = filesLabel;
     if (timeEl) timeEl.textContent = timeLabel;
     if (recentNotesEl) recentNotesEl.textContent = notesLabel;
     if (recentTimeEl) recentTimeEl.textContent = timeLabel;
@@ -6668,46 +6718,48 @@
     if (!feed) return;
 
     const items = [];
-    auditActivityLog.times.forEach(t => {
-      items.push({
-        ts: t.ts || 0,
-        at: t.at,
-        stage: t.stage,
-        type: 'time',
-        activity: t.activity,
-        minutes: t.minutes
-      });
+    auditActivityLog.times.forEach(function (t) {
+      items.push({ ts: t.ts || 0, at: t.at, type: 'time', activity: t.activity, minutes: t.minutes });
     });
-    auditActivityLog.notes.forEach(n => {
-      items.push({
-        ts: n.ts || 0,
-        at: n.at,
-        stage: n.stage,
-        type: 'note',
-        text: n.text
-      });
+    auditActivityLog.notes.forEach(function (n) {
+      items.push({ ts: n.ts || 0, at: n.at, type: 'note', text: n.text });
+    });
+    auditActivityLog.interim.forEach(function (n) {
+      items.push({ ts: n.ts || 0, at: n.at, type: 'interim', title: n.title, text: n.text });
+    });
+    auditActivityLog.files.forEach(function (f) {
+      items.push({ ts: f.ts || 0, at: f.at, type: 'file', name: f.name, description: f.description });
     });
 
     items.sort((a, b) => b.ts - a.ts);
 
     if (items.length === 0) {
-      feed.innerHTML = '<div class="audit-feed-empty">No notes or time logged yet on this audit.</div>';
+      feed.innerHTML = '<div class="audit-feed-empty">No activity logged yet on this audit.</div>';
       return;
     }
 
-    feed.innerHTML = items.map(item => {
-      const isTime = item.type === 'time';
-      const pillClass = isTime ? 'blue' : 'grey';
-      const pillLabel = isTime ? 'Time' : 'Note';
-      const textHtml = isTime
-        ? escHtml(item.activity) + ' · <strong>' + escHtml(formatDurationLabel(item.minutes)) + '</strong>'
-        : escHtml(item.text);
+    feed.innerHTML = items.map(function (item) {
+      let pillClass = 'grey';
+      let pillLabel = 'Note';
+      let textHtml = '';
+      if (item.type === 'time') {
+        pillClass = 'blue';
+        pillLabel = 'Time';
+        textHtml = escHtml(item.activity) + ' · <strong>' + escHtml(formatDurationLabel(item.minutes)) + '</strong>';
+      } else if (item.type === 'interim') {
+        pillClass = 'amber';
+        pillLabel = 'Interim';
+        textHtml = '<strong>' + escHtml(item.title) + '</strong>' + (item.text ? ' — ' + escHtml(item.text) : '');
+      } else if (item.type === 'file') {
+        pillClass = 'purple';
+        pillLabel = 'File';
+        textHtml = '<strong>' + escHtml(item.name) + '</strong>' + (item.description ? ' — ' + escHtml(item.description) : '');
+      } else {
+        textHtml = escHtml(item.text);
+      }
       return (
         '<div class="audit-feed-item">' +
-          '<div class="audit-feed-meta">' +
-            '<span class="audit-feed-when">' + escHtml(item.at) + '</span>' +
-            '<span class="audit-feed-stage">Stage ' + item.stage + '</span>' +
-          '</div>' +
+          '<div class="audit-feed-meta"><span class="audit-feed-when">' + escHtml(item.at) + '</span></div>' +
           '<div class="audit-feed-body">' +
             '<span class="pill ' + pillClass + '">' + pillLabel + '</span>' +
             '<span class="audit-feed-text">' + textHtml + '</span>' +
@@ -6717,52 +6769,77 @@
     }).join('');
   }
 
-  function logAuditTime() {
-    const durEl = document.getElementById('audit-time-duration');
-    const actEl = document.getElementById('audit-time-activity');
-    if (!durEl || !actEl) return;
+  function submitAuditLog() {
+    const stamp = cpinLogTimestamp();
 
-    const minutes = parseInt(durEl.value, 10);
-    const activity = actEl.value;
-    const now = new Date();
-    const at = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' +
-      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-
-    auditActivityLog.times.unshift({
-      id: 't' + Date.now(),
-      activity,
-      minutes,
-      stage: auditStage,
-      at,
-      ts: Date.now()
-    });
-
-    renderAuditActivity();
-    closeAuditFloatPanel();
-  }
-
-  function addAuditNote() {
-    const ta = document.getElementById('audit-note-text');
-    if (!ta) return;
-    const text = ta.value.trim();
-    if (!text) {
-      window.alert('Enter a note before saving.');
-      return;
+    if (auditLogType === 'time') {
+      const durEl = document.getElementById('audit-time-duration');
+      const actEl = document.getElementById('audit-time-activity');
+      if (!durEl || !actEl) return;
+      auditActivityLog.times.unshift({
+        id: 't' + stamp.ts,
+        activity: actEl.value,
+        minutes: parseInt(durEl.value, 10),
+        stage: auditStage,
+        at: stamp.at,
+        ts: stamp.ts
+      });
+    } else if (auditLogType === 'note') {
+      const ta = document.getElementById('audit-note-text');
+      const text = ta?.value?.trim();
+      if (!text) {
+        window.alert('Enter a note before saving.');
+        return;
+      }
+      auditActivityLog.notes.unshift({
+        id: 'n' + stamp.ts,
+        text: text,
+        stage: auditStage,
+        at: stamp.at,
+        ts: stamp.ts
+      });
+      if (ta) ta.value = '';
+    } else if (auditLogType === 'interim') {
+      const desc = document.getElementById('audit-interim-desc')?.value?.trim();
+      if (!desc) {
+        window.alert('Enter a description for this interim activity.');
+        return;
+      }
+      auditActivityLog.interim.unshift({
+        id: 'i' + stamp.ts,
+        title: desc,
+        text: document.getElementById('audit-interim-text')?.value?.trim() || '',
+        at: stamp.at,
+        ts: stamp.ts
+      });
+      const d = document.getElementById('audit-interim-desc');
+      const t = document.getElementById('audit-interim-text');
+      if (d) d.value = '';
+      if (t) t.value = '';
+    } else if (auditLogType === 'file') {
+      const desc = document.getElementById('audit-file-desc')?.value?.trim();
+      const fileInput = document.getElementById('audit-file-input');
+      const file = fileInput?.files?.[0];
+      if (!desc) {
+        window.alert('Enter a description for this file.');
+        return;
+      }
+      if (!file) {
+        window.alert('Choose a file to attach.');
+        return;
+      }
+      auditActivityLog.files.unshift({
+        id: 'f' + stamp.ts,
+        name: file.name,
+        description: desc,
+        at: stamp.at,
+        ts: stamp.ts
+      });
+      if (fileInput) fileInput.value = '';
+      const fd = document.getElementById('audit-file-desc');
+      if (fd) fd.value = '';
     }
 
-    const now = new Date();
-    const at = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' +
-      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-
-    auditActivityLog.notes.unshift({
-      id: 'n' + Date.now(),
-      text,
-      stage: auditStage,
-      at,
-      ts: Date.now()
-    });
-
-    ta.value = '';
     renderAuditActivity();
     closeAuditFloatPanel();
   }
