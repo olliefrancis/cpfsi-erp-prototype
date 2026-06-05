@@ -338,17 +338,17 @@
     const hint = document.getElementById('success-queue-hint');
     const link = document.getElementById('success-queue-link');
     if (record.premises && record.workflow === 'incoming') {
-      hint.textContent = 'Premises matched — appears under Incoming for intake review.';
-      link.href = 'index.html#cpins-incoming';
-      link.textContent = 'Go to CPINs — Incoming';
+      hint.textContent = 'Premises matched — appears under Unassigned for intake review.';
+      link.href = 'index.html#cpins-tab=unassigned';
+      link.textContent = 'Go to CPINs — Unassigned';
     } else if (record.workflow === 'awaiting_premises') {
-      hint.textContent = 'Premises not matched — admin must confirm under Awaiting premises.';
-      link.href = 'index.html#cpins-awaiting-premises';
-      link.textContent = 'Go to CPINs — Awaiting premises';
+      hint.textContent = 'Premises not matched — appears under Unassigned with Premises needed.';
+      link.href = 'index.html#cpins-tab=unassigned&filter=premises-needed';
+      link.textContent = 'Go to CPINs — Unassigned';
     } else {
-      hint.textContent = 'New submission — appears under Incoming; link premises in Stage 1.';
-      link.href = 'index.html#cpins-incoming';
-      link.textContent = 'Go to CPINs — Incoming';
+      hint.textContent = 'New submission — appears under Unassigned; link premises in Stage 1.';
+      link.href = 'index.html#cpins-tab=unassigned';
+      link.textContent = 'Go to CPINs — Unassigned';
     }
     panel.classList.add('show');
   });
