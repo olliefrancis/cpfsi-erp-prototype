@@ -346,6 +346,32 @@
 
   /* Headings */
   h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+
+  .screen-head-text { min-width: 0; }
+  .screen-head-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .screen-head-title-row h1 { margin-bottom: 0; }
+  .screen-head-new,
+  a.screen-head-new {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .screen-head-new:hover,
+  a.screen-head-new:hover { text-decoration: underline; }
   h2 { font-size: 16px; margin: 24px 0 12px; letter-spacing: -0.005em; }
   h3 { font-size: 13px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 600; }
   .crumbs { color: var(--ink-3); font-size: 13px; margin-bottom: 8px; }
@@ -392,8 +418,32 @@
   /* CPIN counts */
   .cpin-counts {
     display: flex;
-    gap: 24px;
+    gap: 40px;
     margin: 8px 0 12px;
+  }
+  .cpin-counts .count {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 2px;
+  }
+  .cpin-counts .count .dot {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .cpin-counts .count strong {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+  }
+  .cpin-counts .count:not(:has(.dot)) strong {
+    grid-column: 1;
+  }
+  .cpin-counts .count .label {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
   .count { display: flex; align-items: center; gap: 8px; }
   .count .dot {
@@ -404,6 +454,8 @@
   .count .dot.green { background: var(--green); }
   .count strong { font-size: 18px; }
   .count .label { color: var(--ink-3); font-size: 13px; }
+  .cpin-counts .count--spaced { margin-left: 32px; }
+  .cpin-counts .count--spaced-sm { margin-left: 0; }
 
   /* Lists */
   table.data {
@@ -2764,6 +2816,33 @@
   }
   .proc-row--head .premises { font-weight: 600; }
 
+  @media (min-width: 841px) {
+    .screen-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      column-gap: 16px;
+    }
+    .screen-head-text { display: contents; }
+    .screen-head-title-row { display: contents; }
+    .screen-head-title-row h1 {
+      grid-column: 1;
+      grid-row: 1;
+      margin-bottom: 4px;
+    }
+    .screen-head .meta {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .screen-head-new,
+    a.screen-head-new {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: end;
+      align-self: baseline;
+    }
+  }
+
   /* Desktop: classic column table */
   @media (min-width: 841px) {
     .proc-row {
@@ -3025,11 +3104,49 @@
   .process-filters-bar {
     margin-bottom: 12px;
   }
+  .filter-group + .filter-group {
+    margin-top: 10px;
+  }
+  .filter-group-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .list-results-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 14px 4px 8px;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .list-sort-trigger {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    display: inline;
+  }
+  .list-sort-trigger strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .list-sort-trigger:hover strong { text-decoration: underline; }
+
+  .process-filters-bar .filter-group {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .process-filters-bar .filter-group:last-child {
+    margin-bottom: 0;
+  }
   .process-filters-bar .filter-chips {
     margin-top: 0;
-    margin-bottom: 8px;
-  }
-  .process-filters-bar .filter-chips:last-child {
     margin-bottom: 0;
   }
   .views-rail {
@@ -3056,6 +3173,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .view-item-label {
+    flex: 1;
+    min-width: 0;
   }
   .view-item:hover { background: var(--bg); }
   .view-item.active {
@@ -3065,6 +3188,8 @@
   .view-item .pin {
     color: var(--ink-3);
     font-size: 12px;
+    flex-shrink: 0;
+    margin-left: auto;
   }
   .view-item.active .pin { color: rgba(255,255,255,0.7); }
 
@@ -3333,23 +3458,46 @@
     .cpin-views-sidebar {
       display: none;
     }
+    .process-toolbar,
+    .cpin-toolbar {
+      width: 100%;
+    }
+    .process-view-dropdown {
+      display: block;
+      width: 100%;
+    }
     .process-view-trigger {
       width: 100%;
-      justify-content: flex-start;
+      justify-content: space-between;
+    }
+    .process-view-trigger-value {
+      flex: 1;
+      min-width: 0;
     }
     .process-view-menu {
       left: 0;
       right: 0;
       width: 100%;
       min-width: 0;
+      box-sizing: border-box;
     }
     .process-view-menu .views-rail {
       border: none;
       box-shadow: none;
     }
-    .process-filters-bar .filter-chips {
-      flex-wrap: wrap;
-      overflow: visible;
+    .filter-chips--scroll {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-bottom: 0;
+      padding: 2px 0 8px;
+    }
+    .filter-chips--scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .filter-chips--scroll .chip {
+      flex-shrink: 0;
     }
     .proc-list-card {
       overflow: visible;
@@ -3357,6 +3505,39 @@
     .proc-row--head,
     .prem-row--head {
       display: none;
+    }
+    .proc-line-secondary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 152px;
+      align-items: center;
+      column-gap: 10px;
+      flex-wrap: nowrap;
+    }
+    .proc-trailing {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr) 44px;
+      column-gap: 6px;
+      align-items: center;
+      margin-left: 0;
+      width: 152px;
+      flex-shrink: 0;
+    }
+    .proc-row .owner {
+      display: contents;
+    }
+    .proc-row .owner .avatar-tiny {
+      grid-column: 1;
+    }
+    .proc-row .owner-name {
+      grid-column: 2;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .proc-row .age {
+      grid-column: 3;
+      text-align: right;
     }
     .prem-list-card {
       overflow: visible;
@@ -3479,21 +3660,17 @@
       flex-shrink: 0;
     }
 
-    .cpin-counts .count {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
+    .cpin-counts {
+      flex-wrap: wrap;
+      gap: 28px 40px;
     }
-    .cpin-counts .count .dot {
-      order: 0;
+    .cpin-counts .count--spaced,
+    .cpin-counts .count--spaced-sm {
+      margin-left: 0;
     }
     .cpin-counts .count strong {
-      order: 1;
       font-size: 22px;
       line-height: 1.1;
-    }
-    .cpin-counts .count .label {
-      order: 2;
     }
     .cpin-tile {
       display: flex;
@@ -3911,12 +4088,17 @@
       <!-- BOTTOM RIGHT: Open processes -->
       <div class="card">
         <h3>My open processes  ·  12</h3>
-        <div class="filter-chips">
-          <button class="chip on">All</button>
-          <button class="chip">Audits</button>
-          <button class="chip">Follow-ups</button>
-          <button class="chip">Consultations</button>
-          <button class="chip">Concerns</button>
+        <div class="process-filters-bar" style="margin-bottom:12px;">
+          <div class="filter-group">
+            <div class="filter-group-label">Type</div>
+            <div class="filter-chips filter-chips--scroll" role="group" aria-label="Process type">
+              <button class="chip on">All</button>
+              <button class="chip">Audits</button>
+              <button class="chip">Follow-ups</button>
+              <button class="chip">Consultations</button>
+              <button class="chip">Concerns</button>
+            </div>
+          </div>
         </div>
         <table class="data">
           <tbody>
@@ -3957,27 +4139,39 @@
 ========================================================= -->
 <div id="premises" class="screen">
   <main>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-      <div>
-        <h1>Premises</h1>
+    <div class="screen-head">
+      <div class="screen-head-text">
+        <div class="screen-head-title-row">
+          <h1>Premises</h1>
+          <button type="button" class="screen-head-new">+ Add premises</button>
+        </div>
         <div class="meta">2,847 premises across the Crown estate</div>
       </div>
-      <button class="btn">+ Add premises</button>
     </div>
 
-    <div style="margin-top:16px;">
-      <div class="filter-chips">
-        <button class="chip on">My patch</button>
-        <button class="chip">All</button>
-        <button class="chip">Prisons</button>
-        <button class="chip">Courts</button>
-        <button class="chip">Government offices</button>
-        <button class="chip">Worst scores first</button>
-        <button class="chip">+ Filter</button>
+    <div class="process-filters-bar" style="margin-top:16px;">
+      <div class="filter-group">
+        <div class="filter-group-label">Scope</div>
+        <div class="filter-chips filter-chips--scroll premises-filters-scope" role="group" aria-label="Premises scope">
+          <button class="chip on" data-premises-scope="patch" type="button">My patch</button>
+          <button class="chip" data-premises-scope="all" type="button">All</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group-label">Type</div>
+        <div class="filter-chips filter-chips--scroll premises-filters-type" role="group" aria-label="Premises type">
+          <button class="chip" data-premises-type="prison" type="button">Prisons</button>
+          <button class="chip" data-premises-type="court" type="button">Courts</button>
+          <button class="chip" data-premises-type="government-office" type="button">Government offices</button>
+        </div>
       </div>
     </div>
 
-    <div class="card prem-list-card" style="padding:0;margin-top:16px;">
+    <div class="list-results-bar">
+      <div>Showing <strong id="premises-results-count" style="color:var(--ink);">0</strong> premises · Sort by <button type="button" class="list-sort-trigger" id="premises-sort-trigger" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button></div>
+    </div>
+
+    <div class="card prem-list-card" style="padding:0;margin-top:0;">
       <div class="prem-row prem-row--head">
         <div class="prem-line-primary">
           <div class="prem-name">Premises</div>
@@ -3988,74 +4182,7 @@
           <div class="prem-trailing"><span>Open work</span></div>
         </div>
       </div>
-
-      <div class="prem-row" onclick="show('premisesdetail')">
-        <div class="prem-line-primary">
-          <div class="prem-name">
-            <strong>Temple Quay House</strong>
-            <span class="prem-address">Temple Back East, Bristol BS1</span>
-          </div>
-          <div class="prem-score score-high">47</div>
-        </div>
-        <div class="prem-line-secondary">
-          <div class="prem-type">Government office</div>
-          <div class="prem-dept">HMCTS</div>
-          <div class="prem-audit">Jan 2025</div>
-          <div class="prem-trailing"><span class="pill blue">Audit in progress</span></div>
-        </div>
-      </div>
-
-      <div class="prem-row">
-        <div class="prem-line-primary">
-          <div class="prem-name"><strong>HMP Lewes</strong></div>
-          <div class="prem-score score-high">42</div>
-        </div>
-        <div class="prem-line-secondary">
-          <div class="prem-type">Prison · Cat B</div>
-          <div class="prem-dept">HMPPS</div>
-          <div class="prem-audit">Oct 2024</div>
-          <div class="prem-trailing"><span class="pill purple">Follow-up due</span></div>
-        </div>
-      </div>
-
-      <div class="prem-row">
-        <div class="prem-line-primary">
-          <div class="prem-name"><strong>Maidstone Magistrates Court</strong></div>
-          <div class="prem-score score-mid">34</div>
-        </div>
-        <div class="prem-line-secondary">
-          <div class="prem-type">Court</div>
-          <div class="prem-dept">HMCTS</div>
-          <div class="prem-audit">Mar 2024</div>
-          <div class="prem-trailing"><span class="pill grey">Concern open</span></div>
-        </div>
-      </div>
-
-      <div class="prem-row">
-        <div class="prem-line-primary">
-          <div class="prem-name"><strong>Crawley Job Centre Plus</strong></div>
-          <div class="prem-score score-mid">31</div>
-        </div>
-        <div class="prem-line-secondary">
-          <div class="prem-type">DWP office</div>
-          <div class="prem-dept">DWP</div>
-          <div class="prem-audit">Jul 2024</div>
-          <div class="prem-trailing"><span class="prem-work-none">none</span></div>
-        </div>
-      </div>
-
-      <div class="prem-row">
-        <div class="prem-line-primary">
-          <div class="prem-name"><strong>Folkestone Tribunal Hearing Centre</strong></div>
-          <div class="prem-score score-low">22</div>
-        </div>
-        <div class="prem-line-secondary">
-          <div class="prem-type">Tribunal</div>
-          <div class="prem-dept">HMCTS</div>
-          <div class="prem-audit">Nov 2024</div>
-          <div class="prem-trailing"><span class="prem-work-none">none</span></div>
-        </div>
-      </div>
+      <div id="premises-list-body"></div>
     </div>
 
   </main>
@@ -4651,23 +4778,31 @@
       <aside class="cpin-views-sidebar" id="cpin-views-sidebar">
         <div class="views-rail" id="cpin-views-rail">
           <h4>Views</h4>
-          <div class="view-item active" data-cpin-view="all" role="menuitem" tabindex="0">All <span class="pin" data-cpin-view-count="all"></span></div>
-          <div class="view-item" data-cpin-view="unassigned" role="menuitem" tabindex="0">Unassigned <span class="pin" data-cpin-view-count="unassigned"></span></div>
-          <div class="view-item" data-cpin-view="mine" role="menuitem" tabindex="0">My CPINs <span class="pin" data-cpin-view-count="mine"></span></div>
-          <div class="view-item" data-cpin-view="closed" role="menuitem" tabindex="0">Closed <span class="pin" data-cpin-view-count="closed"></span></div>
+          <div class="view-item active" data-cpin-view="all" role="menuitem" tabindex="0"><span class="view-item-label">All</span><span class="pin" data-cpin-view-count="all"></span></div>
+          <div class="view-item" data-cpin-view="unassigned" role="menuitem" tabindex="0"><span class="view-item-label">Unassigned</span><span class="pin" data-cpin-view-count="unassigned"></span></div>
+          <div class="view-item" data-cpin-view="mine" role="menuitem" tabindex="0"><span class="view-item-label">My CPINs</span><span class="pin" data-cpin-view-count="mine"></span></div>
+          <div class="view-item" data-cpin-view="closed" role="menuitem" tabindex="0"><span class="view-item-label">Closed</span><span class="pin" data-cpin-view-count="closed"></span></div>
         </div>
       </aside>
 
       <div class="cpin-results">
         <div class="process-filters-bar">
-          <div class="filter-chips cpin-filters">
-            <button class="chip on" data-cpin-filter="all">All</button>
-            <button class="chip" data-cpin-filter="red">Red</button>
-            <button class="chip" data-cpin-filter="amber">Amber</button>
-            <button class="chip" data-cpin-filter="green">Green</button>
-            <button class="chip" data-cpin-filter="patch">My patch</button>
-            <button class="chip" data-cpin-filter="premises-needed">Premises needed</button>
-            <button class="chip" data-cpin-filter="in-progress">In progress</button>
+          <div class="filter-group">
+            <div class="filter-group-label">RAG</div>
+            <div class="filter-chips filter-chips--scroll cpin-filters cpin-filters-rag" role="group" aria-label="RAG severity">
+              <button class="chip on" data-cpin-filter="all">All</button>
+              <button class="chip" data-cpin-filter="red">Red</button>
+              <button class="chip" data-cpin-filter="amber">Amber</button>
+              <button class="chip" data-cpin-filter="green">Green</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-label">Queue</div>
+            <div class="filter-chips filter-chips--scroll cpin-filters cpin-filters-queue" role="group" aria-label="Queue filters">
+              <button class="chip" data-cpin-filter="patch">My patch</button>
+              <button class="chip" data-cpin-filter="premises-needed">Premises needed</button>
+              <button class="chip" data-cpin-filter="in-progress">In progress</button>
+            </div>
           </div>
         </div>
 
@@ -5164,12 +5299,14 @@
 ========================================================= -->
 <div id="processes" class="screen">
   <main>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-      <div>
-        <h1>Processes</h1>
+    <div class="screen-head">
+      <div class="screen-head-text">
+        <div class="screen-head-title-row">
+          <h1>Processes</h1>
+          <button type="button" class="screen-head-new" onclick="openNewModal()">+ New process</button>
+        </div>
         <div class="meta">All active work across the inspectorate, in one place.</div>
       </div>
-      <button class="btn">+ New process</button>
     </div>
 
     <div class="processes-layout">
@@ -5187,43 +5324,50 @@
       <aside class="process-views-sidebar" id="process-views-sidebar">
         <div class="views-rail" id="process-views-rail">
           <h4>Pinned views</h4>
-          <div class="view-item active" data-view-label="Open and mine" role="menuitem" tabindex="0">Open and mine <span class="pin">★ 12</span></div>
-          <div class="view-item" data-view-label="My patch (open)" role="menuitem" tabindex="0">My patch (open) <span class="pin">★ 38</span></div>
-          <div class="view-item" data-view-label="Worst score first" role="menuitem" tabindex="0">Worst score first <span class="pin">★</span></div>
-          <div class="view-item" data-view-label="Awaiting action plan" role="menuitem" tabindex="0">Awaiting action plan <span class="pin">★</span></div>
+          <div class="view-item active" data-view-label="Open and mine" role="menuitem" tabindex="0"><span class="view-item-label">Open and mine</span><span class="pin">★ 12</span></div>
+          <div class="view-item" data-view-label="My patch (open)" role="menuitem" tabindex="0"><span class="view-item-label">My patch (open)</span><span class="pin">★ 38</span></div>
+          <div class="view-item" data-view-label="Worst score first" role="menuitem" tabindex="0"><span class="view-item-label">Worst score first</span><span class="pin">★</span></div>
+          <div class="view-item" data-view-label="Awaiting action plan" role="menuitem" tabindex="0"><span class="view-item-label">Awaiting action plan</span><span class="pin">★</span></div>
 
           <h4 style="margin-top:16px;">Shared views</h4>
-          <div class="view-item" data-view-label="Whole team, open" role="menuitem" tabindex="0">Whole team, open</div>
-          <div class="view-item" data-view-label="Prisons only" role="menuitem" tabindex="0">Prisons only</div>
-          <div class="view-item" data-view-label="SLA approaching" role="menuitem" tabindex="0">SLA approaching</div>
-          <div class="view-item" data-view-label="Closed this month" role="menuitem" tabindex="0">Closed this month</div>
-          <div class="view-item" style="color:var(--accent);">+ Save current view</div>
+          <div class="view-item" data-view-label="Whole team, open" role="menuitem" tabindex="0"><span class="view-item-label">Whole team, open</span></div>
+          <div class="view-item" data-view-label="Prisons only" role="menuitem" tabindex="0"><span class="view-item-label">Prisons only</span></div>
+          <div class="view-item" data-view-label="SLA approaching" role="menuitem" tabindex="0"><span class="view-item-label">SLA approaching</span></div>
+          <div class="view-item" data-view-label="Closed this month" role="menuitem" tabindex="0"><span class="view-item-label">Closed this month</span></div>
+          <div class="view-item" style="color:var(--accent);"><span class="view-item-label">+ Save current view</span></div>
         </div>
       </aside>
 
       <div class="process-results">
         <div class="process-filters-bar">
-          <div class="filter-chips">
-            <button class="chip on">All types</button>
-            <button class="chip">Audits</button>
-            <button class="chip">Follow-ups</button>
-            <button class="chip">CPINs</button>
-            <button class="chip">Concerns</button>
-            <button class="chip">Consultations</button>
-            <button class="chip">Business support</button>
-            <button class="chip">Appeals</button>
+          <div class="filter-group">
+            <div class="filter-group-label">Type</div>
+            <div class="filter-chips filter-chips--scroll process-filters-type" role="group" aria-label="Process type">
+              <button class="chip on" data-process-type="all" type="button">All types</button>
+              <button class="chip" data-process-type="audit" type="button">Audits</button>
+              <button class="chip" data-process-type="follow-up" type="button">Follow-ups</button>
+              <button class="chip" data-process-type="cpin" type="button">CPINs</button>
+              <button class="chip" data-process-type="concern" type="button">Concerns</button>
+              <button class="chip" data-process-type="consultation" type="button">Consultations</button>
+              <button class="chip" data-process-type="support" type="button">Business support</button>
+              <button class="chip" data-process-type="appeal" type="button">Appeals</button>
+            </div>
           </div>
-          <div class="filter-chips">
-            <button class="chip on">Open</button>
-            <button class="chip">In progress</button>
-            <button class="chip">Awaiting action plan</button>
-            <button class="chip">Awaiting follow-up</button>
-            <button class="chip">Closed</button>
+          <div class="filter-group">
+            <div class="filter-group-label">Status</div>
+            <div class="filter-chips filter-chips--scroll process-filters-status" role="group" aria-label="Process status">
+              <button class="chip on" data-process-status="all" type="button">All statuses</button>
+              <button class="chip" data-process-status="open" type="button">Open</button>
+              <button class="chip" data-process-status="in-progress" type="button">In progress</button>
+              <button class="chip" data-process-status="awaiting-action-plan" type="button">Awaiting action plan</button>
+              <button class="chip" data-process-status="awaiting-follow-up" type="button">Awaiting follow-up</button>
+              <button class="chip" data-process-status="closed" type="button">Closed</button>
+            </div>
           </div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 4px 8px;font-size:12px;color:var(--ink-3);">
-          <div>Showing <strong style="color:var(--ink);">12</strong> processes  ·  Sort by <strong style="color:var(--ink);">Worst score first</strong> ▾</div>
+        <div class="list-results-bar">
+          <div>Showing <strong id="process-results-count" style="color:var(--ink);">0</strong> processes · Sort by <button type="button" class="list-sort-trigger" id="process-sort-trigger" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button></div>
           <div><a>Export CSV</a></div>
         </div>
 
@@ -5242,126 +5386,7 @@
               </div>
             </div>
           </div>
-
-          <div class="proc-row" onclick="show('audit')">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill blue">Audit</span></div>
-              <div class="premises">Temple Quay House<span class="id">A-2026-0314</span></div>
-              <div class="proc-score score-high">47 ▲</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Stage 2 of 6  ·  Site visit</div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
-                <div class="age">8 days</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="proc-row">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill purple">Follow-up</span></div>
-              <div class="premises">HMP Lewes<span class="id">F-2026-0142</span></div>
-              <div class="proc-score score-high">42 ▼</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Awaiting action plan</div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
-                <div class="age">12 days</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="proc-row">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill blue">Audit</span></div>
-              <div class="premises">HMP Maidstone<span class="id">A-2026-0301</span></div>
-              <div class="proc-score score-high">38</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Stage 4 of 6  ·  Outcomes</div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">SF</div>Steve France</div>
-                <div class="age">23 days</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="proc-row">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill grey">Consult</span></div>
-              <div class="premises">Charing Cross House refurb<span class="id">C-2026-0089</span></div>
-              <div class="proc-score score-mid">36</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Reviewing  ·  <strong style="color:var(--amber);">SLA: 5 days</strong></div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
-                <div class="age">10 days</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="proc-row">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill grey">Concern</span></div>
-              <div class="premises">Maidstone Magistrates Court<span class="id">SC-2026-0073</span></div>
-              <div class="proc-score score-mid">34</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Awaiting contact</div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
-                <div class="age">4 days</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="proc-row">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill blue">Audit</span></div>
-              <div class="premises">DWP Crawley<span class="id">A-2026-0298</span></div>
-              <div class="proc-score score-mid">31 ▼</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Stage 5  ·  Action plan</div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">HM</div>Hannah Munro</div>
-                <div class="age">2 months</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="proc-row">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill purple">Follow-up</span></div>
-              <div class="premises">HMP Belmarsh<span class="id">F-2026-0118</span></div>
-              <div class="proc-score score-mid">29</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Awaiting follow-up visit</div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">SF</div>Steve France</div>
-                <div class="age">4 months</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="proc-row">
-            <div class="proc-line-primary">
-              <div class="ptype"><span class="pill grey">Support</span></div>
-              <div class="premises">Royal Courts of Justice<span class="id">B-2026-0044</span></div>
-              <div class="proc-score score-low">22</div>
-            </div>
-            <div class="proc-line-secondary">
-              <div class="status">Meeting scheduled  ·  25 Jun</div>
-              <div class="proc-trailing">
-                <div class="owner"><div class="avatar-tiny">PG</div>Phil Gower</div>
-                <div class="age">3 days</div>
-              </div>
-            </div>
-          </div>
+          <div id="process-list-body"></div>
         </div>
 
       </div>
@@ -5374,12 +5399,14 @@
 ========================================================= -->
 <div id="reports" class="screen">
   <main>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-      <div>
-        <h1>Reports</h1>
+    <div class="screen-head">
+      <div class="screen-head-text">
+        <div class="screen-head-title-row">
+          <h1>Reports</h1>
+          <button type="button" class="screen-head-new">+ Build a custom report</button>
+        </div>
         <div class="meta">Templated reports up front  ·  Custom builder behind  ·  Role-tiered access</div>
       </div>
-      <button class="btn">+ Build a custom report</button>
     </div>
 
     <h2 style="margin-top:24px;">Annual report sources</h2>
@@ -6325,6 +6352,7 @@
     if (screen === 'auditsetup') initAuditSetupPage();
     if (screen === 'cpins') initCpinsPage();
     if (screen === 'processes') initProcessesPage();
+    if (screen === 'premises') initPremisesPage();
   }
 
   function render(id) {
@@ -6503,6 +6531,191 @@
     if (el) el.textContent = '· ' + n + ' ' + (AUDIT_STAGE_SHORT[n] || AUDIT_STAGE_NAMES[n] || '');
   }
 
+  const PROCESS_TYPE_PILLS = {
+    audit: { label: 'Audit', pill: 'blue' },
+    'follow-up': { label: 'Follow-up', pill: 'purple' },
+    cpin: { label: 'CPIN', pill: 'amber' },
+    concern: { label: 'Concern', pill: 'grey' },
+    consultation: { label: 'Consult', pill: 'grey' },
+    support: { label: 'Support', pill: 'grey' },
+    appeal: { label: 'Appeal', pill: 'grey' }
+  };
+
+  const PROCESSES_LIST = [
+    { id: 'A-2026-0314', type: 'audit', premises: 'Temple Quay House', score: 47, scoreTrend: 'up', scoreClass: 'score-high', status: 'in-progress', statusText: 'Stage 2 of 6  ·  Site visit', owner: 'Phil Gower', ownerInitials: 'PG', age: '8 days', mine: true, patch: true, route: 'audit' },
+    { id: 'F-2026-0142', type: 'follow-up', premises: 'HMP Lewes', score: 42, scoreTrend: 'down', scoreClass: 'score-high', status: 'awaiting-action-plan', statusText: 'Awaiting action plan', owner: 'Phil Gower', ownerInitials: 'PG', age: '12 days', mine: true, patch: true, prison: true },
+    { id: 'A-2026-0301', type: 'audit', premises: 'HMP Maidstone', score: 38, scoreClass: 'score-high', status: 'in-progress', statusText: 'Stage 4 of 6  ·  Outcomes', owner: 'Steve France', ownerInitials: 'SF', age: '23 days', mine: false, patch: true, prison: true },
+    { id: 'C-2026-0089', type: 'consultation', premises: 'Charing Cross House refurb', score: 36, scoreClass: 'score-mid', status: 'in-progress', statusText: 'Reviewing  ·  <strong style="color:var(--amber);">SLA: 5 days</strong>', owner: 'Phil Gower', ownerInitials: 'PG', age: '10 days', mine: true, patch: true, hasSla: true },
+    { id: 'SC-2026-0073', type: 'concern', premises: 'Maidstone Magistrates Court', score: 34, scoreClass: 'score-mid', status: 'open', statusText: 'Awaiting contact', owner: 'Phil Gower', ownerInitials: 'PG', age: '4 days', mine: true, patch: true },
+    { id: 'A-2026-0298', type: 'audit', premises: 'DWP Crawley', score: 31, scoreTrend: 'down', scoreClass: 'score-mid', status: 'awaiting-action-plan', statusText: 'Stage 5  ·  Action plan', owner: 'Hannah Munro', ownerInitials: 'HM', age: '2 months', mine: false, patch: false },
+    { id: 'F-2026-0118', type: 'follow-up', premises: 'HMP Belmarsh', score: 29, scoreClass: 'score-mid', status: 'awaiting-follow-up', statusText: 'Awaiting follow-up visit', owner: 'Steve France', ownerInitials: 'SF', age: '4 months', mine: false, patch: false, prison: true },
+    { id: 'B-2026-0044', type: 'support', premises: 'Royal Courts of Justice', score: 22, scoreClass: 'score-low', status: 'open', statusText: 'Meeting scheduled  ·  25 Jun', owner: 'Phil Gower', ownerInitials: 'PG', age: '3 days', mine: true, patch: true },
+    { id: 'CPIN-2026-0418', type: 'cpin', premises: 'Temple Quay House', score: 47, scoreClass: 'score-high', status: 'in-progress', statusText: 'Desk evaluation  ·  Triage', owner: 'Phil Gower', ownerInitials: 'PG', age: '2 days', mine: true, patch: true, route: 'cpin/cpin-0418' },
+    { id: 'CPIN-2026-0412', type: 'cpin', premises: 'Premises not yet linked', score: null, scoreClass: 'score-mid', status: 'open', statusText: 'Awaiting premises match', owner: 'Phil Gower', ownerInitials: 'PG', age: '5 days', mine: true, patch: true, route: 'cpin/cpin-0412' },
+    { id: 'CPIN-2026-0398', type: 'cpin', premises: 'HMP Swaleside', score: 41, scoreClass: 'score-high', status: 'in-progress', statusText: 'Remote evaluation  ·  Amber', owner: 'Steve France', ownerInitials: 'SF', age: '9 days', mine: false, patch: true, prison: true, route: 'cpin/cpin-0398' },
+    { id: 'CPIN-2026-0401', type: 'cpin', premises: 'Reading Job Centre Plus', score: 28, scoreClass: 'score-mid', status: 'awaiting-action-plan', statusText: 'Duty holder response due', owner: 'Hannah Munro', ownerInitials: 'HM', age: '14 days', mine: false, patch: false },
+    { id: 'AP-2026-0007', type: 'appeal', premises: 'HMP Wandsworth', score: 35, scoreClass: 'score-mid', status: 'in-progress', statusText: 'Panel review  ·  Evidence pack', owner: 'Steve France', ownerInitials: 'SF', age: '18 days', mine: false, patch: false, prison: true },
+    { id: 'AP-2026-0011', type: 'appeal', premises: 'Folkestone Tribunal Hearing Centre', score: 22, scoreClass: 'score-low', status: 'open', statusText: 'Lodged  ·  Awaiting schedule', owner: 'Hannah Munro', ownerInitials: 'HM', age: '6 days', mine: false, patch: false },
+    { id: 'A-2026-0320', type: 'audit', premises: 'HMP Bristol', score: 44, scoreTrend: 'up', scoreClass: 'score-high', status: 'open', statusText: 'Stage 1 of 6  ·  Planning', owner: 'Phil Gower', ownerInitials: 'PG', age: '1 day', mine: true, patch: true, prison: true },
+    { id: 'F-2026-0155', type: 'follow-up', premises: 'HMP Isis', score: 33, scoreClass: 'score-mid', status: 'open', statusText: 'Opened  ·  Awaiting first visit', owner: 'Steve France', ownerInitials: 'SF', age: '2 days', mine: false, patch: true, prison: true },
+    { id: 'SC-2026-0061', type: 'concern', premises: 'Lewes Crown Court', score: 30, scoreClass: 'score-mid', status: 'in-progress', statusText: 'Investigating  ·  Site photos received', owner: 'Phil Gower', ownerInitials: 'PG', age: '7 days', mine: true, patch: true },
+    { id: 'C-2026-0075', type: 'consultation', premises: 'Bristol Crown Court', score: 27, scoreClass: 'score-mid', status: 'open', statusText: 'New submission  ·  <strong style="color:var(--amber);">SLA: 3 days</strong>', owner: 'Hannah Munro', ownerInitials: 'HM', age: '1 day', mine: false, patch: false, hasSla: true },
+    { id: 'B-2026-0039', type: 'support', premises: 'MoJ HQ London', score: 19, scoreClass: 'score-low', status: 'in-progress', statusText: 'Workshop prep  ·  12 Jul', owner: 'Phil Gower', ownerInitials: 'PG', age: '11 days', mine: true, patch: false },
+    { id: 'A-2026-0281', type: 'audit', premises: 'HMP Durham', score: 52, scoreTrend: 'down', scoreClass: 'score-high', status: 'closed', statusText: 'Closed  ·  14 May 2026', owner: 'Steve France', ownerInitials: 'SF', age: '6 weeks', mine: false, patch: false, prison: true },
+    { id: 'F-2026-0102', type: 'follow-up', premises: 'HMP Pentonville', score: 26, scoreClass: 'score-mid', status: 'closed', statusText: 'Closed  ·  22 May 2026', owner: 'Phil Gower', ownerInitials: 'PG', age: '5 weeks', mine: true, patch: true, prison: true },
+    { id: 'A-2026-0275', type: 'audit', premises: 'HMCTS Guildford', score: 24, scoreClass: 'score-low', status: 'closed', statusText: 'Closed  ·  30 May 2026', owner: 'Hannah Munro', ownerInitials: 'HM', age: '3 weeks', mine: false, patch: false }
+  ];
+
+  const LIST_SORT_OPTIONS = [
+    { id: 'worst', label: 'Worst score first' },
+    { id: 'best', label: 'Best score first' },
+    { id: 'name', label: 'Name A–Z' }
+  ];
+
+  let processesTypeFilter = 'all';
+  let processesStatusFilter = 'all';
+  let processesActiveView = 'Open and mine';
+  let processesSortMode = 'worst';
+
+  function getListSortLabel(mode) {
+    return (LIST_SORT_OPTIONS.find(o => o.id === mode) || LIST_SORT_OPTIONS[0]).label;
+  }
+
+  function sortByListMode(items, mode, scoreKey, nameKey) {
+    const sorted = items.slice();
+    if (mode === 'worst') {
+      sorted.sort((a, b) => {
+        const sa = a[scoreKey] == null ? -1 : a[scoreKey];
+        const sb = b[scoreKey] == null ? -1 : b[scoreKey];
+        return sb - sa;
+      });
+    } else if (mode === 'best') {
+      sorted.sort((a, b) => {
+        const sa = a[scoreKey] == null ? 999 : a[scoreKey];
+        const sb = b[scoreKey] == null ? 999 : b[scoreKey];
+        return sa - sb;
+      });
+    } else if (mode === 'name') {
+      sorted.sort((a, b) => String(a[nameKey]).localeCompare(String(b[nameKey])));
+    }
+    return sorted;
+  }
+
+  function syncListSortTrigger(id, mode) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '<strong>' + getListSortLabel(mode) + '</strong> ▾';
+  }
+
+  function cycleListSort(mode) {
+    const idx = LIST_SORT_OPTIONS.findIndex(o => o.id === mode);
+    return LIST_SORT_OPTIONS[(idx + 1) % LIST_SORT_OPTIONS.length].id;
+  }
+
+  function processMatchesType(p) {
+    return processesTypeFilter === 'all' || p.type === processesTypeFilter;
+  }
+
+  function processMatchesStatus(p) {
+    return processesStatusFilter === 'all' || p.status === processesStatusFilter;
+  }
+
+  function processMatchesView(p, view) {
+    view = view || processesActiveView;
+    if (!view || view === 'Worst score first') return true;
+    if (view === 'Open and mine') return p.mine && p.status !== 'closed';
+    if (view === 'My patch (open)') return p.patch && p.status !== 'closed';
+    if (view === 'Awaiting action plan') return p.status === 'awaiting-action-plan';
+    if (view === 'Whole team, open') return p.status !== 'closed';
+    if (view === 'Prisons only') return !!p.prison && p.status !== 'closed';
+    if (view === 'SLA approaching') return !!p.hasSla && p.status !== 'closed';
+    if (view === 'Closed this month') return p.status === 'closed';
+    return true;
+  }
+
+  function getFilteredProcesses() {
+    return sortByListMode(
+      PROCESSES_LIST.filter(p => processMatchesType(p) && processMatchesStatus(p) && processMatchesView(p)),
+      processesSortMode,
+      'score',
+      'premises'
+    );
+  }
+
+  function countProcessesForView(view) {
+    return PROCESSES_LIST.filter(p => processMatchesView(p, view)).length;
+  }
+
+  function updateProcessViewCounts() {
+    document.querySelectorAll('#process-views-rail .view-item[data-view-label]').forEach(item => {
+      const label = item.dataset.viewLabel;
+      const pin = item.querySelector('.pin');
+      if (!pin || !label) return;
+      const n = countProcessesForView(label);
+      if (label === 'Worst score first') pin.textContent = '★';
+      else pin.textContent = '★ ' + n;
+    });
+  }
+
+  function renderProcessRow(p) {
+    const meta = PROCESS_TYPE_PILLS[p.type] || { label: p.type, pill: 'grey' };
+    const trend = p.scoreTrend === 'up' ? ' ▲' : p.scoreTrend === 'down' ? ' ▼' : '';
+    const scoreHtml = p.score == null
+      ? '<div class="proc-score">—</div>'
+      : `<div class="proc-score ${p.scoreClass || ''}">${p.score}${trend}</div>`;
+    const click = p.route ? `onclick="show('${p.route}')"` : '';
+    return `<div class="proc-row" ${click}>
+      <div class="proc-line-primary">
+        <div class="ptype"><span class="pill ${meta.pill}">${meta.label}</span></div>
+        <div class="premises">${p.premises}<span class="id">${p.id}</span></div>
+        ${scoreHtml}
+      </div>
+      <div class="proc-line-secondary">
+        <div class="status">${p.statusText}</div>
+        <div class="proc-trailing">
+          <div class="owner"><div class="avatar-tiny">${p.ownerInitials}</div><span class="owner-name">${p.owner}</span></div>
+          <div class="age">${p.age}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderProcessesList() {
+    const body = document.getElementById('process-list-body');
+    const countEl = document.getElementById('process-results-count');
+    if (!body) return;
+    const items = getFilteredProcesses();
+    if (countEl) countEl.textContent = String(items.length);
+    syncListSortTrigger('process-sort-trigger', processesSortMode);
+    if (!items.length) {
+      body.innerHTML = '<div class="proc-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No processes match your filters.</div>';
+    } else {
+      body.innerHTML = items.map(renderProcessRow).join('');
+    }
+    updateProcessViewCounts();
+  }
+
+  function cycleProcessSort() {
+    processesSortMode = cycleListSort(processesSortMode);
+    renderProcessesList();
+  }
+
+  function setProcessTypeFilter(type) {
+    processesTypeFilter = type;
+    document.querySelectorAll('.process-filters-type .chip').forEach(chip => {
+      chip.classList.toggle('on', chip.dataset.processType === type);
+    });
+    renderProcessesList();
+  }
+
+  function setProcessStatusFilter(status) {
+    processesStatusFilter = status;
+    document.querySelectorAll('.process-filters-status .chip').forEach(chip => {
+      chip.classList.toggle('on', chip.dataset.processStatus === status);
+    });
+    renderProcessesList();
+  }
+
   function closeProcessViewMenu() {
     const menu = document.getElementById('process-view-menu');
     const btn = document.getElementById('process-view-toggle');
@@ -6536,12 +6749,14 @@
   }
 
   function selectProcessView(label) {
+    processesActiveView = label || processesActiveView;
     document.querySelectorAll('#process-views-rail .view-item[data-view-label]').forEach(v => {
       v.classList.toggle('active', v.dataset.viewLabel === label);
     });
     const selected = document.getElementById('process-view-selected');
     if (selected && label) selected.textContent = label;
     closeProcessViewMenu();
+    renderProcessesList();
   }
 
   function initAuditMobileHelpers() {
@@ -6556,23 +6771,152 @@
 
   function initProcessesPage() {
     layoutProcessViews();
-    if (document.getElementById('processes')?.dataset.filtersBound) return;
-    document.getElementById('processes').dataset.filtersBound = '1';
-    const rail = document.getElementById('process-views-rail');
-    if (rail) {
-      rail.addEventListener('click', (e) => {
-        const item = e.target.closest('.view-item[data-view-label]');
-        if (item) selectProcessView(item.dataset.viewLabel);
+    const screen = document.getElementById('processes');
+    if (!screen) return;
+    if (!screen.dataset.filtersBound) {
+      screen.dataset.filtersBound = '1';
+      document.querySelectorAll('.process-filters-type .chip').forEach(chip => {
+        chip.addEventListener('click', () => setProcessTypeFilter(chip.dataset.processType));
       });
-    }
-    if (!document.body.dataset.processViewBound) {
-      document.body.dataset.processViewBound = '1';
-      document.addEventListener('mousedown', (e) => {
-        if (!isMobileNavLayout()) return;
-        const dropdown = document.querySelector('.process-view-dropdown');
-        if (dropdown && !dropdown.contains(e.target)) closeProcessViewMenu();
+      document.querySelectorAll('.process-filters-status .chip').forEach(chip => {
+        chip.addEventListener('click', () => setProcessStatusFilter(chip.dataset.processStatus));
       });
+      document.getElementById('process-sort-trigger')?.addEventListener('click', cycleProcessSort);
+      const rail = document.getElementById('process-views-rail');
+      if (rail) {
+        rail.addEventListener('click', (e) => {
+          const item = e.target.closest('.view-item[data-view-label]');
+          if (item) selectProcessView(item.dataset.viewLabel);
+        });
+      }
+      if (!document.body.dataset.processViewBound) {
+        document.body.dataset.processViewBound = '1';
+        document.addEventListener('mousedown', (e) => {
+          if (!isMobileNavLayout()) return;
+          const dropdown = document.querySelector('.process-view-dropdown');
+          if (dropdown && !dropdown.contains(e.target)) closeProcessViewMenu();
+        });
+      }
     }
+    renderProcessesList();
+  }
+
+  const PREMISES_LIST = [
+    { name: 'Temple Quay House', address: 'Temple Back East, Bristol BS1', category: 'government-office', typeLabel: 'Government office', dept: 'HMCTS', score: 47, scoreClass: 'score-high', lastAudit: 'Jan 2025', lastAuditSort: 202501, patch: true, route: 'premisesdetail', work: { pill: 'blue', label: 'Audit in progress' } },
+    { name: 'HMP Lewes', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 42, scoreClass: 'score-high', lastAudit: 'Oct 2024', lastAuditSort: 202410, patch: true, work: { pill: 'purple', label: 'Follow-up due' } },
+    { name: 'HMP Maidstone', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 38, scoreClass: 'score-high', lastAudit: 'Aug 2024', lastAuditSort: 202408, patch: true, work: { pill: 'blue', label: 'Audit in progress' } },
+    { name: 'Maidstone Magistrates Court', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 34, scoreClass: 'score-mid', lastAudit: 'Mar 2024', lastAuditSort: 202403, patch: true, work: { pill: 'grey', label: 'Concern open' } },
+    { name: 'Charing Cross House refurb', category: 'government-office', typeLabel: 'Government office', dept: 'MoJ', score: 36, scoreClass: 'score-mid', lastAudit: 'May 2024', lastAuditSort: 202405, patch: true, work: { pill: 'grey', label: 'Consultation open' } },
+    { name: 'Crawley Job Centre Plus', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 31, scoreClass: 'score-mid', lastAudit: 'Jul 2024', lastAuditSort: 202407, patch: false, work: null },
+    { name: 'DWP Crawley', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 31, scoreClass: 'score-mid', lastAudit: 'Jun 2024', lastAuditSort: 202406, patch: false, work: { pill: 'blue', label: 'Action plan review' } },
+    { name: 'HMP Belmarsh', category: 'prison', typeLabel: 'Prison · Cat A', dept: 'HMPPS', score: 29, scoreClass: 'score-mid', lastAudit: 'Feb 2024', lastAuditSort: 202402, patch: false, work: { pill: 'purple', label: 'Follow-up visit due' } },
+    { name: 'Lewes Crown Court', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 30, scoreClass: 'score-mid', lastAudit: 'Apr 2024', lastAuditSort: 202404, patch: true, work: { pill: 'grey', label: 'Concern investigating' } },
+    { name: 'Royal Courts of Justice', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 22, scoreClass: 'score-low', lastAudit: 'Dec 2024', lastAuditSort: 202412, patch: true, work: { pill: 'grey', label: 'Support meeting' } },
+    { name: 'HMP Bristol', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 44, scoreClass: 'score-high', lastAudit: 'Sep 2024', lastAuditSort: 202409, patch: true, work: { pill: 'blue', label: 'Audit planning' } },
+    { name: 'HMP Swaleside', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 41, scoreClass: 'score-high', lastAudit: 'Nov 2024', lastAuditSort: 202411, patch: true, work: { pill: 'amber', label: 'CPIN open' } },
+    { name: 'HMP Wandsworth', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 35, scoreClass: 'score-mid', lastAudit: 'Jan 2024', lastAuditSort: 202401, patch: false, work: { pill: 'grey', label: 'Appeal lodged' } },
+    { name: 'HMP Isis', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 33, scoreClass: 'score-mid', lastAudit: 'Oct 2023', lastAuditSort: 202310, patch: true, work: { pill: 'purple', label: 'Follow-up opened' } },
+    { name: 'Bristol Crown Court', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 27, scoreClass: 'score-mid', lastAudit: 'May 2025', lastAuditSort: 202505, patch: false, work: { pill: 'grey', label: 'Consultation new' } },
+    { name: 'Folkestone Tribunal Hearing Centre', category: 'court', typeLabel: 'Tribunal', dept: 'HMCTS', score: 22, scoreClass: 'score-low', lastAudit: 'Nov 2024', lastAuditSort: 202411, patch: false, work: null },
+    { name: 'Reading Job Centre Plus', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 28, scoreClass: 'score-mid', lastAudit: 'Feb 2025', lastAuditSort: 202502, patch: false, work: { pill: 'amber', label: 'CPIN awaiting response' } },
+    { name: 'MoJ HQ London', category: 'government-office', typeLabel: 'Government office', dept: 'MoJ', score: 19, scoreClass: 'score-low', lastAudit: 'Aug 2023', lastAuditSort: 202308, patch: false, work: { pill: 'grey', label: 'Support workshop' } },
+    { name: 'HMCTS Guildford', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 24, scoreClass: 'score-low', lastAudit: 'Dec 2023', lastAuditSort: 202312, patch: false, work: null },
+    { name: 'HMP Durham', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 52, scoreClass: 'score-high', lastAudit: 'May 2025', lastAuditSort: 202505, patch: false, work: null },
+    { name: 'HMP Pentonville', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 26, scoreClass: 'score-mid', lastAudit: 'Jun 2023', lastAuditSort: 202306, patch: true, work: null },
+    { name: 'HMP Rochester', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 39, scoreClass: 'score-high', lastAudit: 'Mar 2025', lastAuditSort: 202503, patch: true, work: null }
+  ];
+
+  let premisesScopeFilter = 'patch';
+  let premisesTypeFilter = null;
+  let premisesSortMode = 'worst';
+
+  function premisesMatchesScope(p) {
+    return premisesScopeFilter === 'all' || p.patch;
+  }
+
+  function premisesMatchesType(p) {
+    return !premisesTypeFilter || p.category === premisesTypeFilter;
+  }
+
+  function getFilteredPremises() {
+    return sortByListMode(
+      PREMISES_LIST.filter(p => premisesMatchesScope(p) && premisesMatchesType(p)),
+      premisesSortMode,
+      'score',
+      'name'
+    );
+  }
+
+  function renderPremRow(p) {
+    const address = p.address ? `<span class="prem-address">${p.address}</span>` : '';
+    const click = p.route ? `onclick="show('${p.route}')"` : '';
+    const work = p.work
+      ? `<div class="prem-trailing"><span class="pill ${p.work.pill}">${p.work.label}</span></div>`
+      : '<div class="prem-trailing"><span class="prem-work-none">none</span></div>';
+    return `<div class="prem-row" ${click}>
+      <div class="prem-line-primary">
+        <div class="prem-name"><strong>${p.name}</strong>${address}</div>
+        <div class="prem-score ${p.scoreClass}">${p.score}</div>
+      </div>
+      <div class="prem-line-secondary">
+        <div class="prem-type">${p.typeLabel}</div>
+        <div class="prem-dept">${p.dept}</div>
+        <div class="prem-audit">${p.lastAudit}</div>
+        ${work}
+      </div>
+    </div>`;
+  }
+
+  function renderPremisesList() {
+    const body = document.getElementById('premises-list-body');
+    const countEl = document.getElementById('premises-results-count');
+    if (!body) return;
+    const items = getFilteredPremises();
+    if (countEl) countEl.textContent = String(items.length);
+    syncListSortTrigger('premises-sort-trigger', premisesSortMode);
+    if (!items.length) {
+      body.innerHTML = '<div class="prem-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No premises match your filters.</div>';
+    } else {
+      body.innerHTML = items.map(renderPremRow).join('');
+    }
+  }
+
+  function cyclePremisesSort() {
+    premisesSortMode = cycleListSort(premisesSortMode);
+    renderPremisesList();
+  }
+
+  function setPremisesScopeFilter(scope) {
+    premisesScopeFilter = scope;
+    document.querySelectorAll('.premises-filters-scope .chip').forEach(chip => {
+      chip.classList.toggle('on', chip.dataset.premisesScope === scope);
+    });
+    renderPremisesList();
+  }
+
+  function setPremisesTypeFilter(type) {
+    if (premisesTypeFilter === type) premisesTypeFilter = null;
+    else premisesTypeFilter = type;
+    document.querySelectorAll('.premises-filters-type .chip').forEach(chip => {
+      chip.classList.toggle('on', chip.dataset.premisesType === premisesTypeFilter);
+    });
+    renderPremisesList();
+  }
+
+  function initPremisesPage() {
+    const screen = document.getElementById('premises');
+    if (!screen) return;
+    if (!screen.dataset.filtersBound) {
+      screen.dataset.filtersBound = '1';
+      document.querySelectorAll('.premises-filters-scope .chip').forEach(chip => {
+        chip.addEventListener('click', () => setPremisesScopeFilter(chip.dataset.premisesScope));
+      });
+      document.querySelectorAll('.premises-filters-type .chip').forEach(chip => {
+        chip.addEventListener('click', () => setPremisesTypeFilter(chip.dataset.premisesType));
+      });
+      document.getElementById('premises-sort-trigger')?.addEventListener('click', cyclePremisesSort);
+    }
+    renderPremisesList();
   }
 
   function setAuditActivityBarVisible(visible) {
@@ -7690,24 +8034,29 @@
     cpin: 'CPINs'
   };
 
-  const GLOBAL_SEARCH_PREMISES = [
-    { title: 'Temple Quay House', subtitle: 'Temple Back East, Bristol BS1 · HMCTS · Government office', route: 'premisesdetail', keywords: 'temple quay bristol hmcts government office audit a-2026-0314 cpin-2026-0418' },
-    { title: 'HMP Lewes', subtitle: 'Prison · Cat B · HMPPS · RBIP score 42', route: 'premises', keywords: 'hmp lewes prison hmpps lewes cat b follow-up f-2026-0142' },
-    { title: 'Maidstone Magistrates Court', subtitle: 'Court · HMCTS · RBIP score 34', route: 'premises', keywords: 'maidstone magistrates court hmcts concern sc-2026-0073' },
-    { title: 'Crawley Job Centre Plus', subtitle: 'DWP office · RBIP score 31', route: 'premises', keywords: 'crawley job centre plus dwp a-2026-0298' },
-    { title: 'Folkestone Tribunal Hearing Centre', subtitle: 'Tribunal · HMCTS · RBIP score 22', route: 'premises', keywords: 'folkestone tribunal hearing centre hmcts' }
-  ];
+  function getGlobalSearchPremises() {
+    return PREMISES_LIST.map(p => ({
+      title: p.name,
+      subtitle: (p.address ? p.address + ' · ' : '') + p.dept + ' · ' + p.typeLabel + ' · RBIP ' + p.score,
+      route: p.route || 'premises',
+      keywords: (p.name + ' ' + (p.address || '') + ' ' + p.typeLabel + ' ' + p.dept + ' ' + p.category).toLowerCase()
+    }));
+  }
 
-  const GLOBAL_SEARCH_PROCESSES = [
-    { title: 'A-2026-0314', subtitle: 'Audit · Temple Quay House · Stage 2 — Site visit', route: 'audit-stage-2', pill: 'blue', pillLabel: 'Audit', keywords: 'a-2026-0314 temple quay audit site visit reactive cpin-2026-0418' },
-    { title: 'F-2026-0142', subtitle: 'Follow-up · HMP Lewes · Awaiting action plan', route: 'processes', pill: 'purple', pillLabel: 'Follow-up', keywords: 'f-2026-0142 hmp lewes follow-up action plan' },
-    { title: 'A-2026-0301', subtitle: 'Audit · HMP Maidstone · Stage 4 — Outcomes', route: 'processes', pill: 'blue', pillLabel: 'Audit', keywords: 'a-2026-0301 hmp maidstone audit outcomes' },
-    { title: 'C-2026-0089', subtitle: 'Consultation · Charing Cross House refurb · SLA 5 days', route: 'processes', pill: 'grey', pillLabel: 'Consult', keywords: 'c-2026-0089 charing cross consultation building control refurb' },
-    { title: 'SC-2026-0073', subtitle: 'Safety concern · Maidstone Magistrates Court · Awaiting contact', route: 'processes', pill: 'grey', pillLabel: 'Concern', keywords: 'sc-2026-0073 maidstone magistrates safety concern' },
-    { title: 'A-2026-0298', subtitle: 'Audit · DWP Crawley · Stage 5 — Action plan', route: 'processes', pill: 'blue', pillLabel: 'Audit', keywords: 'a-2026-0298 dwp crawley audit action plan' },
-    { title: 'F-2026-0118', subtitle: 'Follow-up · HMP Belmarsh · Awaiting follow-up visit', route: 'processes', pill: 'purple', pillLabel: 'Follow-up', keywords: 'f-2026-0118 hmp belmarsh follow-up' },
-    { title: 'B-2026-0044', subtitle: 'Business support · Royal Courts of Justice · Meeting 25 Jun', route: 'processes', pill: 'grey', pillLabel: 'Support', keywords: 'b-2026-0044 royal courts justice business support meeting' }
-  ];
+  function getGlobalSearchProcesses() {
+    return PROCESSES_LIST.map(p => {
+      const meta = PROCESS_TYPE_PILLS[p.type] || { label: p.type, pill: 'grey' };
+      const plainStatus = p.statusText.replace(/<[^>]+>/g, '');
+      return {
+        title: p.id,
+        subtitle: meta.label + ' · ' + p.premises + ' · ' + plainStatus,
+        route: p.route || 'processes',
+        pill: meta.pill,
+        pillLabel: meta.label,
+        keywords: (p.id + ' ' + p.premises + ' ' + p.type + ' ' + plainStatus + ' ' + p.owner).toLowerCase()
+      };
+    });
+  }
 
   function getGlobalSearchIndex() {
     const cpins = getAllCpinsForSearch().map(c => ({
@@ -7719,9 +8068,9 @@
       pillLabel: { red: 'Red', amber: 'Amber', green: 'Green' }[c.severity],
       keywords: [c.ref, c.premises, c.summary, c.severity, c.when, 'cpin'].filter(Boolean).join(' ')
     }));
-    return GLOBAL_SEARCH_PREMISES.map(i => ({ type: 'premises', ...i }))
+    return getGlobalSearchPremises().map(i => ({ type: 'premises', ...i }))
       .concat(
-        GLOBAL_SEARCH_PROCESSES.map(i => ({ type: 'process', ...i })),
+        getGlobalSearchProcesses().map(i => ({ type: 'process', ...i })),
         cpins
       );
   }
@@ -7982,11 +8331,11 @@
       const green = mine.filter(function (c) { return c.severity === 'green'; }).length;
       const premisesNeeded = all.filter(cpinNeedsPremises).length;
       countsEl.innerHTML =
-        '<div class="count"><div class="dot red"></div><strong>' + red + '</strong><span class="label">Red, my CPINs</span></div>' +
-        '<div class="count"><div class="dot amber"></div><strong>' + amber + '</strong><span class="label">Amber, my CPINs</span></div>' +
-        '<div class="count"><div class="dot green"></div><strong>' + green + '</strong><span class="label">Green, my CPINs</span></div>' +
-        '<div class="count" style="margin-left:32px;"><strong>' + unassigned.length + '</strong><span class="label">Unassigned</span></div>' +
-        (premisesNeeded ? '<div class="count" style="margin-left:16px;"><strong>' + premisesNeeded + '</strong><span class="label">Premises needed</span></div>' : '');
+        '<div class="count"><div class="dot red"></div><strong>' + red + '</strong><span class="label">Red</span></div>' +
+        '<div class="count"><div class="dot amber"></div><strong>' + amber + '</strong><span class="label">Amber</span></div>' +
+        '<div class="count"><div class="dot green"></div><strong>' + green + '</strong><span class="label">Green</span></div>' +
+        '<div class="count count--spaced"><strong>' + unassigned.length + '</strong><span class="label">Unassigned</span></div>' +
+        (premisesNeeded ? '<div class="count count--spaced-sm"><strong>' + premisesNeeded + '</strong><span class="label">Premises needed</span></div>' : '');
     }
   }
 
