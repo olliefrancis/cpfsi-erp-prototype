@@ -1652,7 +1652,8 @@
   }
   .premises-audit-banner strong { font-size: 15px; }
   #audit-float-bar,
-  #cpin-float-bar {
+  #cpin-float-bar,
+  #global-float-bar {
     position: fixed;
     left: 0;
     right: 0;
@@ -1664,7 +1665,8 @@
     box-shadow: 0 -4px 24px rgba(11, 12, 12, 0.1);
   }
   body.audit-activity-bar #audit-float-bar,
-  body.cpin-activity-bar #cpin-float-bar {
+  body.cpin-activity-bar #cpin-float-bar,
+  body.global-activity-bar #global-float-bar {
     display: flex;
   }
   .audit-float-panel {
@@ -1754,12 +1756,14 @@
   }
   body.audit-activity-bar #audit > main,
   body.audit-activity-bar #auditsetup > main,
-  body.cpin-activity-bar #cpin > main {
+  body.cpin-activity-bar #cpin > main,
+  body.global-activity-bar .screen.active > main {
     padding-bottom: 72px;
   }
   body.audit-float-panel-open #audit > main,
   body.audit-float-panel-open #auditsetup > main,
-  body.cpin-float-panel-open #cpin > main {
+  body.cpin-float-panel-open #cpin > main,
+  body.global-float-panel-open .screen.active > main {
     padding-bottom: min(400px, 55vh);
   }
 
@@ -4100,12 +4104,14 @@
     }
     body.audit-activity-bar #audit > main,
     body.audit-activity-bar #auditsetup > main,
-    body.cpin-activity-bar #cpin > main {
+    body.cpin-activity-bar #cpin > main,
+    body.global-activity-bar .screen.active > main {
       padding-bottom: 168px;
     }
     body.audit-float-panel-open #audit > main,
     body.audit-float-panel-open #auditsetup > main,
-    body.cpin-float-panel-open #cpin > main {
+    body.cpin-float-panel-open #cpin > main,
+    body.global-float-panel-open .screen.active > main {
       padding-bottom: min(520px, 78vh);
     }
     #audit .audit-recent-on-audit,
@@ -4419,7 +4425,7 @@
         <span class="user-menu-chevron" aria-hidden="true">▾</span>
       </button>
       <div class="user-menu" id="user-menu" hidden role="menu" aria-label="Account menu">
-        <button type="button" role="menuitem" onclick="closeUserMenu();show('time')">Log time</button>
+        <button type="button" role="menuitem" onclick="closeUserMenu();show('time')">Time log</button>
         <button type="button" role="menuitem" onclick="openCpinReportFromMenu()">Submit CPIN</button>
         <button type="button" role="menuitem" onclick="closeUserMenu();show('admin')">Admin and settings</button>
         <button type="button" role="menuitem" onclick="resetPrototypeData()">Reset prototype</button>
@@ -6596,6 +6602,58 @@
   </div>
 </div>
 
+<!-- Floating activity bar (dashboard, list views, and other general pages — time only) -->
+<div id="global-float-bar">
+  <div class="audit-float-panel" id="global-float-panel" aria-hidden="true">
+    <div id="global-float-log-content">
+      <div class="audit-float-panel-hd">
+        <strong>Log time</strong>
+        <button type="button" class="btn" onclick="closeGlobalFloatPanel()">Close</button>
+      </div>
+      <div id="global-log-fields-time">
+        <div class="audit-quick-log">
+          <div>
+            <label>What for</label>
+            <select id="global-time-what"></select>
+          </div>
+          <div>
+            <label>Activity</label>
+            <select id="global-time-activity"></select>
+          </div>
+          <div>
+            <label>Duration</label>
+            <select id="global-time-duration">
+              <option value="15">15m</option>
+              <option value="30">30m</option>
+              <option value="45">45m</option>
+              <option value="60">1h</option>
+              <option value="90" selected>1h 30m</option>
+              <option value="120">2h</option>
+              <option value="180">3h</option>
+              <option value="240">Half day (4h)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="global-float-log-hint" style="font-size:11px;color:var(--ink-3);margin-top:8px;"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
+        <button class="btn primary" type="button" onclick="submitGlobalTimeLog()">Save log</button>
+      </div>
+    </div>
+  </div>
+  <div class="audit-float-bar-strip">
+    <strong class="audit-float-bar-title" style="font-size:13px;color:var(--ink);">Time</strong>
+    <div class="counts">
+      <span id="global-count-time">21.5h logged this week</span>
+    </div>
+    <div class="actions">
+      <div class="actions-primary">
+        <button class="btn" type="button" onclick="openGlobalFloatPanel()">+ Log time</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- =========================================================
      + NEW QUICK-CREATE MODAL
      Everything CPFSI can create themselves. CPINs are excluded
@@ -7066,7 +7124,6 @@
       initAuditActivity();
       renderAuditFindings();
       updateAuditEditWarning();
-      setAuditActivityBarVisible(true);
       return;
     }
 
@@ -7087,7 +7144,6 @@
       auditStage = 1;
       initAuditSetupPage();
       initAuditActivity();
-      setAuditActivityBarVisible(true);
     }
     if (screen === 'cpins') initCpinsPage();
     if (screen === 'processes') initProcessesPage();
@@ -7136,17 +7192,7 @@
     updateNavMoreActive();
     requestAnimationFrame(layoutResponsiveNav);
 
-    if (id === 'audit' || id === 'auditsetup') {
-      setAuditActivityBarVisible(true);
-    } else {
-      closeAuditFloatPanel();
-      setAuditActivityBarVisible(false);
-    }
-
-    if (id !== 'cpin') {
-      closeCpinFloatPanel();
-      setCpinActivityBarVisible(false);
-    }
+    updateActivityBarForScreen(id);
 
     window.scrollTo(0, 0);
   }
@@ -8049,6 +8095,142 @@
       });
     }
     renderPremisesList();
+  }
+
+  const GLOBAL_TIME_LOG_KEY = 'global-time-log-v1';
+  const GLOBAL_TIME_BASELINE_MINUTES = 1290;
+  const GLOBAL_TIME_WHAT_OPTIONS = [
+    'Process: A-2026-0314  ·  Temple Quay House audit',
+    'Premises: HMP Lewes',
+    'Premises: Maidstone Magistrates Court',
+    'General admin / non-premises'
+  ];
+  const GLOBAL_TIME_ACTIVITY_OPTIONS = [
+    'Site visit',
+    'Desk-based investigation',
+    'Letter drafting',
+    'Meeting',
+    'Phone call',
+    'Travel',
+    'General admin'
+  ];
+
+  let globalTimeLog = [];
+
+  function loadGlobalTimeLog() {
+    try {
+      globalTimeLog = JSON.parse(localStorage.getItem(GLOBAL_TIME_LOG_KEY) || '[]');
+    } catch (e) {
+      globalTimeLog = [];
+    }
+  }
+
+  function saveGlobalTimeLog() {
+    localStorage.setItem(GLOBAL_TIME_LOG_KEY, JSON.stringify(globalTimeLog));
+  }
+
+  function globalTimeLogTotalMinutes() {
+    return GLOBAL_TIME_BASELINE_MINUTES + globalTimeLog.reduce(function (s, t) {
+      return s + (t.minutes || 0);
+    }, 0);
+  }
+
+  function initGlobalTimeActivityFields() {
+    const what = document.getElementById('global-time-what');
+    const act = document.getElementById('global-time-activity');
+    if (what && !what.options.length) {
+      what.innerHTML = GLOBAL_TIME_WHAT_OPTIONS.map(function (o, i) {
+        return '<option value="' + escHtml(o) + '"' + (i === 0 ? ' selected' : '') + '>' + escHtml(o) + '</option>';
+      }).join('');
+    }
+    if (act && !act.options.length) {
+      act.innerHTML = GLOBAL_TIME_ACTIVITY_OPTIONS.map(function (o, i) {
+        return '<option value="' + escHtml(o) + '"' + (i === 0 ? ' selected' : '') + '>' + escHtml(o) + '</option>';
+      }).join('');
+    }
+    const hint = document.getElementById('global-float-log-hint');
+    if (hint) hint.textContent = 'Logged against Phil Gower. Date defaults to today.';
+  }
+
+  function renderGlobalTimeActivity() {
+    initGlobalTimeActivityFields();
+    const timeEl = document.getElementById('global-count-time');
+    if (timeEl) {
+      timeEl.textContent = formatAuditMinutes(globalTimeLogTotalMinutes()) + ' logged this week';
+    }
+  }
+
+  function setGlobalActivityBarVisible(visible) {
+    document.body.classList.toggle('global-activity-bar', visible);
+    if (!visible) document.body.classList.remove('global-float-panel-open');
+  }
+
+  function updateActivityBarForScreen(screenId) {
+    closeGlobalFloatPanel();
+    closeAuditFloatPanel();
+    closeCpinFloatPanel();
+
+    if (screenId === 'login') {
+      setAuditActivityBarVisible(false);
+      setCpinActivityBarVisible(false);
+      setGlobalActivityBarVisible(false);
+      return;
+    }
+    if (screenId === 'audit' || screenId === 'auditsetup') {
+      setGlobalActivityBarVisible(false);
+      setCpinActivityBarVisible(false);
+      setAuditActivityBarVisible(true);
+      return;
+    }
+    if (screenId === 'cpin') {
+      setGlobalActivityBarVisible(false);
+      setAuditActivityBarVisible(false);
+      return;
+    }
+    setAuditActivityBarVisible(false);
+    setCpinActivityBarVisible(false);
+    setGlobalActivityBarVisible(true);
+    loadGlobalTimeLog();
+    renderGlobalTimeActivity();
+  }
+
+  function openGlobalFloatPanel() {
+    const panel = document.getElementById('global-float-panel');
+    if (!panel) return;
+    setGlobalActivityBarVisible(true);
+    initGlobalTimeActivityFields();
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('global-float-panel-open');
+    requestAnimationFrame(function () { document.getElementById('global-time-duration')?.focus(); });
+  }
+
+  function closeGlobalFloatPanel() {
+    const panel = document.getElementById('global-float-panel');
+    if (panel) {
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+    document.body.classList.remove('global-float-panel-open');
+  }
+
+  function submitGlobalTimeLog() {
+    const durEl = document.getElementById('global-time-duration');
+    const actEl = document.getElementById('global-time-activity');
+    const whatEl = document.getElementById('global-time-what');
+    if (!durEl || !actEl || !whatEl) return;
+    const stamp = cpinLogTimestamp();
+    globalTimeLog.unshift({
+      id: 'gt' + stamp.ts,
+      what: whatEl.value,
+      activity: actEl.value,
+      minutes: parseInt(durEl.value, 10),
+      at: stamp.at,
+      ts: stamp.ts
+    });
+    saveGlobalTimeLog();
+    renderGlobalTimeActivity();
+    closeGlobalFloatPanel();
   }
 
   function setAuditActivityBarVisible(visible) {
@@ -10998,6 +11180,8 @@
         closeAuditFloatPanel();
       } else if (document.getElementById('cpin-float-panel')?.classList.contains('open')) {
         closeCpinFloatPanel();
+      } else if (document.getElementById('global-float-panel')?.classList.contains('open')) {
+        closeGlobalFloatPanel();
       } else if (document.getElementById('letter-composer-modal')?.classList.contains('open')) {
         closeLetterComposer();
       } else if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
