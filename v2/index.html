@@ -1126,6 +1126,30 @@
     color: var(--ink-3);
     margin-top: 4px;
   }
+  .cpin-list-head {
+    display: grid;
+    grid-template-columns: 76px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 8px 16px;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .cpin-list-head .cpin-head-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    align-items: center;
+  }
+  .cpin-list-head[hidden] { display: none; }
+  @media (max-width: 840px) {
+    .cpin-list-head { display: none; }
+  }
+
   .cpin-card .cpin-assignee {
     font-size: 12px;
     color: var(--ink-2);
@@ -4608,12 +4632,13 @@
         <span class="list-results-seg">
           <span class="list-results-label">Sort by</span>
           <span class="list-control-dropdown" id="premises-sort-dropdown">
-            <button type="button" class="list-control-trigger" id="premises-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button>
+            <button type="button" class="list-control-trigger" id="premises-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>RBIP score (high first)</strong> ▾</button>
             <div class="list-control-menu" id="premises-sort-menu" role="listbox" hidden>
-              <button type="button" class="list-control-option on" role="option" data-premises-sort="worst">Worst score first</button>
-              <button type="button" class="list-control-option" role="option" data-premises-sort="best">Best score first</button>
-              <button type="button" class="list-control-option" role="option" data-premises-sort="name">Name A–Z</button>
-              <button type="button" class="list-control-option" role="option" data-premises-sort="audit">Most recent audit</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="name">Premises</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="type">Type</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="dept">Department</button>
+              <button type="button" class="list-control-option on" role="option" data-premises-sort="score">RBIP score</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="audit">Last audit</button>
             </div>
           </span>
         </span>
@@ -5244,15 +5269,27 @@
             <span class="list-results-seg">
               <span class="list-results-label">Sort by</span>
               <span class="list-control-dropdown" id="cpin-sort-dropdown">
-                <button type="button" class="list-control-trigger" id="cpin-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Most recent first</strong> ▾</button>
+                <button type="button" class="list-control-trigger" id="cpin-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Received (newest)</strong> ▾</button>
                 <div class="list-control-menu" id="cpin-sort-menu" role="listbox" hidden>
-                  <button type="button" class="list-control-option on" role="option" data-cpin-sort="recent">Most recent first</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-sort="severity">Severity first</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-sort="name">Premises A–Z</button>
+                  <button type="button" class="list-control-option on" role="option" data-cpin-sort="when">Received</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="severity">Severity</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="premises">Premises</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="assignee">Assignee</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="status">Status</button>
                 </div>
               </span>
             </span>
           </div>
+        </div>
+
+        <div class="cpin-list-head" id="cpin-list-head">
+          <div class="cpin-head-severity"><button type="button" class="list-header-sort" data-cpin-col="severity">Severity <span class="sort-ind">↕</span></button></div>
+          <div class="cpin-head-body">
+            <button type="button" class="list-header-sort is-active" data-cpin-col="when">Received <span class="sort-ind">↑</span></button>
+            <button type="button" class="list-header-sort" data-cpin-col="premises">Premises <span class="sort-ind">↕</span></button>
+            <button type="button" class="list-header-sort" data-cpin-col="status">Status <span class="sort-ind">↕</span></button>
+          </div>
+          <div class="cpin-head-meta"><button type="button" class="list-header-sort" data-cpin-col="assignee">Assignee <span class="sort-ind">↕</span></button></div>
         </div>
 
         <div id="cpins-panel-list" class="cpins-panel" data-cpin-panel="list"></div>
@@ -5881,15 +5918,14 @@
             <span class="list-results-seg">
               <span class="list-results-label">Sort by</span>
               <span class="list-control-dropdown" id="process-sort-dropdown">
-                <button type="button" class="list-control-trigger" id="process-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button>
+                <button type="button" class="list-control-trigger" id="process-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Score (high first)</strong> ▾</button>
                 <div class="list-control-menu" id="process-sort-menu" role="listbox" hidden>
-                  <button type="button" class="list-control-option on" role="option" data-process-sort="worst">Worst score first</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="best">Best score first</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="name">Premises A–Z</button>
                   <button type="button" class="list-control-option" role="option" data-process-sort="type">Type</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="owner">Owner A–Z</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="age">Oldest first</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="status">Status</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="premises">Premises</button>
+                  <button type="button" class="list-control-option on" role="option" data-process-sort="score">Score</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="status">Stage / status</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="owner">Owner</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="age">Age</button>
                 </div>
               </span>
             </span>
@@ -7184,64 +7220,119 @@
     { id: 'A-2026-0275', type: 'audit', premises: 'HMCTS Guildford', score: 24, scoreClass: 'score-low', status: 'closed', statusText: 'Closed  ·  30 May 2026', owner: 'Hannah Munro', ownerInitials: 'HM', age: '3 weeks', mine: false, patch: false }
   ];
 
-  const LIST_SORT_OPTIONS = [
-    { id: 'worst', label: 'Worst score first' },
-    { id: 'best', label: 'Best score first' },
-    { id: 'name', label: 'Name A–Z' }
+  const PREMISES_SORT_COLUMNS = [
+    { id: 'name', label: 'Premises', defaultDir: 'asc' },
+    { id: 'type', label: 'Type', defaultDir: 'asc' },
+    { id: 'dept', label: 'Department', defaultDir: 'asc' },
+    { id: 'score', label: 'RBIP score', defaultDir: 'desc' },
+    { id: 'audit', label: 'Last audit', defaultDir: 'desc' }
+  ];
+
+  const CPIN_SORT_COLUMNS = [
+    { id: 'when', label: 'Received', defaultDir: 'asc' },
+    { id: 'severity', label: 'Severity', defaultDir: 'asc' },
+    { id: 'premises', label: 'Premises', defaultDir: 'asc' },
+    { id: 'assignee', label: 'Assignee', defaultDir: 'asc' },
+    { id: 'status', label: 'Status', defaultDir: 'asc' }
+  ];
+
+  const PROCESS_SORT_COLUMNS = [
+    { id: 'type', label: 'Type', defaultDir: 'asc' },
+    { id: 'premises', label: 'Premises', defaultDir: 'asc' },
+    { id: 'score', label: 'Score', defaultDir: 'desc' },
+    { id: 'status', label: 'Stage / status', defaultDir: 'asc' },
+    { id: 'owner', label: 'Owner', defaultDir: 'asc' },
+    { id: 'age', label: 'Age', defaultDir: 'desc' }
   ];
 
   let processesTypeFilter = 'all';
   let processesStatusFilter = 'all';
   let processesActiveView = 'Open and mine';
-  let processesSortMode = 'worst';
+  let processesSort = { column: 'score', dir: 'desc' };
 
-  function getListSortLabel(mode) {
-    return (LIST_SORT_OPTIONS.find(o => o.id === mode) || LIST_SORT_OPTIONS[0]).label;
+  function listSortDefaultDir(columns, columnId) {
+    const col = columns.find(function (c) { return c.id === columnId; });
+    return col ? col.defaultDir : 'asc';
   }
 
-  function sortByListMode(items, mode, scoreKey, nameKey) {
-    const sorted = items.slice();
-    if (mode === 'worst') {
-      sorted.sort((a, b) => {
-        const sa = a[scoreKey] == null ? -1 : a[scoreKey];
-        const sb = b[scoreKey] == null ? -1 : b[scoreKey];
-        return sb - sa;
-      });
-    } else if (mode === 'best') {
-      sorted.sort((a, b) => {
-        const sa = a[scoreKey] == null ? 999 : a[scoreKey];
-        const sb = b[scoreKey] == null ? 999 : b[scoreKey];
-        return sa - sb;
-      });
-    } else if (mode === 'name') {
-      sorted.sort((a, b) => String(a[nameKey]).localeCompare(String(b[nameKey])));
+  function listSortTriggerLabel(sortSpec, columns) {
+    const col = columns.find(function (c) { return c.id === sortSpec.column; }) || columns[0];
+    if (!col) return 'Sort';
+    if (col.id === 'score') {
+      return col.label + (sortSpec.dir === 'desc' ? ' (high first)' : ' (low first)');
     }
+    if (col.id === 'when') {
+      return col.label + (sortSpec.dir === 'asc' ? ' (newest)' : ' (oldest)');
+    }
+    if (col.id === 'severity') {
+      return col.label + (sortSpec.dir === 'asc' ? ' (worst first)' : ' (best first)');
+    }
+    if (col.id === 'age') {
+      return col.label + (sortSpec.dir === 'desc' ? ' (oldest)' : ' (newest)');
+    }
+    if (col.id === 'audit') {
+      return col.label + (sortSpec.dir === 'desc' ? ' (recent)' : ' (oldest)');
+    }
+    return col.label + (sortSpec.dir === 'asc' ? ' A–Z' : ' Z–A');
+  }
+
+  function syncListSortDropdown(dropdownId, sortSpec, columns, dataAttr) {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+    const trigger = dropdown.querySelector('.list-control-trigger strong');
+    if (trigger) trigger.textContent = listSortTriggerLabel(sortSpec, columns);
+    dropdown.querySelectorAll('.list-control-option').forEach(function (o) {
+      const col = o.getAttribute('data-' + dataAttr);
+      o.classList.toggle('on', col === sortSpec.column);
+    });
+  }
+
+  function syncListSortHeaders(headerAttr, sortSpec) {
+    document.querySelectorAll('[' + headerAttr + ']').forEach(function (btn) {
+      const col = btn.getAttribute(headerAttr);
+      const active = col === sortSpec.column;
+      btn.classList.toggle('is-active', active);
+      const ind = btn.querySelector('.sort-ind');
+      if (ind) ind.textContent = active ? (sortSpec.dir === 'asc' ? '↑' : '↓') : '↕';
+    });
+  }
+
+  function applyListSortFromHeader(sortSpec, columns, columnId) {
+    if (sortSpec.column === columnId) {
+      sortSpec.dir = sortSpec.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortSpec.column = columnId;
+      sortSpec.dir = listSortDefaultDir(columns, columnId);
+    }
+  }
+
+  function applyListSortFromDropdown(sortSpec, columns, columnId) {
+    sortSpec.column = columnId;
+    sortSpec.dir = listSortDefaultDir(columns, columnId);
+  }
+
+  function normalizeLegacyProcessSort(saved) {
+    if (saved && typeof saved === 'object' && saved.column) return saved;
+    const map = {
+      worst: { column: 'score', dir: 'desc' },
+      best: { column: 'score', dir: 'asc' },
+      name: { column: 'premises', dir: 'asc' },
+      type: { column: 'type', dir: 'asc' },
+      owner: { column: 'owner', dir: 'asc' },
+      age: { column: 'age', dir: 'desc' },
+      status: { column: 'status', dir: 'asc' }
+    };
+    return map[saved] || { column: 'score', dir: 'desc' };
+  }
+
+  function sortListWithSpec(items, spec, compareForColumn) {
+    const sorted = items.slice();
+    const cmp = compareForColumn[spec.column];
+    if (!cmp) return sorted;
+    const dir = spec.dir === 'asc' ? 1 : -1;
+    sorted.sort(function (a, b) { return cmp(a, b) * dir; });
     return sorted;
   }
-
-  function syncListSortTrigger(id, mode) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = '<strong>' + getListSortLabel(mode) + '</strong> ▾';
-  }
-
-  function cycleListSort(mode) {
-    const idx = LIST_SORT_OPTIONS.findIndex(o => o.id === mode);
-    return LIST_SORT_OPTIONS[(idx + 1) % LIST_SORT_OPTIONS.length].id;
-  }
-
-  const PREMISES_SORT_OPTIONS = [
-    { id: 'worst', label: 'Worst score first' },
-    { id: 'best', label: 'Best score first' },
-    { id: 'name', label: 'Name A–Z' },
-    { id: 'audit', label: 'Most recent audit' }
-  ];
-
-  const CPIN_SORT_OPTIONS = [
-    { id: 'recent', label: 'Most recent first' },
-    { id: 'severity', label: 'Severity first' },
-    { id: 'name', label: 'Premises A–Z' }
-  ];
 
   function closeAllListControlMenus(exceptMenu) {
     document.querySelectorAll('.list-control-menu').forEach(function (menu) {
@@ -7327,22 +7418,26 @@
     return matchesDateFilter(parseDemoAgeDays(p.age), processesDateFilter);
   }
 
+  function sortProcesses(items, spec) {
+    return sortListWithSpec(items, spec, {
+      type: function (a, b) { return a.type.localeCompare(b.type); },
+      premises: function (a, b) { return String(a.premises).localeCompare(String(b.premises)); },
+      score: function (a, b) {
+        const sa = a.score == null ? -1 : a.score;
+        const sb = b.score == null ? -1 : b.score;
+        return sa - sb;
+      },
+      status: function (a, b) { return a.statusText.localeCompare(b.statusText); },
+      owner: function (a, b) { return a.owner.localeCompare(b.owner); },
+      age: function (a, b) { return parseDemoAgeDays(a.age) - parseDemoAgeDays(b.age); }
+    });
+  }
+
   function getFilteredProcesses() {
-    let items = PROCESSES_LIST.filter(function (p) {
+    const items = PROCESSES_LIST.filter(function (p) {
       return processMatchesType(p) && processMatchesStatus(p) && processMatchesView(p) && processMatchesDate(p);
     });
-    if (processesSortMode === 'type') {
-      items.sort(function (a, b) { return a.type.localeCompare(b.type); });
-    } else if (processesSortMode === 'owner') {
-      items.sort(function (a, b) { return a.owner.localeCompare(b.owner); });
-    } else if (processesSortMode === 'age') {
-      items.sort(function (a, b) { return parseDemoAgeDays(a.age) - parseDemoAgeDays(b.age); });
-    } else if (processesSortMode === 'status') {
-      items.sort(function (a, b) { return a.status.localeCompare(b.status); });
-    } else {
-      items = sortByListMode(items, processesSortMode, 'score', 'premises');
-    }
-    return items;
+    return sortProcesses(items, processesSort);
   }
 
   function countProcessesForView(view) {
@@ -7383,17 +7478,14 @@
     </div>`;
   }
 
-  function syncProcessSortDropdown() {
-    syncListControlDropdown('process-sort-dropdown', processesSortMode, 'process-sort');
-    const headerCol = processesSortMode === 'name' ? 'premises' : processesSortMode === 'score' || processesSortMode === 'worst' || processesSortMode === 'best' ? 'score' : processesSortMode;
-    document.querySelectorAll('[data-proc-sort]').forEach(function (btn) {
-      btn.classList.toggle('is-active', btn.dataset.procSort === headerCol);
-    });
+  function syncProcessSortUI() {
+    syncListSortDropdown('process-sort-dropdown', processesSort, PROCESS_SORT_COLUMNS, 'process-sort');
+    syncListSortHeaders('data-proc-sort', processesSort);
   }
 
-  function setProcessSort(mode) {
-    processesSortMode = mode;
-    syncProcessSortDropdown();
+  function setProcessSort(column) {
+    applyListSortFromDropdown(processesSort, PROCESS_SORT_COLUMNS, column);
+    syncProcessSortUI();
     renderProcessesList();
   }
 
@@ -7403,7 +7495,7 @@
     if (!body) return;
     const items = getFilteredProcesses();
     if (countEl) countEl.textContent = String(items.length);
-    syncProcessSortDropdown();
+    syncProcessSortUI();
     syncListControlDropdown('process-date-dropdown', processesDateFilter, 'process-date');
     if (!items.length) {
       body.innerHTML = '<div class="proc-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No processes match your filters.</div>';
@@ -7411,11 +7503,6 @@
       body.innerHTML = items.map(renderProcessRow).join('');
     }
     updateProcessViewCounts();
-  }
-
-  function cycleProcessSort() {
-    processesSortMode = cycleListSort(processesSortMode);
-    renderProcessesList();
   }
 
   function setProcessTypeFilter(type) {
@@ -7552,7 +7639,7 @@
 
   let premisesScopeFilter = 'patch';
   let premisesTypeFilter = null;
-  let premisesSortMode = 'worst';
+  let premisesSort = { column: 'score', dir: 'desc' };
 
   function premisesMatchesScope(p) {
     return premisesScopeFilter === 'all' || p.patch;
@@ -7566,31 +7653,30 @@
     return matchesDateFilter(p.daysSinceAudit != null ? p.daysSinceAudit : 180, premisesDateFilter);
   }
 
-  function sortPremises(items, mode) {
-    const sorted = items.slice();
-    if (mode === 'audit') {
-      sorted.sort(function (a, b) {
-        return (b.lastAuditSort || 0) - (a.lastAuditSort || 0);
-      });
-    } else {
-      return sortByListMode(sorted, mode, 'score', 'name');
-    }
-    return sorted;
+  function sortPremises(items, spec) {
+    return sortListWithSpec(items, spec, {
+      name: function (a, b) { return String(a.name).localeCompare(String(b.name)); },
+      type: function (a, b) { return String(a.typeLabel).localeCompare(String(b.typeLabel)); },
+      dept: function (a, b) { return String(a.dept).localeCompare(String(b.dept)); },
+      score: function (a, b) {
+        const sa = a.score == null ? -1 : a.score;
+        const sb = b.score == null ? -1 : b.score;
+        return sa - sb;
+      },
+      audit: function (a, b) { return (a.lastAuditSort || 0) - (b.lastAuditSort || 0); }
+    });
   }
 
   function getFilteredPremises() {
     const filtered = PREMISES_LIST.filter(function (p) {
       return premisesMatchesScope(p) && premisesMatchesType(p) && premisesMatchesDate(p);
     });
-    return sortPremises(filtered, premisesSortMode);
+    return sortPremises(filtered, premisesSort);
   }
 
-  function syncPremisesSortDropdown() {
-    syncListControlDropdown('premises-sort-dropdown', premisesSortMode, 'premises-sort');
-    const headerCol = premisesSortMode === 'name' ? 'name' : premisesSortMode === 'audit' ? 'audit' : 'score';
-    document.querySelectorAll('[data-prem-sort]').forEach(function (btn) {
-      btn.classList.toggle('is-active', btn.dataset.premSort === headerCol);
-    });
+  function syncPremisesSortUI() {
+    syncListSortDropdown('premises-sort-dropdown', premisesSort, PREMISES_SORT_COLUMNS, 'premises-sort');
+    syncListSortHeaders('data-prem-sort', premisesSort);
   }
 
   function renderPremRow(p) {
@@ -7619,7 +7705,7 @@
     if (!body) return;
     const items = getFilteredPremises();
     if (countEl) countEl.textContent = String(items.length);
-    syncPremisesSortDropdown();
+    syncPremisesSortUI();
     syncListControlDropdown('premises-date-dropdown', premisesDateFilter, 'premises-date');
     if (!items.length) {
       body.innerHTML = '<div class="prem-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No premises match your filters.</div>';
@@ -7628,9 +7714,9 @@
     }
   }
 
-  function setPremisesSort(mode) {
-    premisesSortMode = mode;
-    syncPremisesSortDropdown();
+  function setPremisesSort(column) {
+    applyListSortFromDropdown(premisesSort, PREMISES_SORT_COLUMNS, column);
+    syncPremisesSortUI();
     renderPremisesList();
   }
 
@@ -7655,7 +7741,7 @@
   let processesDateFilter = 'all';
   let premisesDateFilter = 'all';
   let cpinsDateFilter = 'all';
-  let cpinsSortMode = 'recent';
+  let cpinsSort = { column: 'when', dir: 'asc' };
   let processPinnedViews = JSON.parse(localStorage.getItem('process-pinned-views') || '[]');
 
   function parseDemoAgeDays(age) {
@@ -7736,7 +7822,7 @@
       'Type: ' + processesTypeFilter,
       'Status: ' + processesStatusFilter,
       'Date: ' + processesDateFilter,
-      'Sort: ' + getListSortLabel(processesSortMode)
+      'Sort: ' + listSortTriggerLabel(processesSort, PROCESS_SORT_COLUMNS)
     ];
     if (summary) summary.textContent = parts.join('  ·  ');
     document.getElementById('save-view-name').value = '';
@@ -7763,7 +7849,7 @@
       type: processesTypeFilter,
       status: processesStatusFilter,
       date: processesDateFilter,
-      sort: processesSortMode
+      sort: { column: processesSort.column, dir: processesSort.dir }
     });
     localStorage.setItem('process-pinned-views', JSON.stringify(processPinnedViews));
     renderProcessPinnedViews();
@@ -7786,13 +7872,12 @@
     processesTypeFilter = v.type;
     processesStatusFilter = v.status;
     processesDateFilter = v.date;
-    processesSortMode = v.sort;
+    processesSort = normalizeLegacyProcessSort(v.sort);
     selectProcessView(v.view);
     setProcessTypeFilter(v.type);
     setProcessStatusFilter(v.status);
     setProcessDateFilter(v.date);
-    processesSortMode = v.sort;
-    syncProcessSortDropdown();
+    syncProcessSortUI();
     renderProcessesList();
   }
 
@@ -7815,22 +7900,21 @@
   }
 
   function setProcessHeaderSort(col) {
-    if (col === 'score') processesSortMode = processesSortMode === 'worst' ? 'best' : 'worst';
-    else if (col === 'premises') processesSortMode = 'name';
-    else if (col === 'type') processesSortMode = 'type';
-    else if (col === 'status') processesSortMode = 'status';
-    else if (col === 'owner') processesSortMode = 'owner';
-    else if (col === 'age') processesSortMode = 'age';
-    syncProcessSortDropdown();
+    applyListSortFromHeader(processesSort, PROCESS_SORT_COLUMNS, col);
+    syncProcessSortUI();
     renderProcessesList();
   }
 
   function setPremisesHeaderSort(col) {
-    if (col === 'score') premisesSortMode = premisesSortMode === 'worst' ? 'best' : 'worst';
-    else if (col === 'name') premisesSortMode = 'name';
-    else if (col === 'audit') premisesSortMode = 'audit';
-    syncPremisesSortDropdown();
+    applyListSortFromHeader(premisesSort, PREMISES_SORT_COLUMNS, col);
+    syncPremisesSortUI();
     renderPremisesList();
+  }
+
+  function setCpinHeaderSort(col) {
+    applyListSortFromHeader(cpinsSort, CPIN_SORT_COLUMNS, col);
+    syncCpinSortUI();
+    renderCpinsLists();
   }
 
   function initPremisesPage() {
@@ -8781,35 +8865,24 @@
     return { red: 0, amber: 1, green: 2 }[severity] ?? 3;
   }
 
-  function sortCpinsBySeverity(items) {
-    return sortCpinItems(items, 'severity');
+  function sortCpins(items, spec) {
+    return sortListWithSpec(items, spec, {
+      when: function (a, b) { return parseCpinWhenDays(a.when) - parseCpinWhenDays(b.when); },
+      severity: function (a, b) { return cpinSeverityRank(a.severity) - cpinSeverityRank(b.severity); },
+      premises: function (a, b) { return String(a.premises || '').localeCompare(String(b.premises || '')); },
+      assignee: function (a, b) { return String(a.assignee || '\uffff').localeCompare(String(b.assignee || '\uffff')); },
+      status: function (a, b) { return String(cpinRowStatusLabel(a)).localeCompare(String(cpinRowStatusLabel(b))); }
+    });
   }
 
-  function sortCpinItems(items, mode) {
-    const sorted = items.slice();
-    if (mode === 'recent') {
-      sorted.sort(function (a, b) {
-        return parseCpinWhenDays(a.when) - parseCpinWhenDays(b.when);
-      });
-    } else if (mode === 'name') {
-      sorted.sort(function (a, b) {
-        return String(a.premises || '').localeCompare(String(b.premises || ''));
-      });
-    } else {
-      sorted.sort(function (a, b) {
-        return cpinSeverityRank(a.severity) - cpinSeverityRank(b.severity);
-      });
-    }
-    return sorted;
+  function syncCpinSortUI() {
+    syncListSortDropdown('cpin-sort-dropdown', cpinsSort, CPIN_SORT_COLUMNS, 'cpin-sort');
+    syncListSortHeaders('data-cpin-col', cpinsSort);
   }
 
-  function syncCpinSortDropdown() {
-    syncListControlDropdown('cpin-sort-dropdown', cpinsSortMode, 'cpin-sort');
-  }
-
-  function setCpinSort(mode) {
-    cpinsSortMode = mode;
-    syncCpinSortDropdown();
+  function setCpinSort(column) {
+    applyListSortFromDropdown(cpinsSort, CPIN_SORT_COLUMNS, column);
+    syncCpinSortUI();
     renderCpinsLists();
   }
 
@@ -9387,8 +9460,8 @@
   }
 
   function renderCpinCardsHtml(items) {
-    const pinned = sortCpinItems(items.filter(i => cpinPins.has(i.id)), cpinsSortMode);
-    const rest = sortCpinItems(items.filter(i => !cpinPins.has(i.id)), cpinsSortMode);
+    const pinned = sortCpins(items.filter(i => cpinPins.has(i.id)), cpinsSort);
+    const rest = sortCpins(items.filter(i => !cpinPins.has(i.id)), cpinsSort);
     let html = '';
 
     if (pinned.length) {
@@ -9508,8 +9581,10 @@
   }
 
   function renderCpinsLists() {
-    syncCpinSortDropdown();
+    syncCpinSortUI();
     syncListControlDropdown('cpin-date-dropdown', cpinsDateFilter, 'cpin-date');
+    const cpinHead = document.getElementById('cpin-list-head');
+    if (cpinHead) cpinHead.hidden = cpinsActiveTab === 'closed';
     if (cpinsActiveTab === 'closed') {
       renderCompletedCpins();
     } else {
@@ -9598,6 +9673,9 @@
       });
       initListControlDropdown('cpin-date-dropdown', setCpinDateFilter);
       initListControlDropdown('cpin-sort-dropdown', setCpinSort);
+      document.querySelectorAll('[data-cpin-col]').forEach(function (btn) {
+        btn.addEventListener('click', function () { setCpinHeaderSort(btn.dataset.cpinCol); });
+      });
       if (!document.body.dataset.cpinViewBound) {
         document.body.dataset.cpinViewBound = '1';
         document.addEventListener('mousedown', function (e) {
