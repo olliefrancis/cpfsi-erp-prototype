@@ -1019,6 +1019,12 @@
     color: var(--ink-2);
     flex-shrink: 0;
   }
+  .cpin-activity-filters-bar {
+    margin: 0 0 12px;
+  }
+  .cpin-activity-filters-bar .filter-group {
+    margin-bottom: 0;
+  }
 
   /* CPIN page */
   .cpin-tabs {
@@ -1126,30 +1132,6 @@
     color: var(--ink-3);
     margin-top: 4px;
   }
-  .cpin-list-head {
-    display: grid;
-    grid-template-columns: 76px 1fr auto;
-    gap: 16px;
-    align-items: center;
-    padding: 8px 16px;
-    margin-bottom: 4px;
-    font-size: 11px;
-    color: var(--ink-3);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-  }
-  .cpin-list-head .cpin-head-body {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 20px;
-    align-items: center;
-  }
-  .cpin-list-head[hidden] { display: none; }
-  @media (max-width: 840px) {
-    .cpin-list-head { display: none; }
-  }
-
   .cpin-card .cpin-assignee {
     font-size: 12px;
     color: var(--ink-2);
@@ -1771,10 +1753,12 @@
     color: var(--ink-2);
   }
   body.audit-activity-bar #audit > main,
+  body.audit-activity-bar #auditsetup > main,
   body.cpin-activity-bar #cpin > main {
     padding-bottom: 72px;
   }
   body.audit-float-panel-open #audit > main,
+  body.audit-float-panel-open #auditsetup > main,
   body.cpin-float-panel-open #cpin > main {
     padding-bottom: min(400px, 55vh);
   }
@@ -1928,12 +1912,66 @@
     border-bottom: 1px dashed #d4a800;
   }
 
-  /* Letter composer (site-wide pattern) */
-  #letter-composer-modal .modal { max-width: 760px; }
-  .letter-template-grid {
+  /* Letter composer (site-wide pattern — fullscreen split layout) */
+  #letter-composer-modal.modal-backdrop {
+    padding: 0;
+    align-items: stretch;
+    overflow: hidden;
+  }
+  #letter-composer-modal .letter-composer-modal {
+    max-width: none;
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: column;
+    box-shadow: none;
+  }
+  #letter-composer-modal .modal-body {
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .letter-composer-layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    height: 100%;
+    min-height: 0;
+  }
+  .letter-composer-layout.is-view-only {
+    grid-template-columns: 1fr;
+  }
+  .letter-composer-sidebar {
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 16px 20px 24px;
+    background: #f8f8f6;
+  }
+  .letter-composer-sidebar .modal-group { margin-bottom: 20px; }
+  .letter-composer-sidebar .modal-group:last-child { margin-bottom: 0; }
+  .letter-template-search {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--surface);
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+  .letter-template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .letter-template-empty {
+    font-size: 12px;
+    color: var(--ink-3);
+    padding: 8px 0;
   }
   .letter-template-chip {
     padding: 8px 12px;
@@ -1944,7 +1982,7 @@
     color: var(--ink-2);
     cursor: pointer;
     text-align: left;
-    max-width: 100%;
+    width: 100%;
   }
   .letter-template-chip strong {
     display: block;
@@ -1966,24 +2004,56 @@
   .letter-recipient-list { margin-top: 4px; }
   .letter-recipient-row {
     display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 12px;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
     align-items: center;
     padding: 10px 12px;
     border: 1px solid var(--line);
     border-radius: 6px;
     margin-bottom: 6px;
     background: #fcfcfa;
-    cursor: pointer;
   }
   .letter-recipient-row:hover { border-color: var(--accent); }
   .letter-recipient-row.selected {
     border-color: var(--accent);
     background: var(--accent-soft);
   }
+  .letter-recipient-row.previewing {
+    outline: 2px solid var(--gov-focus);
+    outline-offset: -1px;
+  }
+  .letter-recipient-row.is-saved {
+    grid-template-columns: 1fr auto;
+  }
   .letter-recipient-row input { width: auto; margin: 0; }
   .letter-recipient-row .name { font-weight: 600; font-size: 13px; }
   .letter-recipient-row .role { color: var(--ink-3); font-size: 12px; margin-top: 1px; }
+  .letter-recipient-row .dh-link { color: var(--ink-3); font-size: 11px; margin-top: 2px; }
+  .letter-recipient-view-btn {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .letter-recipient-view-btn.on {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .letter-composer-main {
+    overflow-y: auto;
+    padding: 16px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .letter-composer-main .letter-composer-preview-wrap {
+    flex: 1;
+    min-height: 320px;
+  }
+  .letter-composer-main .letter-preview {
+    min-height: 280px;
+  }
   .letter-composer-preview-wrap { margin-top: 4px; }
   #letter-composer-preview.editing {
     outline: 2px solid var(--gov-focus);
@@ -4029,14 +4099,17 @@
       grid-template-columns: 1fr;
     }
     body.audit-activity-bar #audit > main,
+    body.audit-activity-bar #auditsetup > main,
     body.cpin-activity-bar #cpin > main {
       padding-bottom: 168px;
     }
     body.audit-float-panel-open #audit > main,
+    body.audit-float-panel-open #auditsetup > main,
     body.cpin-float-panel-open #cpin > main {
       padding-bottom: min(520px, 78vh);
     }
-    #audit .audit-recent-on-audit {
+    #audit .audit-recent-on-audit,
+    #auditsetup .audit-recent-on-audit {
       margin-bottom: 32px;
       padding-bottom: 16px;
     }
@@ -4632,13 +4705,12 @@
         <span class="list-results-seg">
           <span class="list-results-label">Sort by</span>
           <span class="list-control-dropdown" id="premises-sort-dropdown">
-            <button type="button" class="list-control-trigger" id="premises-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>RBIP score (high first)</strong> ▾</button>
+            <button type="button" class="list-control-trigger" id="premises-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button>
             <div class="list-control-menu" id="premises-sort-menu" role="listbox" hidden>
-              <button type="button" class="list-control-option" role="option" data-premises-sort="name">Premises</button>
-              <button type="button" class="list-control-option" role="option" data-premises-sort="type">Type</button>
-              <button type="button" class="list-control-option" role="option" data-premises-sort="dept">Department</button>
-              <button type="button" class="list-control-option on" role="option" data-premises-sort="score">RBIP score</button>
-              <button type="button" class="list-control-option" role="option" data-premises-sort="audit">Last audit</button>
+              <button type="button" class="list-control-option on" role="option" data-premises-sort="worst">Worst score first</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="best">Best score first</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="name">Name A–Z</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="audit">Most recent audit</button>
             </div>
           </span>
         </span>
@@ -5179,12 +5251,24 @@
       <div class="audit-recent-hd">
         <h3>Recently on this audit</h3>
         <div class="audit-recent-summary">
-          <span id="audit-recent-count-notes">3 notes</span>
-          <span id="audit-recent-count-time">6h 20m logged</span>
+          <span class="audit-recent-count-notes" id="audit-recent-count-notes">3 notes</span>
+          <span class="audit-recent-count-time" id="audit-recent-count-time">6h 20m logged</span>
+        </div>
+      </div>
+      <div class="process-filters-bar cpin-activity-filters-bar">
+        <div class="filter-group">
+          <div class="filter-group-label">Show</div>
+          <div class="filter-chips filter-chips--scroll audit-activity-filters" role="group" aria-label="Activity type">
+            <button type="button" class="chip on" data-audit-activity-filter="all">All</button>
+            <button type="button" class="chip" data-audit-activity-filter="time">Time</button>
+            <button type="button" class="chip" data-audit-activity-filter="note">Notes</button>
+            <button type="button" class="chip" data-audit-activity-filter="interim">Interim</button>
+            <button type="button" class="chip" data-audit-activity-filter="file">Files</button>
+          </div>
         </div>
       </div>
       <div class="audit-activity-feed">
-        <div id="audit-activity-feed-list"></div>
+        <div class="audit-activity-feed-list" id="audit-activity-feed-list"></div>
       </div>
     </section>
 
@@ -5269,27 +5353,15 @@
             <span class="list-results-seg">
               <span class="list-results-label">Sort by</span>
               <span class="list-control-dropdown" id="cpin-sort-dropdown">
-                <button type="button" class="list-control-trigger" id="cpin-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Received (newest)</strong> ▾</button>
+                <button type="button" class="list-control-trigger" id="cpin-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Most recent first</strong> ▾</button>
                 <div class="list-control-menu" id="cpin-sort-menu" role="listbox" hidden>
-                  <button type="button" class="list-control-option on" role="option" data-cpin-sort="when">Received</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-sort="severity">Severity</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-sort="premises">Premises</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-sort="assignee">Assignee</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-sort="status">Status</button>
+                  <button type="button" class="list-control-option on" role="option" data-cpin-sort="recent">Most recent first</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="severity">Severity first</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="name">Premises A–Z</button>
                 </div>
               </span>
             </span>
           </div>
-        </div>
-
-        <div class="cpin-list-head" id="cpin-list-head">
-          <div class="cpin-head-severity"><button type="button" class="list-header-sort" data-cpin-col="severity">Severity <span class="sort-ind">↕</span></button></div>
-          <div class="cpin-head-body">
-            <button type="button" class="list-header-sort is-active" data-cpin-col="when">Received <span class="sort-ind">↑</span></button>
-            <button type="button" class="list-header-sort" data-cpin-col="premises">Premises <span class="sort-ind">↕</span></button>
-            <button type="button" class="list-header-sort" data-cpin-col="status">Status <span class="sort-ind">↕</span></button>
-          </div>
-          <div class="cpin-head-meta"><button type="button" class="list-header-sort" data-cpin-col="assignee">Assignee <span class="sort-ind">↕</span></button></div>
         </div>
 
         <div id="cpins-panel-list" class="cpins-panel" data-cpin-panel="list"></div>
@@ -5553,7 +5625,7 @@
 
         <div style="margin-top:20px;">
           <h4 style="margin:0 0 8px;font-size:14px;">Appointment letters</h4>
-          <div class="help">Write templated letters to one or more Duty Holders on this CPIN. Saved letters appear here as attachments and in the activity log.</div>
+          <div class="help">Write templated letters to Responsible Persons linked to your approved Duty Holders. Saved letters appear here as attachments and in the activity log.</div>
           <div class="letter-attachment-list" id="cpin-onsite-letters-list"></div>
           <div class="letter-composer-actions" style="margin-top:10px;">
             <button class="btn primary" type="button" onclick="openCpinOnsiteLetterComposer()">Write letter</button>
@@ -5571,7 +5643,10 @@
           <label class="cpin-check-row" style="margin-top:10px;"><input type="checkbox" id="cpin-onsite-visit-done" onchange="saveCpinOnsiteEval()" /> Site evaluation completed</label>
         </div>
 
-        <div style="margin-top:20px;">
+        <div style="margin-top:20px;" id="cpin-onsite-audit-blocked">
+          <p class="help" style="margin:0;" id="cpin-onsite-audit-blocked-text">Complete the steps above before deciding whether an audit is required.</p>
+        </div>
+        <div style="margin-top:20px;" id="cpin-onsite-audit-decision" hidden>
           <h4 style="margin:0 0 8px;font-size:14px;">Is an audit required?</h4>
           <div class="cpin-decision-options" style="margin-top:0;">
             <label class="cpin-decision-option">
@@ -5616,6 +5691,18 @@
         <div class="audit-recent-summary">
           <span id="cpin-recent-count-notes">0 notes</span>
           <span id="cpin-recent-count-time">0m logged</span>
+        </div>
+      </div>
+      <div class="process-filters-bar cpin-activity-filters-bar">
+        <div class="filter-group">
+          <div class="filter-group-label">Show</div>
+          <div class="filter-chips filter-chips--scroll cpin-activity-filters" role="group" aria-label="Activity type">
+            <button type="button" class="chip on" data-cpin-activity-filter="all">All</button>
+            <button type="button" class="chip" data-cpin-activity-filter="time">Time</button>
+            <button type="button" class="chip" data-cpin-activity-filter="note">Notes</button>
+            <button type="button" class="chip" data-cpin-activity-filter="interim">Interim</button>
+            <button type="button" class="chip" data-cpin-activity-filter="file">Files</button>
+          </div>
         </div>
       </div>
       <div class="audit-activity-feed">
@@ -5918,14 +6005,15 @@
             <span class="list-results-seg">
               <span class="list-results-label">Sort by</span>
               <span class="list-control-dropdown" id="process-sort-dropdown">
-                <button type="button" class="list-control-trigger" id="process-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Score (high first)</strong> ▾</button>
+                <button type="button" class="list-control-trigger" id="process-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button>
                 <div class="list-control-menu" id="process-sort-menu" role="listbox" hidden>
+                  <button type="button" class="list-control-option on" role="option" data-process-sort="worst">Worst score first</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="best">Best score first</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="name">Premises A–Z</button>
                   <button type="button" class="list-control-option" role="option" data-process-sort="type">Type</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="premises">Premises</button>
-                  <button type="button" class="list-control-option on" role="option" data-process-sort="score">Score</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="status">Stage / status</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="owner">Owner</button>
-                  <button type="button" class="list-control-option" role="option" data-process-sort="age">Age</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="owner">Owner A–Z</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="age">Oldest first</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="status">Status</button>
                 </div>
               </span>
             </span>
@@ -6199,25 +6287,15 @@
           <div style="font-size:12px;color:var(--green);margin-top:8px;" id="apt-calendar-status">✓ No conflicts in Phil's Outlook calendar  ·  ✓ Pushes to Outlook on start</div>
         </div>
 
-        <!-- Appointment letter preview -->
+        <!-- Appointment letters -->
         <div class="setup-section">
-          <h3>5. Appointment letter</h3>
-          <div class="help">The system has drafted the appointment letter using the right template for this premises type (Government office, non-custodial). Review, edit if needed, then it sends when you start the audit.</div>
-          <div class="letter-preview" id="setup-letter-preview" style="padding:18px;font-size:12px;">
-            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
-            <div>22 June 2026</div>
-            <div style="margin-top:10px;">
-              Mark Stevens<br>
-              Property Director, HMCTS<br>
-              Temple Quay House, Bristol BS1
-            </div>
-            <p id="setup-letter-p1" style="margin-top:12px;"></p>
-            <p id="setup-letter-p2"></p>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            <button class="btn" id="setup-edit-letter-btn" type="button" onclick="toggleSetupLetterEdit()">Edit letter</button>
-            <button class="btn" type="button" onclick="previewSetupLetterPdf()">Preview as PDF</button>
-            <span style="font-size:11px;color:var(--ink-3);align-self:center;margin-left:auto;">Templates are <a>admin-editable in config</a>, no developer needed.</span>
+          <h3>5. Appointment letters</h3>
+          <div class="help">Write templated letters to Responsible Persons linked to your approved Duty Holders. Saved letters appear here as PDF attachments and are sent when you start the audit.</div>
+          <div class="letter-attachment-list" id="setup-appointment-letters-list"></div>
+          <div class="letter-composer-actions" style="margin-top:10px;">
+            <button class="btn primary" type="button" onclick="openAuditSetupLetterComposer()">Write letter</button>
+            <button class="btn" type="button" onclick="skipAuditSetupLetter()">Skip letter</button>
+            <span id="setup-appointment-letter-status" style="font-size:12px;color:var(--ink-3);"></span>
           </div>
         </div>
 
@@ -6245,12 +6323,37 @@
       </div>
     </div>
 
+    <section class="audit-recent-on-audit" id="auditsetup-recent-on-audit" aria-label="Recently on this audit">
+      <div class="audit-recent-hd">
+        <h3>Recently on this audit</h3>
+        <div class="audit-recent-summary">
+          <span class="audit-recent-count-notes">0 notes</span>
+          <span class="audit-recent-count-time">0m logged</span>
+        </div>
+      </div>
+      <div class="process-filters-bar cpin-activity-filters-bar">
+        <div class="filter-group">
+          <div class="filter-group-label">Show</div>
+          <div class="filter-chips filter-chips--scroll audit-activity-filters" role="group" aria-label="Activity type">
+            <button type="button" class="chip on" data-audit-activity-filter="all">All</button>
+            <button type="button" class="chip" data-audit-activity-filter="time">Time</button>
+            <button type="button" class="chip" data-audit-activity-filter="note">Notes</button>
+            <button type="button" class="chip" data-audit-activity-filter="interim">Interim</button>
+            <button type="button" class="chip" data-audit-activity-filter="file">Files</button>
+          </div>
+        </div>
+      </div>
+      <div class="audit-activity-feed">
+        <div class="audit-activity-feed-list"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
 <!-- Letter composer (site-wide — CPIN, audits, processes) -->
 <div id="letter-composer-modal" class="modal-backdrop" onclick="if(event.target===this) closeLetterComposer()">
-  <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal letter-composer-modal" onclick="event.stopPropagation()">
     <div class="modal-header">
       <div>
         <h2 id="letter-composer-title">Write letter</h2>
@@ -6259,32 +6362,37 @@
       <button type="button" class="modal-close" onclick="closeLetterComposer()" title="Close (Esc)">×</button>
     </div>
     <div class="modal-body">
-      <div class="modal-group" id="letter-composer-template-group">
-        <div class="modal-group-label">Template</div>
-        <div class="letter-template-grid" id="letter-composer-templates"></div>
-      </div>
-      <div class="modal-group" id="letter-composer-recipient-group">
-        <div class="modal-group-label">Recipients</div>
-        <div class="help" style="margin:-4px 0 8px;">Select Duty Holders attached to this CPIN. One personalised letter is saved per recipient.</div>
-        <div class="letter-recipient-list" id="letter-composer-recipients"></div>
-      </div>
-      <div class="modal-group">
-        <div class="modal-group-label">Letter preview</div>
-        <div class="letter-composer-preview-wrap">
-          <div class="letter-preview" id="letter-composer-preview" style="padding:18px;font-size:12px;">
-            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
-            <div id="letter-composer-date"></div>
-            <div style="margin-top:10px;" id="letter-composer-addressee"></div>
-            <div class="letter-composer-body" id="letter-composer-body" style="margin-top:12px;"></div>
+      <div class="letter-composer-layout">
+        <aside class="letter-composer-sidebar" id="letter-composer-sidebar">
+          <div class="modal-group" id="letter-composer-template-group">
+            <div class="modal-group-label">Template</div>
+            <input type="search" class="letter-template-search" id="letter-composer-template-search" placeholder="Search templates…" oninput="setLetterTemplateSearch(this.value)" />
+            <div class="letter-template-list" id="letter-composer-templates"></div>
           </div>
-        </div>
-        <div class="letter-composer-actions" id="letter-composer-edit-actions">
-          <button class="btn" type="button" id="letter-composer-edit-btn" onclick="toggleLetterComposerEdit()">Edit letter</button>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;" id="letter-composer-footer">
-        <button class="btn" type="button" id="letter-composer-cancel-btn" onclick="closeLetterComposer()">Cancel</button>
-        <button class="btn primary" type="button" id="letter-composer-save-btn" onclick="saveLetterComposer()">Save letters</button>
+          <div class="modal-group" id="letter-composer-recipient-group">
+            <div class="modal-group-label">Recipients</div>
+            <div class="help" id="letter-composer-recipient-help" style="margin:-4px 0 8px;">Tick recipients to include when saving. Use View to read each person's letter in the preview.</div>
+            <div class="letter-recipient-list" id="letter-composer-recipients"></div>
+          </div>
+        </aside>
+        <main class="letter-composer-main">
+          <div class="modal-group-label">Letter preview</div>
+          <div class="letter-composer-preview-wrap">
+            <div class="letter-preview" id="letter-composer-preview" style="padding:18px;font-size:12px;">
+              <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+              <div id="letter-composer-date"></div>
+              <div style="margin-top:10px;" id="letter-composer-addressee"></div>
+              <div class="letter-composer-body" id="letter-composer-body" style="margin-top:12px;"></div>
+            </div>
+          </div>
+          <div class="letter-composer-actions" id="letter-composer-edit-actions">
+            <button class="btn" type="button" id="letter-composer-edit-btn" onclick="toggleLetterComposerEdit()">Edit letter</button>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;" id="letter-composer-footer">
+            <button class="btn" type="button" id="letter-composer-cancel-btn" onclick="closeLetterComposer()">Cancel</button>
+            <button class="btn primary" type="button" id="letter-composer-save-btn" onclick="saveLetterComposer()">Save letters</button>
+          </div>
+        </main>
       </div>
     </div>
   </div>
@@ -6388,6 +6496,7 @@
     </div>
     <div class="actions">
       <div class="actions-secondary">
+        <button class="btn btn-quiet" type="button" onclick="openAuditActivityLetterComposer()">Write a letter</button>
         <button class="btn btn-quiet" type="button">Request more info</button>
       </div>
       <div class="actions-primary">
@@ -6477,6 +6586,7 @@
     </div>
     <div class="actions">
       <div class="actions-secondary">
+        <button class="btn btn-quiet" type="button" onclick="openCpinActivityLetterComposer()">Write a letter</button>
         <button class="btn btn-quiet" type="button">Request more info</button>
       </div>
       <div class="actions-primary">
@@ -6973,7 +7083,12 @@
     }
 
     render(screen);
-    if (screen === 'auditsetup') initAuditSetupPage();
+    if (screen === 'auditsetup') {
+      auditStage = 1;
+      initAuditSetupPage();
+      initAuditActivity();
+      setAuditActivityBarVisible(true);
+    }
     if (screen === 'cpins') initCpinsPage();
     if (screen === 'processes') initProcessesPage();
     if (screen === 'premises') initPremisesPage();
@@ -7021,11 +7136,11 @@
     updateNavMoreActive();
     requestAnimationFrame(layoutResponsiveNav);
 
-    if (id !== 'audit') {
+    if (id === 'audit' || id === 'auditsetup') {
+      setAuditActivityBarVisible(true);
+    } else {
       closeAuditFloatPanel();
       setAuditActivityBarVisible(false);
-    } else {
-      setAuditActivityBarVisible(true);
     }
 
     if (id !== 'cpin') {
@@ -7100,6 +7215,23 @@
 
   let auditActivityPanel = null;
   let auditLogType = 'time';
+  let auditActivityFeedFilter = 'all';
+
+  const AUDIT_ACTIVITY_FILTER_LABELS = {
+    all: 'activity',
+    time: 'time entries',
+    note: 'notes',
+    interim: 'interim reports',
+    file: 'files'
+  };
+
+  function setAuditActivityFeedFilter(filter) {
+    auditActivityFeedFilter = filter || 'all';
+    document.querySelectorAll('.audit-activity-filters .chip').forEach(function (chip) {
+      chip.classList.toggle('on', chip.dataset.auditActivityFilter === auditActivityFeedFilter);
+    });
+    renderAuditActivity();
+  }
 
   let auditStage = 2;
   let hmctsPlanSettled = false;
@@ -7137,7 +7269,36 @@
 
   function startAudit() {
     if (!validateAuditSetup()) return;
-    localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(getAuditSetupPayload()));
+    const payload = getAuditSetupPayload();
+    auditSetup = payload;
+    localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(payload));
+
+    const letters = getAuditSetupSavedLetters();
+    if (letters.length && !auditSetup.letterSkipped) {
+      const stamp = cpinLogTimestamp();
+      const names = letters.map(function (ltr) { return ltr.recipientName; });
+      letters.forEach(function (ltr, i) {
+        const entryTs = stamp.ts - i;
+        auditActivityLog.files.unshift({
+          id: 'f-setup-' + ltr.id,
+          name: ltr.fileName,
+          description: ltr.templateLabel + ' · ' + ltr.recipientName,
+          at: ltr.at,
+          ts: entryTs
+        });
+      });
+      auditActivityLog.notes.unshift({
+        id: 'n-setup-' + stamp.ts,
+        text: letters.length === 1
+          ? 'Appointment letter saved for ' + names[0] + '.'
+          : letters.length + ' appointment letters saved for ' + formatDutyHolderList(names) + '.',
+        stage: 1,
+        at: stamp.at,
+        ts: stamp.ts
+      });
+      renderAuditActivity();
+    }
+
     auditStage = 2;
     window.location.hash = 'audit-stage-2';
   }
@@ -7220,119 +7381,64 @@
     { id: 'A-2026-0275', type: 'audit', premises: 'HMCTS Guildford', score: 24, scoreClass: 'score-low', status: 'closed', statusText: 'Closed  ·  30 May 2026', owner: 'Hannah Munro', ownerInitials: 'HM', age: '3 weeks', mine: false, patch: false }
   ];
 
-  const PREMISES_SORT_COLUMNS = [
-    { id: 'name', label: 'Premises', defaultDir: 'asc' },
-    { id: 'type', label: 'Type', defaultDir: 'asc' },
-    { id: 'dept', label: 'Department', defaultDir: 'asc' },
-    { id: 'score', label: 'RBIP score', defaultDir: 'desc' },
-    { id: 'audit', label: 'Last audit', defaultDir: 'desc' }
-  ];
-
-  const CPIN_SORT_COLUMNS = [
-    { id: 'when', label: 'Received', defaultDir: 'asc' },
-    { id: 'severity', label: 'Severity', defaultDir: 'asc' },
-    { id: 'premises', label: 'Premises', defaultDir: 'asc' },
-    { id: 'assignee', label: 'Assignee', defaultDir: 'asc' },
-    { id: 'status', label: 'Status', defaultDir: 'asc' }
-  ];
-
-  const PROCESS_SORT_COLUMNS = [
-    { id: 'type', label: 'Type', defaultDir: 'asc' },
-    { id: 'premises', label: 'Premises', defaultDir: 'asc' },
-    { id: 'score', label: 'Score', defaultDir: 'desc' },
-    { id: 'status', label: 'Stage / status', defaultDir: 'asc' },
-    { id: 'owner', label: 'Owner', defaultDir: 'asc' },
-    { id: 'age', label: 'Age', defaultDir: 'desc' }
+  const LIST_SORT_OPTIONS = [
+    { id: 'worst', label: 'Worst score first' },
+    { id: 'best', label: 'Best score first' },
+    { id: 'name', label: 'Name A–Z' }
   ];
 
   let processesTypeFilter = 'all';
   let processesStatusFilter = 'all';
   let processesActiveView = 'Open and mine';
-  let processesSort = { column: 'score', dir: 'desc' };
+  let processesSortMode = 'worst';
 
-  function listSortDefaultDir(columns, columnId) {
-    const col = columns.find(function (c) { return c.id === columnId; });
-    return col ? col.defaultDir : 'asc';
+  function getListSortLabel(mode) {
+    return (LIST_SORT_OPTIONS.find(o => o.id === mode) || LIST_SORT_OPTIONS[0]).label;
   }
 
-  function listSortTriggerLabel(sortSpec, columns) {
-    const col = columns.find(function (c) { return c.id === sortSpec.column; }) || columns[0];
-    if (!col) return 'Sort';
-    if (col.id === 'score') {
-      return col.label + (sortSpec.dir === 'desc' ? ' (high first)' : ' (low first)');
-    }
-    if (col.id === 'when') {
-      return col.label + (sortSpec.dir === 'asc' ? ' (newest)' : ' (oldest)');
-    }
-    if (col.id === 'severity') {
-      return col.label + (sortSpec.dir === 'asc' ? ' (worst first)' : ' (best first)');
-    }
-    if (col.id === 'age') {
-      return col.label + (sortSpec.dir === 'desc' ? ' (oldest)' : ' (newest)');
-    }
-    if (col.id === 'audit') {
-      return col.label + (sortSpec.dir === 'desc' ? ' (recent)' : ' (oldest)');
-    }
-    return col.label + (sortSpec.dir === 'asc' ? ' A–Z' : ' Z–A');
-  }
-
-  function syncListSortDropdown(dropdownId, sortSpec, columns, dataAttr) {
-    const dropdown = document.getElementById(dropdownId);
-    if (!dropdown) return;
-    const trigger = dropdown.querySelector('.list-control-trigger strong');
-    if (trigger) trigger.textContent = listSortTriggerLabel(sortSpec, columns);
-    dropdown.querySelectorAll('.list-control-option').forEach(function (o) {
-      const col = o.getAttribute('data-' + dataAttr);
-      o.classList.toggle('on', col === sortSpec.column);
-    });
-  }
-
-  function syncListSortHeaders(headerAttr, sortSpec) {
-    document.querySelectorAll('[' + headerAttr + ']').forEach(function (btn) {
-      const col = btn.getAttribute(headerAttr);
-      const active = col === sortSpec.column;
-      btn.classList.toggle('is-active', active);
-      const ind = btn.querySelector('.sort-ind');
-      if (ind) ind.textContent = active ? (sortSpec.dir === 'asc' ? '↑' : '↓') : '↕';
-    });
-  }
-
-  function applyListSortFromHeader(sortSpec, columns, columnId) {
-    if (sortSpec.column === columnId) {
-      sortSpec.dir = sortSpec.dir === 'asc' ? 'desc' : 'asc';
-    } else {
-      sortSpec.column = columnId;
-      sortSpec.dir = listSortDefaultDir(columns, columnId);
-    }
-  }
-
-  function applyListSortFromDropdown(sortSpec, columns, columnId) {
-    sortSpec.column = columnId;
-    sortSpec.dir = listSortDefaultDir(columns, columnId);
-  }
-
-  function normalizeLegacyProcessSort(saved) {
-    if (saved && typeof saved === 'object' && saved.column) return saved;
-    const map = {
-      worst: { column: 'score', dir: 'desc' },
-      best: { column: 'score', dir: 'asc' },
-      name: { column: 'premises', dir: 'asc' },
-      type: { column: 'type', dir: 'asc' },
-      owner: { column: 'owner', dir: 'asc' },
-      age: { column: 'age', dir: 'desc' },
-      status: { column: 'status', dir: 'asc' }
-    };
-    return map[saved] || { column: 'score', dir: 'desc' };
-  }
-
-  function sortListWithSpec(items, spec, compareForColumn) {
+  function sortByListMode(items, mode, scoreKey, nameKey) {
     const sorted = items.slice();
-    const cmp = compareForColumn[spec.column];
-    if (!cmp) return sorted;
-    const dir = spec.dir === 'asc' ? 1 : -1;
-    sorted.sort(function (a, b) { return cmp(a, b) * dir; });
+    if (mode === 'worst') {
+      sorted.sort((a, b) => {
+        const sa = a[scoreKey] == null ? -1 : a[scoreKey];
+        const sb = b[scoreKey] == null ? -1 : b[scoreKey];
+        return sb - sa;
+      });
+    } else if (mode === 'best') {
+      sorted.sort((a, b) => {
+        const sa = a[scoreKey] == null ? 999 : a[scoreKey];
+        const sb = b[scoreKey] == null ? 999 : b[scoreKey];
+        return sa - sb;
+      });
+    } else if (mode === 'name') {
+      sorted.sort((a, b) => String(a[nameKey]).localeCompare(String(b[nameKey])));
+    }
     return sorted;
   }
+
+  function syncListSortTrigger(id, mode) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '<strong>' + getListSortLabel(mode) + '</strong> ▾';
+  }
+
+  function cycleListSort(mode) {
+    const idx = LIST_SORT_OPTIONS.findIndex(o => o.id === mode);
+    return LIST_SORT_OPTIONS[(idx + 1) % LIST_SORT_OPTIONS.length].id;
+  }
+
+  const PREMISES_SORT_OPTIONS = [
+    { id: 'worst', label: 'Worst score first' },
+    { id: 'best', label: 'Best score first' },
+    { id: 'name', label: 'Name A–Z' },
+    { id: 'audit', label: 'Most recent audit' }
+  ];
+
+  const CPIN_SORT_OPTIONS = [
+    { id: 'recent', label: 'Most recent first' },
+    { id: 'severity', label: 'Severity first' },
+    { id: 'name', label: 'Premises A–Z' }
+  ];
 
   function closeAllListControlMenus(exceptMenu) {
     document.querySelectorAll('.list-control-menu').forEach(function (menu) {
@@ -7418,26 +7524,22 @@
     return matchesDateFilter(parseDemoAgeDays(p.age), processesDateFilter);
   }
 
-  function sortProcesses(items, spec) {
-    return sortListWithSpec(items, spec, {
-      type: function (a, b) { return a.type.localeCompare(b.type); },
-      premises: function (a, b) { return String(a.premises).localeCompare(String(b.premises)); },
-      score: function (a, b) {
-        const sa = a.score == null ? -1 : a.score;
-        const sb = b.score == null ? -1 : b.score;
-        return sa - sb;
-      },
-      status: function (a, b) { return a.statusText.localeCompare(b.statusText); },
-      owner: function (a, b) { return a.owner.localeCompare(b.owner); },
-      age: function (a, b) { return parseDemoAgeDays(a.age) - parseDemoAgeDays(b.age); }
-    });
-  }
-
   function getFilteredProcesses() {
-    const items = PROCESSES_LIST.filter(function (p) {
+    let items = PROCESSES_LIST.filter(function (p) {
       return processMatchesType(p) && processMatchesStatus(p) && processMatchesView(p) && processMatchesDate(p);
     });
-    return sortProcesses(items, processesSort);
+    if (processesSortMode === 'type') {
+      items.sort(function (a, b) { return a.type.localeCompare(b.type); });
+    } else if (processesSortMode === 'owner') {
+      items.sort(function (a, b) { return a.owner.localeCompare(b.owner); });
+    } else if (processesSortMode === 'age') {
+      items.sort(function (a, b) { return parseDemoAgeDays(a.age) - parseDemoAgeDays(b.age); });
+    } else if (processesSortMode === 'status') {
+      items.sort(function (a, b) { return a.status.localeCompare(b.status); });
+    } else {
+      items = sortByListMode(items, processesSortMode, 'score', 'premises');
+    }
+    return items;
   }
 
   function countProcessesForView(view) {
@@ -7478,14 +7580,17 @@
     </div>`;
   }
 
-  function syncProcessSortUI() {
-    syncListSortDropdown('process-sort-dropdown', processesSort, PROCESS_SORT_COLUMNS, 'process-sort');
-    syncListSortHeaders('data-proc-sort', processesSort);
+  function syncProcessSortDropdown() {
+    syncListControlDropdown('process-sort-dropdown', processesSortMode, 'process-sort');
+    const headerCol = processesSortMode === 'name' ? 'premises' : processesSortMode === 'score' || processesSortMode === 'worst' || processesSortMode === 'best' ? 'score' : processesSortMode;
+    document.querySelectorAll('[data-proc-sort]').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.procSort === headerCol);
+    });
   }
 
-  function setProcessSort(column) {
-    applyListSortFromDropdown(processesSort, PROCESS_SORT_COLUMNS, column);
-    syncProcessSortUI();
+  function setProcessSort(mode) {
+    processesSortMode = mode;
+    syncProcessSortDropdown();
     renderProcessesList();
   }
 
@@ -7495,7 +7600,7 @@
     if (!body) return;
     const items = getFilteredProcesses();
     if (countEl) countEl.textContent = String(items.length);
-    syncProcessSortUI();
+    syncProcessSortDropdown();
     syncListControlDropdown('process-date-dropdown', processesDateFilter, 'process-date');
     if (!items.length) {
       body.innerHTML = '<div class="proc-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No processes match your filters.</div>';
@@ -7503,6 +7608,11 @@
       body.innerHTML = items.map(renderProcessRow).join('');
     }
     updateProcessViewCounts();
+  }
+
+  function cycleProcessSort() {
+    processesSortMode = cycleListSort(processesSortMode);
+    renderProcessesList();
   }
 
   function setProcessTypeFilter(type) {
@@ -7639,7 +7749,7 @@
 
   let premisesScopeFilter = 'patch';
   let premisesTypeFilter = null;
-  let premisesSort = { column: 'score', dir: 'desc' };
+  let premisesSortMode = 'worst';
 
   function premisesMatchesScope(p) {
     return premisesScopeFilter === 'all' || p.patch;
@@ -7653,30 +7763,31 @@
     return matchesDateFilter(p.daysSinceAudit != null ? p.daysSinceAudit : 180, premisesDateFilter);
   }
 
-  function sortPremises(items, spec) {
-    return sortListWithSpec(items, spec, {
-      name: function (a, b) { return String(a.name).localeCompare(String(b.name)); },
-      type: function (a, b) { return String(a.typeLabel).localeCompare(String(b.typeLabel)); },
-      dept: function (a, b) { return String(a.dept).localeCompare(String(b.dept)); },
-      score: function (a, b) {
-        const sa = a.score == null ? -1 : a.score;
-        const sb = b.score == null ? -1 : b.score;
-        return sa - sb;
-      },
-      audit: function (a, b) { return (a.lastAuditSort || 0) - (b.lastAuditSort || 0); }
-    });
+  function sortPremises(items, mode) {
+    const sorted = items.slice();
+    if (mode === 'audit') {
+      sorted.sort(function (a, b) {
+        return (b.lastAuditSort || 0) - (a.lastAuditSort || 0);
+      });
+    } else {
+      return sortByListMode(sorted, mode, 'score', 'name');
+    }
+    return sorted;
   }
 
   function getFilteredPremises() {
     const filtered = PREMISES_LIST.filter(function (p) {
       return premisesMatchesScope(p) && premisesMatchesType(p) && premisesMatchesDate(p);
     });
-    return sortPremises(filtered, premisesSort);
+    return sortPremises(filtered, premisesSortMode);
   }
 
-  function syncPremisesSortUI() {
-    syncListSortDropdown('premises-sort-dropdown', premisesSort, PREMISES_SORT_COLUMNS, 'premises-sort');
-    syncListSortHeaders('data-prem-sort', premisesSort);
+  function syncPremisesSortDropdown() {
+    syncListControlDropdown('premises-sort-dropdown', premisesSortMode, 'premises-sort');
+    const headerCol = premisesSortMode === 'name' ? 'name' : premisesSortMode === 'audit' ? 'audit' : 'score';
+    document.querySelectorAll('[data-prem-sort]').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.premSort === headerCol);
+    });
   }
 
   function renderPremRow(p) {
@@ -7705,7 +7816,7 @@
     if (!body) return;
     const items = getFilteredPremises();
     if (countEl) countEl.textContent = String(items.length);
-    syncPremisesSortUI();
+    syncPremisesSortDropdown();
     syncListControlDropdown('premises-date-dropdown', premisesDateFilter, 'premises-date');
     if (!items.length) {
       body.innerHTML = '<div class="prem-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No premises match your filters.</div>';
@@ -7714,9 +7825,9 @@
     }
   }
 
-  function setPremisesSort(column) {
-    applyListSortFromDropdown(premisesSort, PREMISES_SORT_COLUMNS, column);
-    syncPremisesSortUI();
+  function setPremisesSort(mode) {
+    premisesSortMode = mode;
+    syncPremisesSortDropdown();
     renderPremisesList();
   }
 
@@ -7741,7 +7852,7 @@
   let processesDateFilter = 'all';
   let premisesDateFilter = 'all';
   let cpinsDateFilter = 'all';
-  let cpinsSort = { column: 'when', dir: 'asc' };
+  let cpinsSortMode = 'recent';
   let processPinnedViews = JSON.parse(localStorage.getItem('process-pinned-views') || '[]');
 
   function parseDemoAgeDays(age) {
@@ -7822,7 +7933,7 @@
       'Type: ' + processesTypeFilter,
       'Status: ' + processesStatusFilter,
       'Date: ' + processesDateFilter,
-      'Sort: ' + listSortTriggerLabel(processesSort, PROCESS_SORT_COLUMNS)
+      'Sort: ' + getListSortLabel(processesSortMode)
     ];
     if (summary) summary.textContent = parts.join('  ·  ');
     document.getElementById('save-view-name').value = '';
@@ -7849,7 +7960,7 @@
       type: processesTypeFilter,
       status: processesStatusFilter,
       date: processesDateFilter,
-      sort: { column: processesSort.column, dir: processesSort.dir }
+      sort: processesSortMode
     });
     localStorage.setItem('process-pinned-views', JSON.stringify(processPinnedViews));
     renderProcessPinnedViews();
@@ -7872,12 +7983,13 @@
     processesTypeFilter = v.type;
     processesStatusFilter = v.status;
     processesDateFilter = v.date;
-    processesSort = normalizeLegacyProcessSort(v.sort);
+    processesSortMode = v.sort;
     selectProcessView(v.view);
     setProcessTypeFilter(v.type);
     setProcessStatusFilter(v.status);
     setProcessDateFilter(v.date);
-    syncProcessSortUI();
+    processesSortMode = v.sort;
+    syncProcessSortDropdown();
     renderProcessesList();
   }
 
@@ -7900,21 +8012,22 @@
   }
 
   function setProcessHeaderSort(col) {
-    applyListSortFromHeader(processesSort, PROCESS_SORT_COLUMNS, col);
-    syncProcessSortUI();
+    if (col === 'score') processesSortMode = processesSortMode === 'worst' ? 'best' : 'worst';
+    else if (col === 'premises') processesSortMode = 'name';
+    else if (col === 'type') processesSortMode = 'type';
+    else if (col === 'status') processesSortMode = 'status';
+    else if (col === 'owner') processesSortMode = 'owner';
+    else if (col === 'age') processesSortMode = 'age';
+    syncProcessSortDropdown();
     renderProcessesList();
   }
 
   function setPremisesHeaderSort(col) {
-    applyListSortFromHeader(premisesSort, PREMISES_SORT_COLUMNS, col);
-    syncPremisesSortUI();
+    if (col === 'score') premisesSortMode = premisesSortMode === 'worst' ? 'best' : 'worst';
+    else if (col === 'name') premisesSortMode = 'name';
+    else if (col === 'audit') premisesSortMode = 'audit';
+    syncPremisesSortDropdown();
     renderPremisesList();
-  }
-
-  function setCpinHeaderSort(col) {
-    applyListSortFromHeader(cpinsSort, CPIN_SORT_COLUMNS, col);
-    syncCpinSortUI();
-    renderCpinsLists();
   }
 
   function initPremisesPage() {
@@ -8061,9 +8174,7 @@
     const notesEl = document.getElementById('audit-count-notes');
     const filesEl = document.getElementById('audit-count-files');
     const timeEl = document.getElementById('audit-count-time');
-    const recentNotesEl = document.getElementById('audit-recent-count-notes');
-    const recentTimeEl = document.getElementById('audit-recent-count-time');
-    const feed = document.getElementById('audit-activity-feed-list');
+    const feeds = document.querySelectorAll('.audit-activity-feed-list');
 
     const noteCount = auditActivityLog.notes.length + auditActivityLog.interim.length;
     const fileCount = auditActivityLog.files.length;
@@ -8075,10 +8186,14 @@
     if (notesEl) notesEl.textContent = notesLabel;
     if (filesEl) filesEl.textContent = filesLabel;
     if (timeEl) timeEl.textContent = timeLabel;
-    if (recentNotesEl) recentNotesEl.textContent = notesLabel;
-    if (recentTimeEl) recentTimeEl.textContent = timeLabel;
+    document.querySelectorAll('.audit-recent-count-notes').forEach(function (el) {
+      el.textContent = notesLabel;
+    });
+    document.querySelectorAll('.audit-recent-count-time').forEach(function (el) {
+      el.textContent = timeLabel;
+    });
 
-    if (!feed) return;
+    if (!feeds.length) return;
 
     const items = [];
     auditActivityLog.times.forEach(function (t) {
@@ -8096,12 +8211,18 @@
 
     items.sort((a, b) => b.ts - a.ts);
 
-    if (items.length === 0) {
-      feed.innerHTML = '<div class="audit-feed-empty">No activity logged yet on this audit.</div>';
-      return;
-    }
+    const filtered = auditActivityFeedFilter === 'all'
+      ? items
+      : items.filter(function (item) { return item.type === auditActivityFeedFilter; });
 
-    feed.innerHTML = items.map(function (item) {
+    let feedHtml;
+    if (items.length === 0) {
+      feedHtml = '<div class="audit-feed-empty">No activity logged yet on this audit.</div>';
+    } else if (!filtered.length) {
+      const label = AUDIT_ACTIVITY_FILTER_LABELS[auditActivityFeedFilter] || 'entries';
+      feedHtml = '<div class="audit-feed-empty">No ' + label + ' on this audit yet.</div>';
+    } else {
+      feedHtml = filtered.map(function (item) {
       let pillClass = 'grey';
       let pillLabel = 'Note';
       let textHtml = '';
@@ -8130,6 +8251,8 @@
         '</div>'
       );
     }).join('');
+    }
+    feeds.forEach(function (feed) { feed.innerHTML = feedHtml; });
   }
 
   function submitAuditLog() {
@@ -8220,7 +8343,15 @@
       });
     }
     syncAuditActivityForStage(auditStage);
-    renderAuditActivity();
+    if (!document.body.dataset.auditActivityFiltersBound) {
+      document.querySelectorAll('.audit-activity-filters .chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          if (chip.dataset.auditActivityFilter) setAuditActivityFeedFilter(chip.dataset.auditActivityFilter);
+        });
+      });
+      document.body.dataset.auditActivityFiltersBound = '1';
+    }
+    setAuditActivityFeedFilter(auditActivityFeedFilter);
   }
 
   function auditFindingsLocked() {
@@ -8776,9 +8907,59 @@
   }
 
   function cpinHasAcceptedResponsiblePersons(cpin) {
-    return getCpinResponsiblePersonRecords(cpin).some(function (rp) {
-      return rp.status === 'accepted';
+    return getCpinResponsiblePersonsForDutyHolders(cpin, { acceptedOnly: true }).length > 0;
+  }
+
+  function getDhKeyForRpKey(rpKey) {
+    const keys = Object.keys(SETUP_DH_TO_RP_KEYS);
+    for (let i = 0; i < keys.length; i++) {
+      if ((SETUP_DH_TO_RP_KEYS[keys[i]] || []).indexOf(rpKey) >= 0) return keys[i];
+    }
+    return null;
+  }
+
+  function getDutyHolderLabelForKey(key) {
+    const catalog = (typeof SETUP_LOOKUP_CATALOG !== 'undefined' && SETUP_LOOKUP_CATALOG.dutyHolder) || [];
+    const entry = catalog.find(function (e) { return e.key === key; });
+    return entry ? entry.name : key;
+  }
+
+  function getCpinDutyHolderKey(dh) {
+    if (!dh) return null;
+    return dh.key || SETUP_DH_KEY_BY_NAME[dh.name] || null;
+  }
+
+  function getAcceptedDutyHolderKeys(cpin) {
+    return getCpinDutyHolders(cpin).map(getCpinDutyHolderKey).filter(Boolean);
+  }
+
+  function getCpinResponsiblePersonsForDutyHolders(cpin, opts) {
+    opts = opts || {};
+    const dhKeys = getAcceptedDutyHolderKeys(cpin);
+    if (!dhKeys.length) return [];
+    return getCpinResponsiblePersonRecords(cpin).filter(function (rp) {
+      if (opts.acceptedOnly && rp.status !== 'accepted') return false;
+      if (!rp.linkedDh) return false;
+      return dhKeys.indexOf(rp.linkedDh) >= 0;
     });
+  }
+
+  function getCpinLetterRecipients(cpin) {
+    return getCpinResponsiblePersonsForDutyHolders(cpin, { acceptedOnly: true });
+  }
+
+  function pruneCpinResponsiblePersons(cpin) {
+    if (!cpin) return false;
+    const dhKeys = getAcceptedDutyHolderKeys(cpin);
+    const rps = (cpin.responsiblePersons || []).filter(function (rp) {
+      if (!rp.linkedDh) return true;
+      return dhKeys.indexOf(rp.linkedDh) >= 0;
+    });
+    if (rps.length !== (cpin.responsiblePersons || []).length) {
+      persistCpinPatch(activeCpinId, { responsiblePersons: rps });
+      return true;
+    }
+    return false;
   }
 
   function cpinPeopleGateOk(cpin) {
@@ -8865,24 +9046,35 @@
     return { red: 0, amber: 1, green: 2 }[severity] ?? 3;
   }
 
-  function sortCpins(items, spec) {
-    return sortListWithSpec(items, spec, {
-      when: function (a, b) { return parseCpinWhenDays(a.when) - parseCpinWhenDays(b.when); },
-      severity: function (a, b) { return cpinSeverityRank(a.severity) - cpinSeverityRank(b.severity); },
-      premises: function (a, b) { return String(a.premises || '').localeCompare(String(b.premises || '')); },
-      assignee: function (a, b) { return String(a.assignee || '\uffff').localeCompare(String(b.assignee || '\uffff')); },
-      status: function (a, b) { return String(cpinRowStatusLabel(a)).localeCompare(String(cpinRowStatusLabel(b))); }
-    });
+  function sortCpinsBySeverity(items) {
+    return sortCpinItems(items, 'severity');
   }
 
-  function syncCpinSortUI() {
-    syncListSortDropdown('cpin-sort-dropdown', cpinsSort, CPIN_SORT_COLUMNS, 'cpin-sort');
-    syncListSortHeaders('data-cpin-col', cpinsSort);
+  function sortCpinItems(items, mode) {
+    const sorted = items.slice();
+    if (mode === 'recent') {
+      sorted.sort(function (a, b) {
+        return parseCpinWhenDays(a.when) - parseCpinWhenDays(b.when);
+      });
+    } else if (mode === 'name') {
+      sorted.sort(function (a, b) {
+        return String(a.premises || '').localeCompare(String(b.premises || ''));
+      });
+    } else {
+      sorted.sort(function (a, b) {
+        return cpinSeverityRank(a.severity) - cpinSeverityRank(b.severity);
+      });
+    }
+    return sorted;
   }
 
-  function setCpinSort(column) {
-    applyListSortFromDropdown(cpinsSort, CPIN_SORT_COLUMNS, column);
-    syncCpinSortUI();
+  function syncCpinSortDropdown() {
+    syncListControlDropdown('cpin-sort-dropdown', cpinsSortMode, 'cpin-sort');
+  }
+
+  function setCpinSort(mode) {
+    cpinsSortMode = mode;
+    syncCpinSortDropdown();
     renderCpinsLists();
   }
 
@@ -8901,16 +9093,41 @@
     return cpin.auditRequired === 'yes';
   }
 
+  function cpinOnsitePrereqs(cpin) {
+    const o = getCpinOnsiteEval(cpin);
+    const apptOk = !!(o.appointmentConfirmed || (o.appointmentDate && o.appointmentTime));
+    const lettersOk = cpinOnsiteLettersComplete(cpin);
+    const visitOk = !!o.siteVisitDone;
+    return {
+      apptOk: apptOk,
+      lettersOk: lettersOk,
+      visitOk: visitOk,
+      ready: apptOk && lettersOk && visitOk
+    };
+  }
+
+  function cpinOnsiteAuditDecisionReady(cpin) {
+    return cpinOnsitePrereqs(cpin).ready;
+  }
+
+  function cpinOnsiteAuditBlockedHint(cpin) {
+    const p = cpinOnsitePrereqs(cpin);
+    const missing = [];
+    if (!p.apptOk) missing.push('confirm the appointment date and time');
+    if (!p.lettersOk) missing.push('save or skip appointment letters');
+    if (!p.visitOk) missing.push('mark site evaluation as completed');
+    if (!missing.length) return '';
+    if (missing.length === 1) return 'Before deciding whether an audit is required, ' + missing[0] + '.';
+    return 'Before deciding whether an audit is required, ' + missing.slice(0, -1).join(', ') + ' and ' + missing[missing.length - 1] + '.';
+  }
+
   function cpinStage4Ready(cpin) {
     if (!cpin || !cpin.deskOutcome) return false;
     if (cpin.deskOutcome === 'no_action') return true;
     if (cpin.deskOutcome === 'audit') return true;
     if (cpin.deskOutcome === 'onsite_eval') {
+      if (!cpinOnsiteAuditDecisionReady(cpin)) return false;
       const o = getCpinOnsiteEval(cpin);
-      const apptOk = o.appointmentConfirmed || (o.appointmentDate && o.appointmentTime);
-      if (!apptOk) return false;
-      if (!cpinOnsiteLettersComplete(cpin)) return false;
-      if (!o.siteVisitDone) return false;
       return o.auditRequired === 'yes' || o.auditRequired === 'no';
     }
     return false;
@@ -8993,6 +9210,23 @@
   let cpinActivityLog = { notes: [], times: [], interim: [], files: [] };
   let cpinActivityPanel = null;
   let cpinLogType = 'time';
+  let cpinActivityFeedFilter = 'all';
+
+  const CPIN_ACTIVITY_FILTER_LABELS = {
+    all: 'activity',
+    time: 'time entries',
+    note: 'notes',
+    interim: 'interim reports',
+    file: 'files'
+  };
+
+  function setCpinActivityFeedFilter(filter) {
+    cpinActivityFeedFilter = filter || 'all';
+    document.querySelectorAll('.cpin-activity-filters .chip').forEach(function (chip) {
+      chip.classList.toggle('on', chip.dataset.cpinActivityFilter === cpinActivityFeedFilter);
+    });
+    renderCpinActivity();
+  }
 
   function loadCpinActivityFromRecord(cpin) {
     if (!cpin) return { notes: [], times: [], interim: [], files: [] };
@@ -9130,12 +9364,22 @@
 
     items.sort(function (a, b) { return b.ts - a.ts; });
 
+    const filtered = cpinActivityFeedFilter === 'all'
+      ? items
+      : items.filter(function (item) { return item.type === cpinActivityFeedFilter; });
+
     if (items.length === 0) {
       feed.innerHTML = '<div class="audit-feed-empty">No activity logged yet on this CPIN.</div>';
       return;
     }
 
-    feed.innerHTML = items.map(function (item) {
+    if (!filtered.length) {
+      const label = CPIN_ACTIVITY_FILTER_LABELS[cpinActivityFeedFilter] || 'entries';
+      feed.innerHTML = '<div class="audit-feed-empty">No ' + label + ' on this CPIN yet.</div>';
+      return;
+    }
+
+    feed.innerHTML = filtered.map(function (item) {
       let pillClass = 'grey';
       let pillLabel = 'Note';
       let textHtml = '';
@@ -9249,7 +9493,16 @@
     const cpin = getCpinById(activeCpinId);
     cpinActivityLog = loadCpinActivityFromRecord(cpin);
     syncCpinActivityForStage(cpinStage);
-    renderCpinActivity();
+    const recentSection = document.getElementById('cpin-recent-on-cpin');
+    if (recentSection && !recentSection.dataset.filtersBound) {
+      document.querySelectorAll('.cpin-activity-filters .chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          if (chip.dataset.cpinActivityFilter) setCpinActivityFeedFilter(chip.dataset.cpinActivityFilter);
+        });
+      });
+      recentSection.dataset.filtersBound = '1';
+    }
+    setCpinActivityFeedFilter(cpinActivityFeedFilter);
   }
 
   function persistCpinPatch(id, patch) {
@@ -9460,8 +9713,8 @@
   }
 
   function renderCpinCardsHtml(items) {
-    const pinned = sortCpins(items.filter(i => cpinPins.has(i.id)), cpinsSort);
-    const rest = sortCpins(items.filter(i => !cpinPins.has(i.id)), cpinsSort);
+    const pinned = sortCpinItems(items.filter(i => cpinPins.has(i.id)), cpinsSortMode);
+    const rest = sortCpinItems(items.filter(i => !cpinPins.has(i.id)), cpinsSortMode);
     let html = '';
 
     if (pinned.length) {
@@ -9581,10 +9834,8 @@
   }
 
   function renderCpinsLists() {
-    syncCpinSortUI();
+    syncCpinSortDropdown();
     syncListControlDropdown('cpin-date-dropdown', cpinsDateFilter, 'cpin-date');
-    const cpinHead = document.getElementById('cpin-list-head');
-    if (cpinHead) cpinHead.hidden = cpinsActiveTab === 'closed';
     if (cpinsActiveTab === 'closed') {
       renderCompletedCpins();
     } else {
@@ -9673,9 +9924,6 @@
       });
       initListControlDropdown('cpin-date-dropdown', setCpinDateFilter);
       initListControlDropdown('cpin-sort-dropdown', setCpinSort);
-      document.querySelectorAll('[data-cpin-col]').forEach(function (btn) {
-        btn.addEventListener('click', function () { setCpinHeaderSort(btn.dataset.cpinCol); });
-      });
       if (!document.body.dataset.cpinViewBound) {
         document.body.dataset.cpinViewBound = '1';
         document.addEventListener('mousedown', function (e) {
@@ -9715,8 +9963,7 @@
     const labels = { red: 'Red CPIN', amber: 'Amber CPIN', green: 'Green CPIN' };
     if (label) label.textContent = labels[sev] || 'CPIN';
     if (detail) {
-      const st = cpin.intake?.incidentStatus || '';
-      detail.textContent = st || ({ red: 'Serious or fatal injuries suspected', amber: 'Fire fought, rescue or injuries', green: 'Dealt with on site — no known injuries' }[sev]);
+      detail.textContent = CPIN_SEVERITY_LONG[sev] || CPIN_SEVERITY_LABELS[sev] || '';
     }
   }
 
@@ -9738,6 +9985,14 @@
       inp.checked = o.auditRequired === inp.value;
     });
     renderCpinOnsiteLetters(cpin);
+
+    const auditReady = cpinOnsiteAuditDecisionReady(cpin);
+    const auditSection = document.getElementById('cpin-onsite-audit-decision');
+    const auditBlocked = document.getElementById('cpin-onsite-audit-blocked');
+    const auditBlockedText = document.getElementById('cpin-onsite-audit-blocked-text');
+    if (auditSection) auditSection.hidden = !auditReady;
+    if (auditBlocked) auditBlocked.hidden = auditReady;
+    if (auditBlockedText) auditBlockedText.textContent = cpinOnsiteAuditBlockedHint(cpin) || 'Complete the steps above before deciding whether an audit is required.';
   }
 
   function renderCpinCloseSection(cpin) {
@@ -10247,11 +10502,14 @@
       if (hint) hint.textContent = '';
       return;
     }
-    const rps = getCpinResponsiblePersonRecords(cpin);
+    pruneCpinResponsiblePersons(cpin);
+    cpin = getCpinById(activeCpinId) || cpin;
+    const rps = getCpinResponsiblePersonsForDutyHolders(cpin);
     if (!rps.length) {
-      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No Responsible Persons yet. Approve Duty Holders to see suggested contacts here.</p>';
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No suggested contacts for the approved Duty Holders. Use + Add to search the directory.</p>';
     } else {
       list.innerHTML = rps.map(function (rp) {
+        const dhLabel = rp.linkedDh ? getDutyHolderLabelForKey(rp.linkedDh) : '';
         const pill = rp.status === 'suggested'
           ? '<span class="pill amber">Suggested</span>'
           : '<span class="pill grey">Approved</span>';
@@ -10264,7 +10522,9 @@
         return '<div class="holder-card' + (rp.status === 'suggested' ? ' is-suggested' : '') + '" data-id="' + escHtml(rp.id) + '">' +
           '<div class="avatar-sm">' + escHtml(sanitizeAvatarInitials(rp.initials)) + '</div>' +
           '<div><div class="name">' + escHtml(rp.name) + (rp.ref ? ' <span class="prem-ref">' + escHtml(rp.ref) + '</span>' : '') + '</div>' +
-          '<div class="role">' + escHtml((rp.role || '').replace(/[\u2013\u2014]/g, '-')) + '</div></div>' +
+          '<div class="role">' + escHtml((rp.role || '').replace(/[\u2013\u2014]/g, '-')) + '</div>' +
+          (dhLabel ? '<div class="role" style="font-size:11px;margin-top:2px;">Contact for ' + escHtml(dhLabel) + '</div>' : '') +
+          '</div>' +
           pill + actions + '</div>';
       }).join('');
     }
@@ -10394,6 +10654,8 @@
       });
     });
     persistCpinPatch(activeCpinId, { rejectedDutyHolders: rejected });
+    pruneCpinResponsiblePersons(getCpinById(activeCpinId));
+    renderCpinWorkflowSections(getCpinById(activeCpinId));
   }
 
   function addCpinDutyHolder() {
@@ -10514,6 +10776,7 @@
       rejected.push(removed.name);
     }
     persistCpinPatch(activeCpinId, { dutyHolders: next, rejectedDutyHolders: rejected });
+    pruneCpinResponsiblePersons(getCpinById(activeCpinId));
     renderCpinWorkflowSections(getCpinById(activeCpinId));
   }
 
@@ -10835,7 +11098,7 @@
     {
       id: 'cpin-request-docs',
       label: 'Request for documentation',
-      hint: 'Ask Duty Holder to supply records before the visit',
+      hint: 'Ask for fire safety records before the visit',
       contexts: ['cpin-onsite'],
       buildBody: function (ctx) {
         return (
@@ -10850,15 +11113,239 @@
           (ctx.assignee ? ' (<span class="conditional">' + escHtml(ctx.assignee) + '</span>)' : '') + '.</p>'
         );
       }
+    },
+    {
+      id: 'cpin-acknowledge-incident',
+      label: 'Acknowledgement of incident',
+      hint: 'Confirm receipt of the incident notification',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>We acknowledge receipt of the incident notification' +
+          (ctx.incidentRef ? ' (<span class="conditional">' + escHtml(ctx.incidentRef) + '</span>)' : '') +
+          ' relating to <span class="conditional">' + escHtml(ctx.premises) + '</span>. ' +
+          'CPFSI is reviewing the information and will advise on next steps shortly.</p>';
+      }
+    },
+    {
+      id: 'cpin-remote-eval',
+      label: 'Remote evaluation appointment',
+      hint: 'Desk-based review without a site visit',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>CPFSI will carry out a remote fire safety evaluation for <span class="conditional">' + escHtml(ctx.premises) + '</span> ' +
+          'on <span class="conditional">' + escHtml(ctx.appointment.long) + '</span>. ' +
+          'Please ensure requested documentation is available for review during this session.</p>';
+      }
+    },
+    {
+      id: 'cpin-reminder-visit',
+      label: 'Reminder before visit',
+      hint: 'Short reminder ahead of the scheduled appointment',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>This is a reminder that CPFSI will attend <span class="conditional">' + escHtml(ctx.premises) + '</span> ' +
+          'on <span class="conditional">' + escHtml(ctx.appointment.long) + '</span> for an on-site fire safety evaluation. ' +
+          'Please confirm access arrangements remain in place.</p>';
+      }
+    },
+    {
+      id: 'cpin-revised-appointment',
+      label: 'Revised appointment date',
+      hint: 'Notify a change to the agreed visit date',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>Please note the on-site fire safety evaluation at <span class="conditional">' + escHtml(ctx.premises) + '</span> ' +
+          'has been rescheduled to <span class="conditional">' + escHtml(ctx.appointment.long) + '</span>. ' +
+          'We anticipate the visit will take ' + escHtml(ctx.appointment.duration) + '.</p>';
+      }
+    },
+    {
+      id: 'cpin-cancel-appointment',
+      label: 'Cancellation of appointment',
+      hint: 'Formal cancellation of a scheduled visit',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>The on-site fire safety evaluation previously scheduled for <span class="conditional">' + escHtml(ctx.premises) + '</span> ' +
+          'on <span class="conditional">' + escHtml(ctx.appointment.long) + '</span> is cancelled. ' +
+          'CPFSI will contact you to agree any replacement arrangements if still required.</p>';
+      }
+    },
+    {
+      id: 'cpin-request-access',
+      label: 'Request for site access',
+      hint: 'Arrange access to restricted or out-of-hours areas',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>To complete the evaluation at <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'please confirm arrangements for access to all relevant areas, plant rooms and risers on ' +
+          '<span class="conditional">' + escHtml(ctx.appointment.long) + '</span>.</p>';
+      }
+    },
+    {
+      id: 'cpin-article-27',
+      label: 'Article 27 formal request',
+      hint: 'Statutory request for information under Article 27',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>Under Article 27 of the Regulatory Reform (Fire Safety) Order 2005, CPFSI requires the following information ' +
+          'in relation to <span class="conditional">' + escHtml(ctx.premises) + '</span> within 14 days of the date of this letter. ' +
+          'Failure to comply may result in enforcement action.</p>';
+      }
+    },
+    {
+      id: 'cpin-no-cooperation',
+      label: 'Failure to cooperate',
+      hint: 'Where a Duty Holder has not responded to requests',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>Despite previous correspondence regarding <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'we have not received the information or access requested. Please respond within five working days or CPFSI may consider formal enforcement.</p>';
+      }
+    },
+    {
+      id: 'cpin-post-visit-docs',
+      label: 'Post-visit documentation request',
+      hint: 'Ask for records seen or referenced on site',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>Following the recent visit to <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'please provide copies of the fire safety records discussed on site within ten working days.</p>';
+      }
+    },
+    {
+      id: 'cpin-fra-request',
+      label: 'Fire risk assessment request',
+      hint: 'Request a current fire risk assessment',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>Please provide a copy of the current fire risk assessment for <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'including any action plan and evidence of review, within five working days.</p>';
+      }
+    },
+    {
+      id: 'cpin-meeting-invite',
+      label: 'Meeting invitation',
+      hint: 'Invite to a pre- or post-visit discussion',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>CPFSI invites you to a meeting regarding fire safety at <span class="conditional">' + escHtml(ctx.premises) + '</span> ' +
+          'on <span class="conditional">' + escHtml(ctx.appointment.long) + '</span>. ' +
+          'Please confirm attendance and name any additional representatives who will join.</p>';
+      }
+    },
+    {
+      id: 'cpin-inspector-change',
+      label: 'Change of inspector',
+      hint: 'Notify that a different inspector will attend',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>The on-site evaluation at <span class="conditional">' + escHtml(ctx.premises) + '</span> on ' +
+          '<span class="conditional">' + escHtml(ctx.appointment.long) + '</span> will be led by ' +
+          (ctx.assignee ? '<span class="conditional">' + escHtml(ctx.assignee) + '</span>' : 'a CPFSI inspector') +
+          ' rather than the inspector previously named. The scope and timing of the visit are unchanged.</p>';
+      }
+    },
+    {
+      id: 'cpin-deadline-extension',
+      label: 'Extension of deadline',
+      hint: 'Grant additional time to respond or supply records',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>CPFSI agrees to extend the deadline for your response regarding <span class="conditional">' + escHtml(ctx.premises) + '</span> ' +
+          'to <span class="conditional">' + escHtml(ctx.appointment.long) + '</span>. ' +
+          'Please ensure all requested material is provided by that date.</p>';
+      }
+    },
+    {
+      id: 'cpin-no-audit-required',
+      label: 'No audit required',
+      hint: 'Confirm desk evaluation outcome — audit not needed',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>Following review of the incident at <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'CPFSI does not consider a formal audit is required at this time. This CPIN will remain on record for monitoring purposes.</p>';
+      }
+    },
+    {
+      id: 'cpin-desk-eval-followup',
+      label: 'Desk evaluation follow-up',
+      hint: 'Summary after remote review',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>Following the desk-based evaluation of <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'CPFSI requires further information before deciding whether an on-site visit is necessary. Please respond within ten working days.</p>';
+      }
+    },
+    {
+      id: 'cpin-witness-request',
+      label: 'Witness statement request',
+      hint: 'Ask for a formal account from a named witness',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return '<p>CPFSI requests a written witness statement regarding the incident at <span class="conditional">' + escHtml(ctx.premises) + '</span>. ' +
+          'Please provide the account within ten working days, including times, locations and actions taken.</p>';
+      }
     }
   ];
 
   let letterComposerState = null;
 
-  function getLetterTemplatesForContext(context) {
-    return LETTER_TEMPLATES.filter(function (t) {
-      return t.contexts.indexOf(context) >= 0;
+  function letterComposerUsesAuditSetup() {
+    if (!letterComposerState) return false;
+    return letterComposerState.context === 'audit-setup' || letterComposerState.context === 'audit-activity';
+  }
+
+  function getSetupLetterRecipients() {
+    return getSetupResponsiblePersonsForDutyHolders().filter(function (rp) {
+      return rp.status === 'accepted';
     });
+  }
+
+  function getAuditSetupSavedLetters() {
+    if (auditSetup.letters && auditSetup.letters.length) return auditSetup.letters.slice();
+    return [];
+  }
+
+  function auditSetupLettersComplete() {
+    if (auditSetup.letterSkipped) return true;
+    return getAuditSetupSavedLetters().length > 0;
+  }
+
+  function getLetterComposerRecipients() {
+    if (letterComposerUsesAuditSetup()) return getSetupLetterRecipients();
+    const cpin = getCpinById(activeCpinId);
+    return cpin ? getCpinLetterRecipients(cpin) : [];
+  }
+
+  function getLetterComposerSavedLetters() {
+    if (letterComposerUsesAuditSetup()) return getAuditSetupSavedLetters();
+    const cpin = getCpinById(activeCpinId);
+    return cpin ? getCpinSavedLetters(cpin) : [];
+  }
+
+  function getLetterComposerPremises() {
+    if (letterComposerUsesAuditSetup()) {
+      return auditSetup.premises || 'Temple Quay House, Bristol BS1';
+    }
+    const cpin = getCpinById(activeCpinId);
+    return cpin?.premises || '';
+  }
+
+  function getLetterTemplatesForContext(context, searchQuery) {
+    const resolvedContext = (context === 'audit-setup' || context === 'audit-activity') ? 'cpin-onsite' : context;
+    const q = (searchQuery || '').trim().toLowerCase();
+    return LETTER_TEMPLATES.filter(function (t) {
+      if (t.contexts.indexOf(resolvedContext) < 0) return false;
+      if (!q) return true;
+      const hay = (t.label + ' ' + t.hint + ' ' + t.id).toLowerCase();
+      return hay.indexOf(q) >= 0;
+    });
+  }
+
+  function setLetterTemplateSearch(value) {
+    if (!letterComposerState) return;
+    letterComposerState.templateSearch = value || '';
+    renderLetterComposer();
   }
 
   function formatCpinAppointment(cpin) {
@@ -10912,6 +11399,15 @@
   }
 
   function buildLetterComposerContext(context, cpin) {
+    if (context === 'audit-setup' || context === 'audit-activity') {
+      const appt = formatSetupAppointment();
+      return {
+        premises: auditSetup.premises || 'Temple Quay House, Bristol BS1',
+        appointment: appt,
+        incidentRef: auditSetup.sourceCpinRef || 'CPIN-2026-0418',
+        assignee: 'Phil Gower'
+      };
+    }
     const appt = formatCpinAppointment(cpin);
     return {
       premises: cpin.premises || 'Premises',
@@ -10921,15 +11417,47 @@
     };
   }
 
+  function letterComposerAddresseeHtml(rp, premises, savedLetter) {
+    const name = savedLetter
+      ? (savedLetter.recipientName || 'Recipient')
+      : (rp ? rp.name : 'Sir/Madam');
+    const org = savedLetter
+      ? (savedLetter.recipientDh || '')
+      : (rp && rp.linkedDh ? getDutyHolderLabelForKey(rp.linkedDh) : '');
+    return escHtml(name) +
+      (org ? '<br>' + escHtml(org) : '') +
+      '<br>' + escHtml(premises || '');
+  }
+
+  function selectLetterPreviewRecipient(id) {
+    if (!letterComposerState || letterComposerState.mode === 'view') return;
+    if (letterComposerState.editing) {
+      const bodyEl = document.getElementById('letter-composer-body');
+      if (bodyEl) letterComposerState.customBody = bodyEl.innerHTML;
+      letterComposerState.editing = false;
+    }
+    letterComposerState.previewRecipientId = id;
+    renderLetterComposer();
+  }
+
+  function selectLetterView(id) {
+    if (!letterComposerState || letterComposerState.mode !== 'view') return;
+    letterComposerState.viewLetterId = id;
+    renderLetterComposer();
+  }
+
   function openLetterComposer(opts) {
     opts = opts || {};
     letterComposerState = {
       context: opts.context || 'cpin-onsite',
       mode: opts.mode || 'compose',
+      saveTo: opts.saveTo || 'onsite',
       viewLetterId: opts.viewLetterId || null,
       templateId: opts.templateId || null,
       recipientIds: opts.recipientIds ? opts.recipientIds.slice() : null,
       customBody: opts.customBody || null,
+      templateSearch: opts.templateSearch || '',
+      previewRecipientId: opts.previewRecipientId || null,
       editing: false
     };
     const modal = document.getElementById('letter-composer-modal');
@@ -10953,66 +11481,123 @@
   function renderLetterComposer() {
     if (!letterComposerState) return;
     const cpin = getCpinById(activeCpinId);
+    const isAudit = letterComposerUsesAuditSetup();
     const isView = letterComposerState.mode === 'view';
-    const templates = getLetterTemplatesForContext(letterComposerState.context);
-    const holders = getCpinDutyHolders(cpin);
-    const saved = cpin ? getCpinSavedLetters(cpin) : [];
-    const viewLetter = isView && letterComposerState.viewLetterId
-      ? saved.find(function (l) { return l.id === letterComposerState.viewLetterId; })
-      : null;
+    const allTemplates = getLetterTemplatesForContext(letterComposerState.context);
+    const templates = getLetterTemplatesForContext(letterComposerState.context, letterComposerState.templateSearch);
+    const recipients = getLetterComposerRecipients();
+    const saved = getLetterComposerSavedLetters();
+    const premises = getLetterComposerPremises();
 
     const titleEl = document.getElementById('letter-composer-title');
     const subEl = document.getElementById('letter-composer-sub');
+    const layout = document.querySelector('.letter-composer-layout');
     const tplGroup = document.getElementById('letter-composer-template-group');
     const recGroup = document.getElementById('letter-composer-recipient-group');
     const editActions = document.getElementById('letter-composer-edit-actions');
     const saveBtn = document.getElementById('letter-composer-save-btn');
+    const searchEl = document.getElementById('letter-composer-template-search');
 
     if (titleEl) titleEl.textContent = isView ? 'View letter' : 'Write letter';
     if (subEl) {
-      subEl.textContent = isView
-        ? 'Saved copy attached to this CPIN.'
-        : 'Pick a template, choose recipients, review and save.';
+      if (isView) {
+        subEl.textContent = 'Use View on each saved letter to read it in the preview panel.';
+      } else if (letterComposerState.saveTo === 'activity-files' || letterComposerState.saveTo === 'audit-activity-files') {
+        subEl.textContent = 'Choose a template and recipients — use View to preview each letter. Saved copies go to Files only.';
+      } else if (letterComposerState.context === 'audit-setup') {
+        subEl.textContent = 'Choose a template and recipients — letters are saved here and sent when you start the audit.';
+      } else {
+        subEl.textContent = 'Choose a template and recipients on the left — use View to preview each person\'s letter.';
+      }
     }
+    if (layout) layout.classList.remove('is-view-only');
     if (tplGroup) tplGroup.hidden = isView;
-    if (recGroup) recGroup.hidden = isView;
+    const recHelp = document.getElementById('letter-composer-recipient-help');
+    const recLabel = recGroup && recGroup.querySelector('.modal-group-label');
+    if (recLabel) recLabel.textContent = isView ? 'Saved letters' : 'Recipients';
+    if (recHelp) {
+      recHelp.textContent = isView
+        ? 'Use View to read each saved letter in the preview panel.'
+        : 'Tick recipients to include when saving. Use View to read each person\'s letter in the preview.';
+    }
     if (editActions) editActions.hidden = isView;
     if (saveBtn) {
       saveBtn.hidden = isView;
-      if (!isView) saveBtn.textContent = 'Save letters';
+      if (!isView) {
+        const toFiles = letterComposerState.saveTo === 'activity-files' || letterComposerState.saveTo === 'audit-activity-files';
+        saveBtn.textContent = toFiles ? 'Save to files' : 'Save letters';
+      }
     }
     const cancelBtn = document.getElementById('letter-composer-cancel-btn');
     if (cancelBtn) cancelBtn.textContent = isView ? 'Close' : 'Cancel';
 
     if (!isView) {
-      if (!letterComposerState.templateId && templates.length) {
+      if (searchEl && searchEl.value !== (letterComposerState.templateSearch || '')) {
+        searchEl.value = letterComposerState.templateSearch || '';
+      }
+      if (!letterComposerState.templateId && allTemplates.length) {
+        letterComposerState.templateId = allTemplates[0].id;
+      }
+      if (letterComposerState.templateId && templates.length && !templates.some(function (t) { return t.id === letterComposerState.templateId; })) {
         letterComposerState.templateId = templates[0].id;
+        letterComposerState.customBody = null;
       }
       if (!letterComposerState.recipientIds) {
-        letterComposerState.recipientIds = holders.map(function (dh) { return dh.id; });
+        letterComposerState.recipientIds = recipients.map(function (rp) { return rp.id; });
       }
+      letterComposerState.recipientIds = (letterComposerState.recipientIds || []).filter(function (id) {
+        return recipients.some(function (rp) { return rp.id === id; });
+      });
       const tplEl = document.getElementById('letter-composer-templates');
       if (tplEl) {
-        tplEl.innerHTML = templates.map(function (t) {
-          const active = t.id === letterComposerState.templateId ? ' active' : '';
-          return '<button type="button" class="letter-template-chip' + active + '" data-template-id="' + escHtml(t.id) + '" onclick="selectLetterTemplate(\'' + escHtml(t.id) + '\')">' +
-            '<strong>' + escHtml(t.label) + '</strong><span>' + escHtml(t.hint) + '</span></button>';
-        }).join('');
-      }
-      const recEl = document.getElementById('letter-composer-recipients');
-      if (recEl) {
-        if (!holders.length) {
-          recEl.innerHTML = '<div class="letter-attachment-empty">No accepted Duty Holders on this CPIN yet. Approve or add Duty Holders before writing letters.</div>';
+        if (!templates.length) {
+          tplEl.innerHTML = '<div class="letter-template-empty">No templates match your search.</div>';
         } else {
-          recEl.innerHTML = holders.map(function (dh) {
-            const selected = letterComposerState.recipientIds.indexOf(dh.id) >= 0;
-            return '<label class="letter-recipient-row' + (selected ? ' selected' : '') + '">' +
-              '<input type="checkbox"' + (selected ? ' checked' : '') + ' onchange="toggleLetterRecipient(\'' + escHtml(dh.id) + '\', this.checked)" />' +
-              '<div><div class="name">' + escHtml(dh.name) + '</div>' +
-              (dh.role ? '<div class="role">' + escHtml(dh.role) + '</div>' : '') +
-              '</div></label>';
+          tplEl.innerHTML = templates.map(function (t) {
+            const active = t.id === letterComposerState.templateId ? ' active' : '';
+            return '<button type="button" class="letter-template-chip' + active + '" data-template-id="' + escHtml(t.id) + '" onclick="selectLetterTemplate(\'' + escHtml(t.id) + '\')">' +
+              '<strong>' + escHtml(t.label) + '</strong><span>' + escHtml(t.hint) + '</span></button>';
           }).join('');
         }
+      }
+    }
+
+    const recEl = document.getElementById('letter-composer-recipients');
+    if (recEl) {
+      if (isView) {
+        if (!saved.length) {
+          recEl.innerHTML = '<div class="letter-attachment-empty">No saved letters' + (isAudit ? ' for this audit setup' : ' on this CPIN') + '.</div>';
+        } else {
+          recEl.innerHTML = saved.map(function (ltr) {
+            const previewing = ltr.id === letterComposerState.viewLetterId;
+            return '<div class="letter-recipient-row is-saved' + (previewing ? ' previewing' : '') + '">' +
+              '<div><div class="name">' + escHtml(ltr.recipientName || 'Recipient') + '</div>' +
+              (ltr.templateLabel ? '<div class="role">' + escHtml(ltr.templateLabel) + '</div>' : '') +
+              (ltr.at ? '<div class="dh-link">' + escHtml(ltr.at) + '</div>' : '') +
+              '</div>' +
+              '<button type="button" class="btn letter-recipient-view-btn' + (previewing ? ' on' : '') + '" onclick="selectLetterView(\'' + escHtml(ltr.id) + '\')">View</button>' +
+              '</div>';
+          }).join('');
+        }
+      } else if (!recipients.length) {
+        recEl.innerHTML = '<div class="letter-attachment-empty">No approved Responsible Persons for your Duty Holders yet. Approve contacts in the Duty Holders section before writing letters.</div>';
+      } else {
+        if (!letterComposerState.previewRecipientId || !recipients.some(function (rp) { return rp.id === letterComposerState.previewRecipientId; })) {
+          letterComposerState.previewRecipientId = recipients[0].id;
+        }
+        recEl.innerHTML = recipients.map(function (rp) {
+          const selected = letterComposerState.recipientIds.indexOf(rp.id) >= 0;
+          const previewing = rp.id === letterComposerState.previewRecipientId;
+          const dhLabel = rp.linkedDh ? getDutyHolderLabelForKey(rp.linkedDh) : '';
+          return '<div class="letter-recipient-row' + (selected ? ' selected' : '') + (previewing ? ' previewing' : '') + '">' +
+            '<input type="checkbox"' + (selected ? ' checked' : '') + ' onchange="toggleLetterRecipient(\'' + escHtml(rp.id) + '\', this.checked)" />' +
+            '<div><div class="name">' + escHtml(rp.name) + '</div>' +
+            (rp.role ? '<div class="role">' + escHtml(rp.role) + '</div>' : '') +
+            (dhLabel ? '<div class="dh-link">Contact for ' + escHtml(dhLabel) + '</div>' : '') +
+            '</div>' +
+            '<button type="button" class="btn letter-recipient-view-btn' + (previewing ? ' on' : '') + '" onclick="selectLetterPreviewRecipient(\'' + escHtml(rp.id) + '\')">View</button>' +
+            '</div>';
+        }).join('');
       }
     }
 
@@ -11021,32 +11606,35 @@
     const bodyEl = document.getElementById('letter-composer-body');
     const preview = document.getElementById('letter-composer-preview');
 
-    if (isView && viewLetter) {
-      if (dateEl) dateEl.textContent = viewLetter.at || letterComposerTodayLabel();
-      if (addresseeEl) {
-        addresseeEl.innerHTML = escHtml(viewLetter.recipientName || 'Duty Holder') + '<br>' + escHtml(cpin?.premises || '');
+    if (isView) {
+      if (!letterComposerState.viewLetterId && saved.length) {
+        letterComposerState.viewLetterId = saved[0].id;
       }
-      if (bodyEl) bodyEl.innerHTML = viewLetter.body || '';
+      const activeViewLetter = saved.find(function (l) { return l.id === letterComposerState.viewLetterId; }) || saved[0];
+      if (activeViewLetter) {
+        if (dateEl) dateEl.textContent = activeViewLetter.at || letterComposerTodayLabel();
+        if (addresseeEl) {
+          addresseeEl.innerHTML = letterComposerAddresseeHtml(null, premises, activeViewLetter);
+        }
+        if (bodyEl) bodyEl.innerHTML = activeViewLetter.body || '';
+      }
       if (preview) preview.classList.remove('editing');
       return;
     }
 
-    const template = templates.find(function (t) { return t.id === letterComposerState.templateId; }) || templates[0];
-    const firstDh = holders.find(function (dh) {
-      return letterComposerState.recipientIds && letterComposerState.recipientIds.indexOf(dh.id) >= 0;
-    }) || holders[0];
+    const template = allTemplates.find(function (t) { return t.id === letterComposerState.templateId; }) || allTemplates[0];
+    const previewRp = recipients.find(function (rp) { return rp.id === letterComposerState.previewRecipientId; }) || recipients[0];
 
     if (dateEl) dateEl.textContent = letterComposerTodayLabel();
-    if (addresseeEl && cpin) {
-      const name = firstDh ? firstDh.name : 'Duty Holder';
-      addresseeEl.innerHTML = escHtml(name) + '<br>' + escHtml(cpin.premises || '');
+    if (addresseeEl && (cpin || isAudit)) {
+      addresseeEl.innerHTML = letterComposerAddresseeHtml(previewRp, premises);
     }
-    if (bodyEl && template && cpin) {
+    if (bodyEl && template && (cpin || isAudit)) {
       if (letterComposerState.customBody && !letterComposerState.editing) {
         bodyEl.innerHTML = letterComposerState.customBody;
       } else if (!letterComposerState.editing) {
         const ctx = buildLetterComposerContext(letterComposerState.context, cpin);
-        if (firstDh) ctx.addressee = firstDh;
+        if (previewRp) ctx.addressee = previewRp;
         bodyEl.innerHTML = template.buildBody(ctx);
       }
     }
@@ -11089,13 +11677,14 @@
 
   function saveLetterComposer() {
     if (!letterComposerState || letterComposerState.mode === 'view') return;
+    const isAudit = letterComposerUsesAuditSetup();
     const cpin = getCpinById(activeCpinId);
-    if (!cpin) return;
-    const holders = getCpinDutyHolders(cpin);
+    if (!isAudit && !cpin) return;
+    const recipients = getLetterComposerRecipients();
     const recipientIds = letterComposerState.recipientIds || [];
-    const selected = holders.filter(function (dh) { return recipientIds.indexOf(dh.id) >= 0; });
+    const selected = recipients.filter(function (rp) { return recipientIds.indexOf(rp.id) >= 0; });
     if (!selected.length) {
-      window.alert('Select at least one Duty Holder to send letters to.');
+      window.alert('Select at least one Responsible Person to send letters to.');
       return;
     }
     const templates = getLetterTemplatesForContext(letterComposerState.context);
@@ -11111,23 +11700,24 @@
     const sharedBody = letterComposerState.customBody || (bodyEl ? bodyEl.innerHTML : '');
     const ctxBase = buildLetterComposerContext(letterComposerState.context, cpin);
     const stamp = cpinLogTimestamp();
-    const existing = getCpinSavedLetters(cpin);
-    const newLetters = selected.map(function (dh) {
+    const saveTo = letterComposerState.saveTo || 'onsite';
+    const newLetters = selected.map(function (rp) {
       let bodyHtml;
       if (useSharedBody) {
         bodyHtml = sharedBody;
       } else {
-        const ctx = Object.assign({}, ctxBase, { addressee: dh });
+        const ctx = Object.assign({}, ctxBase, { addressee: rp });
         bodyHtml = template.buildBody(ctx);
       }
-      const fileName = 'Letter-' + letterFileSlug(dh.name) + '-' + letterFileSlug(template.label) + '-' +
+      const fileName = 'Letter-' + letterFileSlug(rp.name) + '-' + letterFileSlug(template.label) + '-' +
         new Date().toISOString().slice(0, 10) + '.pdf';
       return {
-        id: 'ltr-' + Date.now() + '-' + dh.id,
+        id: 'ltr-' + Date.now() + '-' + rp.id,
         templateId: template.id,
         templateLabel: template.label,
-        recipientId: dh.id,
-        recipientName: dh.name,
+        recipientId: rp.id,
+        recipientName: rp.name,
+        recipientDh: rp.linkedDh ? getDutyHolderLabelForKey(rp.linkedDh) : '',
         fileName: fileName,
         body: bodyHtml,
         at: stamp.at,
@@ -11135,6 +11725,67 @@
       };
     });
 
+    if (saveTo === 'setup') {
+      auditSetup.letters = getAuditSetupSavedLetters().concat(newLetters);
+      auditSetup.letterSkipped = false;
+      auditSetup.letterSent = true;
+      localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(getAuditSetupPayload()));
+      renderSetupAppointmentLetters();
+      closeLetterComposer();
+      return;
+    }
+
+    if (saveTo === 'audit-activity-files') {
+      newLetters.forEach(function (ltr, i) {
+        const entryTs = stamp.ts - i;
+        auditActivityLog.files.unshift({
+          id: 'f-' + ltr.id,
+          name: ltr.fileName,
+          description: ltr.templateLabel + ' · ' + ltr.recipientName,
+          at: ltr.at,
+          ts: entryTs
+        });
+        auditActivityLog.interim.unshift({
+          id: 'i-' + ltr.id,
+          title: ltr.templateLabel,
+          text: 'Letter for ' + ltr.recipientName + ' saved to files.',
+          at: ltr.at,
+          ts: entryTs
+        });
+      });
+      renderAuditActivity();
+      closeLetterComposer();
+      return;
+    }
+
+    newLetters.forEach(function (ltr, i) {
+      const entryTs = stamp.ts - i;
+      cpinActivityLog.files.unshift({
+        id: 'f-' + ltr.id,
+        name: ltr.fileName,
+        description: ltr.templateLabel + ' · ' + ltr.recipientName,
+        at: ltr.at,
+        ts: entryTs
+      });
+      if (saveTo === 'activity-files') {
+        cpinActivityLog.interim.unshift({
+          id: 'i-' + ltr.id,
+          title: ltr.templateLabel,
+          text: 'Letter for ' + ltr.recipientName + ' saved to files.',
+          at: ltr.at,
+          ts: entryTs
+        });
+      }
+    });
+    saveCpinActivityLogToRecord();
+    renderCpinActivity();
+
+    if (saveTo === 'activity-files') {
+      closeLetterComposer();
+      return;
+    }
+
+    const existing = getCpinSavedLetters(cpin);
     const o = Object.assign({}, getCpinOnsiteEval(cpin), {
       letters: existing.concat(newLetters),
       letterSent: true,
@@ -11143,21 +11794,12 @@
     });
     persistCpinPatch(activeCpinId, { onsiteEval: o, workflow: 'desk_eval' });
 
-    newLetters.forEach(function (ltr) {
-      cpinActivityLog.files.unshift({
-        id: 'f-' + ltr.id,
-        name: ltr.fileName,
-        description: ltr.templateLabel + ' · ' + ltr.recipientName,
-        at: ltr.at,
-        ts: ltr.ts
-      });
-    });
-    const names = selected.map(function (dh) { return dh.name; });
+    const names = selected.map(function (rp) { return rp.name; });
     cpinActivityLog.notes.unshift({
       id: 'n-' + stamp.ts,
       text: newLetters.length === 1
-        ? 'Appointment letter saved for ' + names[0] + '.'
-        : newLetters.length + ' appointment letters saved for ' + formatDutyHolderList(names) + '.',
+        ? 'Letter saved for ' + names[0] + '.'
+        : newLetters.length + ' letters saved for ' + formatDutyHolderList(names) + '.',
       at: stamp.at,
       ts: stamp.ts
     });
@@ -11168,14 +11810,32 @@
     refreshCpinDetailPage();
   }
 
+  function openCpinActivityLetterComposer() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    if (!getCpinDutyHolders(cpin).length) {
+      window.alert('Approve at least one Duty Holder before writing letters.');
+      return;
+    }
+    if (!getCpinLetterRecipients(cpin).length) {
+      window.alert('Approve at least one Responsible Person linked to your Duty Holders before writing letters.');
+      return;
+    }
+    openLetterComposer({ context: 'cpin-onsite', saveTo: 'activity-files' });
+  }
+
   function openCpinOnsiteLetterComposer() {
     const cpin = getCpinById(activeCpinId);
     if (!cpin) return;
     if (!getCpinDutyHolders(cpin).length) {
-      window.alert('Add and accept at least one Duty Holder before writing letters.');
+      window.alert('Approve at least one Duty Holder before writing letters.');
       return;
     }
-    openLetterComposer({ context: 'cpin-onsite' });
+    if (!getCpinLetterRecipients(cpin).length) {
+      window.alert('Approve at least one Responsible Person linked to your Duty Holders before writing letters.');
+      return;
+    }
+    openLetterComposer({ context: 'cpin-onsite', saveTo: 'onsite' });
   }
 
   function viewCpinOnsiteLetter(letterId) {
@@ -11190,7 +11850,7 @@
     const o = getCpinOnsiteEval(cpin);
 
     if (!letters.length) {
-      list.innerHTML = '<div class="letter-attachment-empty">No letters saved yet. Use Write letter to create templated letters for Duty Holders on this CPIN.</div>';
+      list.innerHTML = '<div class="letter-attachment-empty">No letters saved yet. Use Write letter to create templated letters for Responsible Persons on this CPIN.</div>';
     } else {
       list.innerHTML = letters.map(function (ltr) {
         const meta = (ltr.templateLabel || 'Letter') + ' · ' + (ltr.recipientName || 'Duty Holder') + (ltr.at ? ' · ' + ltr.at : '');
@@ -11210,6 +11870,67 @@
     }
   }
 
+  function renderSetupAppointmentLetters() {
+    const list = document.getElementById('setup-appointment-letters-list');
+    const status = document.getElementById('setup-appointment-letter-status');
+    if (!list) return;
+    const letters = getAuditSetupSavedLetters();
+
+    if (!letters.length) {
+      list.innerHTML = '<div class="letter-attachment-empty">No letters saved yet. Use Write letter to create templated letters for Responsible Persons on this audit.</div>';
+    } else {
+      list.innerHTML = letters.map(function (ltr) {
+        const meta = (ltr.templateLabel || 'Letter') + ' · ' + (ltr.recipientName || 'Recipient') + (ltr.at ? ' · ' + ltr.at : '');
+        return '<div class="letter-attachment-item">' +
+          '<div class="letter-attachment-icon">PDF</div>' +
+          '<div class="letter-attachment-info"><strong>' + escHtml(ltr.fileName || 'Letter.pdf') + '</strong>' +
+          '<span>' + escHtml(meta) + '</span></div>' +
+          '<button class="btn" type="button" onclick="viewAuditSetupLetter(\'' + escHtml(ltr.id) + '\')">View</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    if (status) {
+      if (auditSetup.letterSkipped) status.textContent = 'Skipped — confirmed by telephone';
+      else if (letters.length) status.textContent = '✓ ' + letters.length + (letters.length === 1 ? ' letter saved' : ' letters saved');
+      else status.textContent = '';
+    }
+  }
+
+  function openAuditSetupLetterComposer() {
+    if (!setupHasAcceptedDutyHolders()) {
+      window.alert('Approve at least one Duty Holder before writing letters.');
+      return;
+    }
+    if (!getSetupLetterRecipients().length) {
+      window.alert('Approve at least one Responsible Person linked to your Duty Holders before writing letters.');
+      return;
+    }
+    openLetterComposer({ context: 'audit-setup', saveTo: 'setup' });
+  }
+
+  function openAuditActivityLetterComposer() {
+    const draft = localStorage.getItem(SETUP_DRAFT_KEY);
+    if (draft) {
+      try { auditSetup = Object.assign(defaultAuditSetup(), JSON.parse(draft)); } catch (e) { /* keep current */ }
+    }
+    if (!getSetupLetterRecipients().length) {
+      window.alert('Approve at least one Responsible Person on this audit before writing letters.');
+      return;
+    }
+    openLetterComposer({ context: 'audit-activity', saveTo: 'audit-activity-files' });
+  }
+
+  function skipAuditSetupLetter() {
+    auditSetup.letterSkipped = true;
+    localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(getAuditSetupPayload()));
+    renderSetupAppointmentLetters();
+  }
+
+  function viewAuditSetupLetter(letterId) {
+    openLetterComposer({ context: 'audit-setup', mode: 'view', viewLetterId: letterId });
+  }
+
   function defaultSetupDutyHolders() {
     return [
       { id: 'dh1', key: 'hmcts', ref: 'DH-0001042', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM', fromPremises: true, status: 'suggested' },
@@ -11223,6 +11944,9 @@
     dutyHolders: defaultSetupDutyHolders(),
     responsiblePersons: [],
     inspectors: [],
+    letters: [],
+    letterSkipped: false,
+    letterSent: false,
     letterCustom: null,
     letterEditing: false
   };
@@ -11233,6 +11957,9 @@
       dutyHolders: defaultSetupDutyHolders(),
       responsiblePersons: [],
       inspectors: [],
+      letters: [],
+      letterSkipped: false,
+      letterSent: false,
       letterCustom: null,
       letterEditing: false
     }));
@@ -11296,6 +12023,7 @@
     if (timeEl && auditSetup.appointmentTime) timeEl.value = auditSetup.appointmentTime;
     if (durEl && auditSetup.appointmentDuration) durEl.value = auditSetup.appointmentDuration;
     onSetupAppointmentChange();
+    renderSetupAppointmentLetters();
     showSetupDraftNotice(!!draft);
   }
 
@@ -11333,8 +12061,38 @@
       };
       durHelp.textContent = hints[type] || hints.full;
     }
-    if (refresh !== false && !auditSetup.letterCustom) updateSetupLetter();
     refreshSetupSummary();
+  }
+
+  function getSetupDutyHolderKey(dh) {
+    if (!dh) return null;
+    return dh.key || SETUP_DH_KEY_BY_NAME[dh.name] || null;
+  }
+
+  function setupHasAcceptedDutyHolders() {
+    return auditSetup.dutyHolders.some(function (d) { return d.status === 'accepted'; });
+  }
+
+  function getSetupAcceptedDhKeys() {
+    return auditSetup.dutyHolders.filter(function (d) { return d.status === 'accepted'; })
+      .map(getSetupDutyHolderKey).filter(Boolean);
+  }
+
+  function getSetupResponsiblePersonsForDutyHolders() {
+    const dhKeys = getSetupAcceptedDhKeys();
+    if (!dhKeys.length) return [];
+    return (auditSetup.responsiblePersons || []).filter(function (rp) {
+      if (!rp.linkedDh) return false;
+      return dhKeys.indexOf(rp.linkedDh) >= 0;
+    });
+  }
+
+  function pruneSetupResponsiblePersons() {
+    const dhKeys = getSetupAcceptedDhKeys();
+    auditSetup.responsiblePersons = (auditSetup.responsiblePersons || []).filter(function (rp) {
+      if (!rp.linkedDh) return true;
+      return dhKeys.indexOf(rp.linkedDh) >= 0;
+    });
   }
 
   function suggestSetupRpsForDh(dhKey) {
@@ -11376,6 +12134,7 @@
       return;
     }
     auditSetup.dutyHolders = auditSetup.dutyHolders.filter(function (d) { return d.id !== id; });
+    pruneSetupResponsiblePersons();
     renderSetupDutyHolders();
     renderSetupResponsiblePersons();
     refreshSetupSummary();
@@ -11411,18 +12170,20 @@
         pill + actions + '</div>';
     }).join('');
     refreshSetupSummary();
-    if (!auditSetup.letterCustom) updateSetupLetter();
   }
 
   function renderSetupResponsiblePersons() {
     const list = document.getElementById('setup-rp-list');
     if (!list) return;
-    if (!auditSetup.responsiblePersons.length) {
-      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No Responsible Persons yet. Approve Duty Holders to see suggested contacts here.</p>';
+    pruneSetupResponsiblePersons();
+    const rps = getSetupResponsiblePersonsForDutyHolders();
+    if (!rps.length) {
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No suggested contacts for the approved Duty Holders. Use + Add to search the directory.</p>';
       refreshSetupSummary();
       return;
     }
-    list.innerHTML = auditSetup.responsiblePersons.map(function (rp) {
+    list.innerHTML = rps.map(function (rp) {
+      const dhLabel = rp.linkedDh ? getDutyHolderLabelForKey(rp.linkedDh) : '';
       const pill = rp.status === 'suggested'
         ? '<span class="pill amber">Suggested</span>'
         : '<span class="pill grey">Approved</span>';
@@ -11432,7 +12193,9 @@
       return '<div class="holder-card' + (rp.status === 'suggested' ? ' is-suggested' : '') + '" data-id="' + rp.id + '">' +
         '<div class="avatar-sm">' + escHtml(sanitizeAvatarInitials(rp.initials)) + '</div>' +
         '<div><div class="name">' + escHtml(rp.name) + ' <span class="prem-ref">' + escHtml(rp.ref || '') + '</span></div>' +
-        '<div class="role">' + escHtml(rp.role.replace(/[\u2013\u2014]/g, '-')) + '</div></div>' +
+        '<div class="role">' + escHtml(rp.role.replace(/[\u2013\u2014]/g, '-')) + '</div>' +
+        (dhLabel ? '<div class="role" style="font-size:11px;margin-top:2px;">Contact for ' + escHtml(dhLabel) + '</div>' : '') +
+        '</div>' +
         pill + actions + '</div>';
     }).join('');
     refreshSetupSummary();
@@ -11529,6 +12292,11 @@
   let setupLookupMode = null;
   let setupLookupTarget = 'audit';
 
+  function getSetupLookupCatalog(mode) {
+    if (mode === 'premises') return getCpinPremisesCatalog();
+    return SETUP_LOOKUP_CATALOG[mode] || [];
+  }
+
   function openSetupLookupModal(mode) {
     if (setupLookupTarget !== 'cpin') setupLookupTarget = 'audit';
     setupLookupMode = mode;
@@ -11567,8 +12335,7 @@
     const empty = document.getElementById('setup-lookup-empty');
     if (!list || !empty) return;
 
-    let catalog = SETUP_LOOKUP_CATALOG[setupLookupMode] || [];
-    if (setupLookupMode === 'premises') catalog = getCpinPremisesCatalog();
+    let catalog = getSetupLookupCatalog(setupLookupMode);
 
     let filtered = catalog.filter(entry => {
       if (!q) return true;
@@ -11617,7 +12384,7 @@
   }
 
   function selectSetupLookup(key) {
-    const catalog = SETUP_LOOKUP_CATALOG[setupLookupMode] || [];
+    const catalog = getSetupLookupCatalog(setupLookupMode);
     const entry = catalog.find(e => e.key === key);
     if (!entry || !setupLookupMode) return;
 
@@ -11648,6 +12415,9 @@
         renderSetupDutyHolders();
       }
     } else if (setupLookupMode === 'responsiblePerson') {
+      const linkedDh = getDhKeyForRpKey(entry.key) ||
+        (setupLookupTarget === 'cpin' && getCpinById(activeCpinId) ? getAcceptedDutyHolderKeys(getCpinById(activeCpinId))[0] : null) ||
+        (setupHasAcceptedDutyHolders() ? getSetupAcceptedDhKeys()[0] : null);
       const rp = {
         id: 'rp' + Date.now(),
         key: entry.key,
@@ -11656,7 +12426,8 @@
         role: entry.role,
         initials: entry.initials,
         fromPremises: false,
-        status: 'suggested'
+        status: 'suggested',
+        linkedDh: linkedDh
       };
       if (setupLookupTarget === 'cpin') {
         const cpin = getCpinById(activeCpinId);
@@ -11698,7 +12469,9 @@
       return;
     }
     auditSetup.dutyHolders = auditSetup.dutyHolders.filter(d => d.id !== id);
+    pruneSetupResponsiblePersons();
     renderSetupDutyHolders();
+    renderSetupResponsiblePersons();
   }
 
   function addSetupResponsiblePerson() {
@@ -11723,22 +12496,22 @@
     const dateEl = document.getElementById('apt-date');
     const timeEl = document.getElementById('apt-time');
     const durEl = document.getElementById('setup-apt-duration');
-    if (!dateEl || !timeEl) return { label: '—', long: '—', duration: 'half a day' };
-
-    const d = new Date(dateEl.value + 'T' + timeEl.value);
-    const day = dateEl.value
-      ? new Date(dateEl.value).toLocaleDateString('en-GB', { weekday: 'long' })
-      : '';
-    const dateShort = dateEl.value
-      ? new Date(dateEl.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-      : '';
-    const time = timeEl.value ? timeEl.value.slice(0, 5) : '10:00';
-    const durationKey = durEl ? durEl.value : 'half';
+    const dateVal = (dateEl && dateEl.value) || auditSetup.appointmentDate || '';
+    const timeVal = (timeEl && timeEl.value) || auditSetup.appointmentTime || '10:00';
+    const durationKey = (durEl && durEl.value) || auditSetup.appointmentDuration || 'half';
     const duration = DURATION_LABELS[durationKey] || DURATION_LABELS.half;
 
+    if (!dateVal) {
+      return { label: '—', long: 'the agreed date', duration: duration, durationKey: durationKey };
+    }
+
+    const day = new Date(dateVal).toLocaleDateString('en-GB', { weekday: 'long' });
+    const dateShort = new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const time = timeVal ? timeVal.slice(0, 5) : '10:00';
+
     return {
-      label: day ? day.slice(0, 3) + ' ' + dateShort + ', ' + time : '—',
-      long: day ? day + ' ' + new Date(dateEl.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + time : '—',
+      label: day.slice(0, 3) + ' ' + dateShort + ', ' + time,
+      long: day + ' ' + new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + time,
       duration,
       durationKey
     };
@@ -11759,7 +12532,6 @@
       };
       durHelp.textContent = hints[durEl.value] || hints.half;
     }
-    if (!auditSetup.letterCustom) updateSetupLetter();
     refreshSetupSummary();
   }
 
@@ -11833,8 +12605,8 @@
         insEl.className = 'v';
       }
     }
-    if (dhEl) dhEl.textContent = String(auditSetup.dutyHolders.length);
-    if (rpEl) rpEl.textContent = String(auditSetup.responsiblePersons.length);
+    if (dhEl) dhEl.textContent = String(auditSetup.dutyHolders.filter(function (d) { return d.status === 'accepted'; }).length || auditSetup.dutyHolders.length);
+    if (rpEl) rpEl.textContent = String(getSetupResponsiblePersonsForDutyHolders().length);
     if (apptEl) apptEl.textContent = formatSetupAppointment().label;
   }
 
@@ -11880,10 +12652,18 @@
 
   function validateAuditSetup() {
     const approvedDh = auditSetup.dutyHolders.filter(function (d) {
-      return d.status === 'accepted' || (d.status !== 'suggested' && d.status !== 'rejected' && !d.status);
+      return d.status === 'accepted';
     });
     if (approvedDh.length < 1) {
       window.alert('Approve at least one Duty Holder before starting the audit.');
+      return false;
+    }
+    if (!getSetupLetterRecipients().length) {
+      window.alert('Approve at least one Responsible Person linked to your Duty Holders before starting the audit.');
+      return false;
+    }
+    if (!auditSetupLettersComplete()) {
+      window.alert('Save or skip appointment letters before starting the audit.');
       return false;
     }
     const dateEl = document.getElementById('apt-date');
