@@ -1,7 +1,7 @@
 ---
 description: Update root index BUILD_STAMPS whenever the prototype changes
 globs: index.html,v1/**,v2/**
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Prototype build stamps
@@ -10,7 +10,7 @@ When you change the CPFSI prototype (`index.html`, `v1/`, or `v2/`), update `BUI
 
 ## Format
 
-UK style: `D Mon YYYY, HH:MM` (24-hour), e.g. `4 Jun 2026, 20:24`.
+UK style: `D Mon YYYY, HH:MM` (24-hour), e.g. `8 Jun 2026, 13:48`.
 
 ## Which keys to bump
 
@@ -19,14 +19,32 @@ UK style: `D Mon YYYY, HH:MM` (24-hour), e.g. `4 Jun 2026, 20:24`.
 
 Only V1 and V2 cards show stamps; do not add a chooser-page stamp.
 
-Use the current local date/time when updating (not a placeholder).
+## Getting the date (required)
+
+**Do not guess the date** from conversation metadata, summaries, or prior stamps.
+
+Before bumping a stamp, run this in the terminal and use its output verbatim:
+
+```bash
+date '+%d %b %Y, %H:%M'
+```
+
+Strip any leading zero on the day if the command returns one (e.g. `08 Jun` → `8 Jun`) to match existing stamps.
+
+## Final checklist
+
+Before marking prototype work complete:
+
+1. Run `date '+%d %b %Y, %H:%M'`.
+2. Update the matching key in root `index.html` → `BUILD_STAMPS`.
+3. Confirm the V1/V2 chooser cards would show the new stamp (no typo in month or year).
 
 ## Example
 
 ```javascript
 const BUILD_STAMPS = {
   v1: '4 Jun 2026, 14:31',
-  v2: '4 Jun 2026, 20:24'
+  v2: '8 Jun 2026, 13:48'
 };
 ```
 
