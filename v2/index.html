@@ -1372,6 +1372,127 @@
   }
   .cpin-intake-grid .v { font-weight: 500; }
   .cpin-intake-grid .full { grid-column: 1 / -1; }
+  .cpin-intake-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .cpin-intake-section-head h3 {
+    margin: 0;
+  }
+  .cpin-intake-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 24px;
+    margin-bottom: 12px;
+  }
+  .cpin-intake-edit-field label {
+    display: block;
+    color: var(--ink-3);
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .cpin-intake-edit-field input,
+  .cpin-intake-edit-field select {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+  .cpin-intake-edit-field.full {
+    grid-column: 1 / -1;
+  }
+  .cpin-intake-edit-divider {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .cpin-intake-premises-linked {
+    font-size: 13px;
+    color: var(--ink-2);
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+  }
+  .cpin-stop-message {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .cpin-stop-message-heading {
+    margin: 0 0 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .cpin-stop-status-label {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .cpin-stop-status-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cpin-stop-status-option {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .cpin-stop-status-option input {
+    width: auto;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .cpin-stop-message-panel {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+  }
+  .cpin-stop-message-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .cpin-stop-message-block + .cpin-stop-message-block {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-2);
+  }
+  .cpin-stop-desc-readonly {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink);
+    white-space: pre-wrap;
+  }
+  .cpin-stop-status-readonly {
+    margin: 6px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .cpin-stop-message-edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
   .cpin-decision-options {
     display: flex;
     flex-direction: column;
@@ -1507,7 +1628,8 @@
   }
   @media (max-width: 900px) {
     .cpin-key-fields { grid-template-columns: 1fr; }
-    .cpin-intake-grid { grid-template-columns: 1fr; }
+    .cpin-intake-grid,
+    .cpin-intake-edit-grid { grid-template-columns: 1fr; }
     .cpin-rag-strip-detail { text-align: left; }
   }
   .premises-audit-banner {
@@ -1780,6 +1902,127 @@
     padding: 2px 4px;
     border-radius: 3px;
     border-bottom: 1px dashed #d4a800;
+  }
+
+  /* Letter composer (site-wide pattern) */
+  #letter-composer-modal .modal { max-width: 760px; }
+  .letter-template-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .letter-template-chip {
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-2);
+    cursor: pointer;
+    text-align: left;
+    max-width: 100%;
+  }
+  .letter-template-chip strong {
+    display: block;
+    color: var(--ink);
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  .letter-template-chip span {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .letter-template-chip.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+  .letter-template-chip.active strong,
+  .letter-template-chip.active span { color: #fff; }
+  .letter-recipient-list { margin-top: 4px; }
+  .letter-recipient-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: #fcfcfa;
+    cursor: pointer;
+  }
+  .letter-recipient-row:hover { border-color: var(--accent); }
+  .letter-recipient-row.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .letter-recipient-row input { width: auto; margin: 0; }
+  .letter-recipient-row .name { font-weight: 600; font-size: 13px; }
+  .letter-recipient-row .role { color: var(--ink-3); font-size: 12px; margin-top: 1px; }
+  .letter-composer-preview-wrap { margin-top: 4px; }
+  #letter-composer-preview.editing {
+    outline: 2px solid var(--gov-focus);
+    outline-offset: 2px;
+  }
+  #letter-composer-preview.editing .letter-composer-body {
+    background: #fffceb;
+    padding: 6px 8px;
+    border-radius: 4px;
+  }
+  .letter-composer-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    align-items: center;
+  }
+  .letter-attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .letter-attachment-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+  }
+  .letter-attachment-icon {
+    width: 36px;
+    height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 0.04em;
+  }
+  .letter-attachment-info strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  .letter-attachment-info span {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .letter-attachment-empty {
+    padding: 14px;
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: center;
   }
 
   /* Help banner */
@@ -3119,8 +3362,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 14px 4px 8px;
-    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    margin: 14px 4px 10px;
+    font-size: 13px;
     color: var(--ink-3);
   }
   .list-sort-trigger {
@@ -3137,6 +3382,157 @@
     font-weight: 600;
   }
   .list-sort-trigger:hover strong { text-decoration: underline; }
+  .list-results-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 28px;
+  }
+  .list-results-seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .list-results-seg strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .list-results-label {
+    color: var(--ink-3);
+  }
+  .list-control-dropdown {
+    position: relative;
+    display: inline;
+  }
+  .list-control-trigger {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    display: inline;
+  }
+  .list-control-trigger strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .list-control-trigger:hover strong { text-decoration: underline; }
+  .list-control-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 30;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(11, 12, 12, 0.12);
+    padding: 4px;
+  }
+  .list-control-menu[hidden] { display: none !important; }
+  .list-control-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--ink-2);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .list-control-option:hover { background: var(--line-2); color: var(--ink); }
+  .list-control-option.on { font-weight: 600; color: var(--ink); background: var(--line-2); }
+  .list-header-sort {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    font-weight: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .list-header-sort:hover { color: var(--ink); }
+  .list-header-sort.is-active { color: var(--ink); }
+  .list-header-sort .sort-ind { font-size: 9px; opacity: 0.7; }
+  .prem-ref,
+  .proc-ref {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 400;
+  }
+  .topbar-create-btn { flex-shrink: 0; white-space: nowrap; }
+  .cpin-pin-hint {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin: 0 0 12px;
+  }
+  .cpin-pin-hint .cpin-pin-demo {
+    color: var(--amber);
+    font-weight: 600;
+  }
+  .dash-cpin-toggle {
+    display: flex;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .dash-cpin-toggle button {
+    background: none;
+    border: none;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--ink-3);
+    font: inherit;
+    cursor: pointer;
+  }
+  .dash-cpin-toggle button.on {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+  }
+  .finding-dh-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .finding-dh-checks label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .finding .edit-finding {
+    margin-left: 8px;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .finding .edit-finding:hover { text-decoration: underline; }
+  .audit-edit-warning {
+    padding: 12px 14px;
+    background: var(--amber-soft);
+    border: 1px solid var(--amber-soft);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--amber);
+    margin-bottom: 16px;
+  }
+  .holder-card.is-suggested { border-color: var(--amber); background: var(--amber-soft); }
+  .holder-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .holder-actions .btn { padding: 4px 10px; font-size: 12px; }
 
   .process-filters-bar .filter-group {
     margin-top: 0;
@@ -3148,6 +3544,38 @@
   .process-filters-bar .filter-chips {
     margin-top: 0;
     margin-bottom: 0;
+  }
+  @media (min-width: 841px) {
+    #premises .process-filters-bar,
+    #cpins .process-filters-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 16px 24px;
+    }
+    #premises .process-filters-bar .filter-group,
+    #cpins .process-filters-bar .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+    #premises .process-filters-bar .filter-group + .filter-group,
+    #cpins .process-filters-bar .filter-group + .filter-group {
+      margin-top: 0;
+    }
+    #premises .process-filters-bar .filter-group-label,
+    #cpins .process-filters-bar .filter-group-label {
+      margin-bottom: 0;
+      white-space: nowrap;
+    }
+    #premises .process-filters-bar .filter-chips--scroll,
+    #cpins .process-filters-bar .filter-chips--scroll {
+      flex-wrap: nowrap;
+      overflow-x: visible;
+      padding: 0;
+    }
   }
   .views-rail {
     background: var(--surface);
@@ -3343,10 +3771,9 @@
       margin-left: auto;
       gap: 6px;
     }
-    #topbar-log-time {
+    .topbar-create-btn {
       font-size: 12px;
-      padding: 7px 10px;
-      white-space: nowrap;
+      padding: 7px 12px;
     }
 
     .phase-banner {
@@ -3887,7 +4314,7 @@
     <div id="global-search-results" class="search-results" hidden role="listbox"></div>
   </div>
   <div class="topbar-tools">
-    <button class="btn" id="topbar-log-time" type="button" onclick="show('time')">+ Log time</button>
+    <button class="btn primary topbar-create-btn" type="button" onclick="openNewModal()">+ Create</button>
     <div class="user-menu-wrap" id="user-menu-wrap">
       <button type="button" class="user-menu-trigger" id="user-menu-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="user-menu" aria-label="Account menu for Phil Gower" onclick="toggleUserMenu(event)">
         <span class="topbar-user-name" style="font-size:13px;">Phil Gower</span>
@@ -3895,7 +4322,9 @@
         <span class="user-menu-chevron" aria-hidden="true">▾</span>
       </button>
       <div class="user-menu" id="user-menu" hidden role="menu" aria-label="Account menu">
+        <button type="button" role="menuitem" onclick="closeUserMenu();show('time')">Log time</button>
         <button type="button" role="menuitem" onclick="openCpinReportFromMenu()">Submit CPIN</button>
+        <button type="button" role="menuitem" onclick="closeUserMenu();show('admin')">Admin and settings</button>
         <button type="button" role="menuitem" onclick="resetPrototypeData()">Reset prototype</button>
         <div class="user-menu-divider" role="separator"></div>
         <button type="button" role="menuitem" class="is-destructive" onclick="signOutPrototype()">Sign out</button>
@@ -3965,58 +4394,52 @@
 </div>
 
 <!-- =========================================================
+     ADMIN (placeholder — user management & system config)
+========================================================= -->
+<div id="admin" class="screen">
+  <main>
+    <div class="crumbs"><a onclick="show('dashboard')">Dashboard</a> /  Admin</div>
+    <h1>Admin and settings</h1>
+    <div class="meta">User management, system configuration and permissions. Views not in scope for this prototype.</div>
+    <div class="card" style="margin-top:20px;max-width:560px;">
+      <h3 style="margin-top:0;">Planned areas</h3>
+      <ul style="margin:0;padding-left:20px;line-height:1.8;color:var(--ink-2);font-size:13px;">
+        <li>User accounts and roles</li>
+        <li>Organisation and patch configuration</li>
+        <li>Letter templates and report definitions</li>
+        <li>Audit edit permissions (e.g. amend findings after letters sent)</li>
+      </ul>
+      <p style="font-size:12px;color:var(--ink-3);margin:16px 0 0;">Prototype demo: <button type="button" class="btn" onclick="grantAuditEditPermission()">Grant audit edit permission</button> for the Temple Quay audit.</p>
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================
      DASHBOARD
 ========================================================= -->
 <div id="dashboard" class="screen">
   <main>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-      <div>
-        <h1>Good morning, Phil.</h1>
-        <div class="meta">Monday 22 June 2026  ·  Week 26  ·  Patch: Kent, Surrey, Sussex</div>
-      </div>
-      <button class="btn primary" onclick="openNewModal()">+ Create</button>
+    <div>
+      <h1>Good morning, Phil.</h1>
+      <div class="meta">Monday 22 June 2026  ·  Week 26  ·  Patch: Kent, Surrey, Sussex</div>
     </div>
 
     <div class="dash-grid">
       <!-- TOP LEFT: CPINs block -->
-      <div class="card" onclick="show('cpins')" style="cursor:pointer;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <h3 style="margin:0;">My CPINs</h3>
-          <span style="font-size:11px;color:var(--ink-3);" id="dash-cpin-meta">8 to action  ·  5 unassigned</span>
-        </div>
-
-        <div class="cpin-hero">
-          <div class="cpin-tile red">
-            <div class="lbl"><span class="dot"></span>Red</div>
-            <div class="big">2</div>
-            <div class="sub">Serious, act now</div>
-          </div>
-          <div class="cpin-tile amber">
-            <div class="lbl"><span class="dot"></span>Amber</div>
-            <div class="big">1</div>
-            <div class="sub">Review required</div>
-          </div>
-          <div class="cpin-tile green" id="dash-green-tile">
-            <div class="lbl"><span class="dot"></span>Green</div>
-            <div class="big" id="dash-green-count">5</div>
-            <div class="sub" id="dash-green-sub">Review needed</div>
+      <div class="card" id="dash-cpin-card">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
+          <h3 style="margin:0;" id="dash-cpin-title">My CPINs</h3>
+          <div class="dash-cpin-toggle" role="group" aria-label="CPIN queue" onclick="event.stopPropagation()">
+            <button type="button" class="on" id="dash-cpin-toggle-mine" onclick="setDashboardCpinView('mine')">My CPINs</button>
+            <button type="button" id="dash-cpin-toggle-unassigned" onclick="setDashboardCpinView('unassigned')">Unassigned</button>
           </div>
         </div>
+        <span style="font-size:11px;color:var(--ink-3);display:block;margin-top:4px;" id="dash-cpin-meta"></span>
 
-        <div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin:8px 0 4px;">Action now</div>
-        <div class="cpin-mini red" onclick="event.stopPropagation();show('cpins');">
-          <div class="lead"><span class="dot"></span><strong>HMP Lewes</strong>  ·  Cell fire, serious injury</div>
-          <span class="when">04:22 today</span>
-        </div>
-        <div class="cpin-mini red" onclick="event.stopPropagation();show('cpins');">
-          <div class="lead"><span class="dot"></span><strong>Belmarsh</strong>  ·  Kitchen fire, 2 injured</div>
-          <span class="when">21:14 yest</span>
-        </div>
-        <div class="cpin-mini amber" onclick="event.stopPropagation();show('cpins');">
-          <div class="lead"><span class="dot"></span><strong>Temple Quay House</strong>  ·  Electrical, no injuries</div>
-          <span class="when">12 Jun</span>
-        </div>
+        <div class="cpin-hero" id="dash-cpin-hero" onclick="show('cpins')" style="cursor:pointer;margin-top:10px;"></div>
 
+        <div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin:8px 0 4px;" id="dash-cpin-list-label">Action now</div>
+        <div id="dash-cpin-list" onclick="show('cpins')" style="cursor:pointer;"></div>
       </div>
 
       <!-- TOP RIGHT: This week -->
@@ -4168,17 +4591,43 @@
     </div>
 
     <div class="list-results-bar">
-      <div>Showing <strong id="premises-results-count" style="color:var(--ink);">0</strong> premises · Sort by <button type="button" class="list-sort-trigger" id="premises-sort-trigger" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button></div>
+      <div class="list-results-line">
+        <span class="list-results-seg">Showing <strong id="premises-results-count">0</strong> premises</span>
+        <span class="list-results-seg">
+          <span class="list-results-label">Date range</span>
+          <span class="list-control-dropdown" id="premises-date-dropdown">
+            <button type="button" class="list-control-trigger" id="premises-date-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change date range"><strong>All dates</strong> ▾</button>
+            <div class="list-control-menu" id="premises-date-menu" role="listbox" hidden>
+              <button type="button" class="list-control-option on" role="option" data-premises-date="all">All dates</button>
+              <button type="button" class="list-control-option" role="option" data-premises-date="30">Last 30 days</button>
+              <button type="button" class="list-control-option" role="option" data-premises-date="90">Last 90 days</button>
+              <button type="button" class="list-control-option" role="option" data-premises-date="year">This year</button>
+            </div>
+          </span>
+        </span>
+        <span class="list-results-seg">
+          <span class="list-results-label">Sort by</span>
+          <span class="list-control-dropdown" id="premises-sort-dropdown">
+            <button type="button" class="list-control-trigger" id="premises-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button>
+            <div class="list-control-menu" id="premises-sort-menu" role="listbox" hidden>
+              <button type="button" class="list-control-option on" role="option" data-premises-sort="worst">Worst score first</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="best">Best score first</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="name">Name A–Z</button>
+              <button type="button" class="list-control-option" role="option" data-premises-sort="audit">Most recent audit</button>
+            </div>
+          </span>
+        </span>
+      </div>
     </div>
 
     <div class="card prem-list-card" style="padding:0;margin-top:0;">
-      <div class="prem-row prem-row--head">
+      <div class="prem-row prem-row--head" id="premises-list-head">
         <div class="prem-line-primary">
-          <div class="prem-name">Premises</div>
-          <div class="prem-type">Type</div>
-          <div class="prem-dept">Department</div>
-          <div class="prem-score">RBIP score</div>
-          <div class="prem-audit">Last audit</div>
+          <div class="prem-name"><button type="button" class="list-header-sort" data-prem-sort="name">Premises <span class="sort-ind">↕</span></button></div>
+          <div class="prem-type"><button type="button" class="list-header-sort" data-prem-sort="type">Type <span class="sort-ind">↕</span></button></div>
+          <div class="prem-dept"><button type="button" class="list-header-sort" data-prem-sort="dept">Department <span class="sort-ind">↕</span></button></div>
+          <div class="prem-score"><button type="button" class="list-header-sort is-active" data-prem-sort="score">RBIP score <span class="sort-ind">↓</span></button></div>
+          <div class="prem-audit"><button type="button" class="list-header-sort" data-prem-sort="audit">Last audit <span class="sort-ind">↕</span></button></div>
           <div class="prem-trailing"><span>Open work</span></div>
         </div>
       </div>
@@ -4197,6 +4646,7 @@
 
     <div class="premises-header">
       <div>
+        <div class="prem-ref" id="premises-detail-ref">PRM-0001847</div>
         <h1>Temple Quay House</h1>
         <div class="meta">Temple Back East, Bristol BS1  ·  <strong>HMCTS</strong>  ·  Government office</div>
         <div style="margin-top:12px;display:flex;gap:8px;">
@@ -4231,15 +4681,15 @@
       <div class="card">
         <h3>Duty Holders</h3>
         <div style="font-size:13px;line-height:1.7;">
-          <strong>HMCTS</strong> <span class="pill grey" style="margin-left:6px;">Government dept</span><br>
+          <strong>HMCTS</strong> <span class="prem-ref">DH-0001042</span> <span class="pill grey" style="margin-left:6px;">Government dept</span><br>
           <span style="color:var(--ink-3);font-size:12px;">Mark Stevens · Property Director</span>
         </div>
         <div style="font-size:13px;line-height:1.7;margin-top:10px;">
-          <strong>Equans</strong> <span class="pill grey" style="margin-left:6px;">FM company</span><br>
+          <strong>Equans</strong> <span class="prem-ref">DH-0002087</span> <span class="pill grey" style="margin-left:6px;">FM company</span><br>
           <span style="color:var(--ink-3);font-size:12px;">Sarah Patel · Maintenance Lead</span>
         </div>
         <div style="font-size:13px;line-height:1.7;margin-top:10px;">
-          <strong>The Property Directorate</strong> <span class="pill grey" style="margin-left:6px;">Internal</span><br>
+          <strong>The Property Directorate</strong> <span class="prem-ref">DH-0000315</span> <span class="pill grey" style="margin-left:6px;">Internal</span><br>
           <span style="color:var(--ink-3);font-size:12px;">James Howell · Property Officer</span>
         </div>
       </div>
@@ -4308,7 +4758,6 @@
           <div class="audit-meta-row">Lead inspector: <strong>Phil Gower</strong></div>
         </div>
       </div>
-      <button type="button" class="btn audit-process-options-desktop">⋯ Process options</button>
     </div>
 
     <div class="audit-mobile-toolbar">
@@ -4320,7 +4769,6 @@
           <div id="audit-stage-rail-slot-mobile"></div>
         </div>
       </div>
-      <button type="button" class="btn">⋯ Process options</button>
     </div>
 
     <div class="process-grid">
@@ -4395,48 +4843,17 @@
             Attend site. Assess against articles in three categories: General Fire Precautions, Fire Safety Management, Fire Safety Maintenance. Score 0–6 per article; record failings, examples and Duty Holder attribution. Enter findings once back in the office — replaces the external Excel tracker.
           </div>
 
-          <div id="audit-findings-list">
-          <div class="finding">
-            <div class="article">Article 7  ·  Fire detection and warning</div>
-            <div style="font-size:12px;color:var(--ink-3);">Category: Fire Safety Maintenance</div>
-            <div class="scores">
-              <button class="score-btn">0</button>
-              <button class="score-btn">1</button>
-              <button class="score-btn selected">2</button>
-              <button class="score-btn">3</button>
-              <button class="score-btn">4</button>
-              <button class="score-btn">5</button>
-              <button class="score-btn">6</button>
-            </div>
-            <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
-            <div style="margin:4px 0 6px;"><span class="pill amber">Fire door defects</span></div>
-            <div class="example"><strong>Example seen:</strong> Two fire door closers missing on first-floor corridor (rooms 103, 107). Cold-smoke seal damaged on door 109.</div>
-            <div class="attribution">Attributed to: <span>Equans (FM)</span></div>
+          <div id="audit-edit-warning" class="audit-edit-warning" hidden>
+            <strong>Audit outcomes already sent.</strong> Editing findings after letters have been issued requires admin permission.
+            <span id="audit-edit-warning-action"></span>
           </div>
 
-          <div class="finding">
-            <div class="article">Article 13  ·  Means of escape</div>
-            <div style="font-size:12px;color:var(--ink-3);">Category: General Fire Precautions</div>
-            <div class="scores">
-              <button class="score-btn">0</button>
-              <button class="score-btn selected">1</button>
-              <button class="score-btn">2</button>
-              <button class="score-btn">3</button>
-              <button class="score-btn">4</button>
-              <button class="score-btn">5</button>
-              <button class="score-btn">6</button>
-            </div>
-            <div style="font-size:12px;color:var(--ink-3);">Failure type</div>
-            <div style="margin:4px 0 6px;"><span class="pill amber">Obstructed escape route</span></div>
-            <div class="example"><strong>Example seen:</strong> Office furniture stored in the rear escape stairwell.</div>
-            <div class="attribution">Attributed to: <span>HMCTS</span><span>+ add another</span></div>
-          </div>
-          </div>
+          <div id="audit-findings-list"></div>
 
           <div class="add-finding-btn" id="audit-add-finding-btn" onclick="toggleAddFindingForm(true)">+ Add finding  ·  manually add failings spotted on site</div>
 
           <div class="add-finding-form" id="audit-add-finding-form" hidden>
-            <h3>Add a finding</h3>
+            <h3 id="audit-finding-form-title">Add a finding</h3>
             <div class="field-row">
               <div class="field">
                 <label>Article</label>
@@ -4479,15 +4896,15 @@
               <textarea id="new-finding-example" rows="2" placeholder="What you observed on site…"></textarea>
             </div>
             <div class="field">
-              <label>Attributed to</label>
-              <select id="new-finding-dh">
-                <option>HMCTS</option>
-                <option>Equans (FM)</option>
-                <option>The Property Directorate</option>
-              </select>
+              <label>Attributed to (select one or more)</label>
+              <div class="finding-dh-checks" id="new-finding-dh-list">
+                <label><input type="checkbox" value="HMCTS" checked> HMCTS</label>
+                <label><input type="checkbox" value="Equans (FM)"> Equans (FM)</label>
+                <label><input type="checkbox" value="The Property Directorate"> The Property Directorate</label>
+              </div>
             </div>
             <div style="display:flex;gap:8px;margin-top:12px;">
-              <button class="btn primary" type="button" onclick="saveNewFinding()">Add finding</button>
+              <button class="btn primary" type="button" id="audit-finding-save-btn" onclick="saveAuditFinding()">Add finding</button>
               <button class="btn" type="button" onclick="toggleAddFindingForm(false)">Cancel</button>
             </div>
           </div>
@@ -4604,7 +5021,7 @@
           <div class="stage-actions">
             <button class="btn">Edit letter</button>
             <button class="btn">Preview as PDF</button>
-            <button class="btn primary" onclick="setAuditStage(5)">Finalise all three letters and send →</button>
+            <button class="btn primary" onclick="finalizeAuditLetters()">Finalise all three letters and send →</button>
           </div>
         </div>
 
@@ -4692,6 +5109,7 @@
         <div class="context-card">
           <h3>Premises</h3>
           <div style="font-weight:600;">Temple Quay House</div>
+          <div class="prem-ref" style="margin:2px 0 6px;">PRM-0001847</div>
           <div style="color:var(--ink-3);font-size:12px;margin-bottom:8px;">Government office  ·  HMCTS</div>
           <div class="row"><span class="k">RBIP score</span><span style="color:var(--red);font-weight:600;">47</span></div>
           <div class="row"><span class="k">Last audit</span><span>Jan 2025</span></div>
@@ -4806,8 +5224,35 @@
           </div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 4px 8px;font-size:12px;color:var(--ink-3);">
-          <div>Showing <strong id="cpin-results-count" style="color:var(--ink);">0</strong> CPINs</div>
+        <p class="cpin-pin-hint">Pin priority CPINs with <span class="cpin-pin-demo" aria-hidden="true">☆</span> on any card — pinned items stay at the top for <strong>everyone</strong> on this team, across all views.</p>
+
+        <div class="list-results-bar">
+          <div class="list-results-line">
+            <span class="list-results-seg">Showing <strong id="cpin-results-count">0</strong> CPINs</span>
+            <span class="list-results-seg">
+              <span class="list-results-label">Date range</span>
+              <span class="list-control-dropdown" id="cpin-date-dropdown">
+                <button type="button" class="list-control-trigger" id="cpin-date-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change date range"><strong>All dates</strong> ▾</button>
+                <div class="list-control-menu" id="cpin-date-menu" role="listbox" hidden>
+                  <button type="button" class="list-control-option on" role="option" data-cpin-date="all">All dates</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-date="7">Last 7 days</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-date="30">Last 30 days</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-date="90">Last 90 days</button>
+                </div>
+              </span>
+            </span>
+            <span class="list-results-seg">
+              <span class="list-results-label">Sort by</span>
+              <span class="list-control-dropdown" id="cpin-sort-dropdown">
+                <button type="button" class="list-control-trigger" id="cpin-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Most recent first</strong> ▾</button>
+                <div class="list-control-menu" id="cpin-sort-menu" role="listbox" hidden>
+                  <button type="button" class="list-control-option on" role="option" data-cpin-sort="recent">Most recent first</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="severity">Severity first</button>
+                  <button type="button" class="list-control-option" role="option" data-cpin-sort="name">Premises A–Z</button>
+                </div>
+              </span>
+            </span>
+          </div>
         </div>
 
         <div id="cpins-panel-list" class="cpins-panel" data-cpin-panel="list"></div>
@@ -4848,27 +5293,11 @@
         <div class="help">Anchor the CPIN to premises, confirm severity, then assign an inspector. Further sections appear as you complete each step.</div>
         <div class="cpin-key-fields">
           <div class="cpin-key-field" id="cpin-field-premises">
-            <label for="cpin-intake-premises">Premises</label>
+            <label>Premises</label>
             <p id="cpin-premises-status" class="cpin-key-field-hint"></p>
             <div id="cpin-premises-display" class="cpin-key-display">
               <div class="cpin-key-value" id="cpin-premises-value"></div>
               <button type="button" class="btn cpin-key-change-btn" id="cpin-premises-change-btn" onclick="openCpinPremisesEdit()">Change</button>
-            </div>
-            <div id="cpin-premises-edit" class="cpin-key-edit" hidden>
-              <select id="cpin-intake-premises" onchange="saveCpinIntakePremises()">
-                <option value="">— Select premises —</option>
-                <option value="HMP Lewes">HMP Lewes</option>
-                <option value="HMP Belmarsh">HMP Belmarsh</option>
-                <option value="Temple Quay House">Temple Quay House</option>
-                <option value="DWP Canterbury">DWP Canterbury</option>
-                <option value="HMCTS Maidstone">HMCTS Maidstone</option>
-                <option value="HMP Wandsworth">HMP Wandsworth</option>
-                <option value="DWP Brighton">DWP Brighton</option>
-                <option value="HMCTS Guildford">HMCTS Guildford</option>
-                <option value="Jobcentre Plus Crawley">Jobcentre Plus Crawley</option>
-                <option value="HMP Rochester">HMP Rochester</option>
-              </select>
-              <button type="button" class="btn" onclick="cancelCpinPremisesEdit()">Cancel</button>
             </div>
           </div>
           <div class="cpin-key-field" id="cpin-field-severity">
@@ -4901,9 +5330,82 @@
         </div>
       </div>
 
-      <div class="setup-section">
-        <h3>Submission details (from FRS form)</h3>
-        <div class="cpin-intake-grid" id="cpin-intake-grid"></div>
+      <div class="setup-section" id="cpin-intake-section">
+        <div class="cpin-intake-section-head">
+          <h3>Submission details (from FRS form)</h3>
+          <button type="button" class="btn cpin-key-change-btn" id="cpin-intake-change-btn" onclick="openCpinIntakeDetailsEdit()">Change</button>
+        </div>
+        <div id="cpin-intake-display">
+          <div class="cpin-intake-grid" id="cpin-intake-grid"></div>
+        </div>
+        <div id="cpin-intake-edit" class="cpin-key-edit" hidden>
+          <div class="cpin-intake-edit-grid">
+            <div class="cpin-intake-edit-field">
+              <label for="cpin-intake-incident-number">Incident number</label>
+              <input type="text" id="cpin-intake-incident-number" />
+            </div>
+            <div class="cpin-intake-edit-field">
+              <label for="cpin-intake-incident-date">Date of incident</label>
+              <input type="text" id="cpin-intake-incident-date" placeholder="DD/MM/YYYY" />
+            </div>
+            <div class="cpin-intake-edit-field">
+              <label for="cpin-intake-incident-time">Time of incident</label>
+              <input type="time" id="cpin-intake-incident-time" step="60" />
+            </div>
+            <div class="cpin-intake-edit-field">
+              <label for="cpin-intake-frs">Fire and Rescue Service</label>
+              <select id="cpin-intake-frs">
+                <option>Not Given</option>
+                <option>London Fire Brigade</option>
+                <option>Kent FRS</option>
+                <option>East Sussex FRS</option>
+                <option>West Sussex FRS</option>
+                <option>Surrey FRS</option>
+                <option>Avon FRS</option>
+              </select>
+            </div>
+            <div class="cpin-intake-edit-field">
+              <label for="cpin-intake-contact">Point of contact</label>
+              <input type="text" id="cpin-intake-contact" />
+            </div>
+            <div class="cpin-intake-edit-field">
+              <label for="cpin-intake-email">FRS contact email</label>
+              <input type="email" id="cpin-intake-email" />
+            </div>
+            <div class="cpin-intake-edit-field full" id="cpin-intake-premises-field">
+              <label for="cpin-intake-premises-free">Address of premises</label>
+              <p class="cpin-intake-premises-linked" id="cpin-intake-premises-linked" hidden></p>
+              <input type="text" id="cpin-intake-premises-free" placeholder="Premises not in system or not found" />
+            </div>
+          </div>
+          <h4 class="cpin-stop-message-heading cpin-intake-edit-divider">Stop message</h4>
+          <div class="audit-note-form" style="margin-top:0;">
+            <label for="cpin-intake-description">Description of incident</label>
+            <p class="help" style="margin-top:4px;margin-bottom:8px;">From the FRS form — please replace any codes with plain language.</p>
+            <textarea id="cpin-intake-description" placeholder="Description of incident…"></textarea>
+          </div>
+          <span class="cpin-stop-status-label">Incident status</span>
+          <div class="cpin-stop-status-group" id="cpin-stop-status-group" role="radiogroup" aria-label="Incident status"></div>
+          <div class="cpin-stop-message-edit-actions">
+            <button type="button" class="btn primary" onclick="saveCpinIntakeDetails()">Save</button>
+            <button type="button" class="btn" onclick="cancelCpinIntakeDetailsEdit()">Cancel</button>
+          </div>
+        </div>
+        <div class="cpin-stop-message" id="cpin-stop-message">
+          <h4 class="cpin-stop-message-heading">Stop message</h4>
+          <div id="cpin-stop-message-display" class="cpin-stop-message-panel">
+            <div class="cpin-stop-message-content">
+              <div class="cpin-stop-message-block">
+                <span class="cpin-stop-status-label">Description of incident</span>
+                <p class="cpin-stop-desc-readonly" id="cpin-stop-desc-value">—</p>
+              </div>
+              <div class="cpin-stop-message-block">
+                <span class="cpin-stop-status-label">Incident status</span>
+                <p class="cpin-stop-status-readonly" id="cpin-stop-status-value">—</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="setup-section cpin-workflow-section" id="cpin-section-assigned-away" hidden>
@@ -4935,12 +5437,16 @@
       </div>
 
       <div class="setup-section cpin-workflow-section" id="cpin-section-dh" hidden>
-        <h3>Duty Holders</h3>
-        <div class="help">Suggested from premises when you reach this stage. Approve each Duty Holder who applies, or reject and remove. Not pre-locked — who is on site can change.</div>
+        <h3>Duty Holders and Responsible Persons</h3>
+        <div class="help">Pre-suggested from this premises when further action is needed. Review and add or remove as needed — not pre-locked, since who is on site can change.</div>
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders (organisations)</div>
         <div id="cpin-dh-list"></div>
         <div class="add-holder-btn" onclick="addCpinDutyHolder()">+ Add a Duty Holder</div>
         <p id="cpin-dh-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:16px 0 6px;">Responsible Persons (individuals)</div>
+        <div id="cpin-rp-list"></div>
+        <div class="add-holder-btn" onclick="addCpinResponsiblePerson()">+ Add a Responsible Person</div>
+        <p id="cpin-rp-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
       </div>
 
       <div class="setup-section cpin-workflow-section" id="cpin-section-remote" hidden>
@@ -5009,23 +5515,13 @@
         </div>
 
         <div style="margin-top:20px;">
-          <h4 style="margin:0 0 8px;font-size:14px;">Appointment letter</h4>
-          <div class="help">Review the draft letter. Save to record it as sent, or skip when already confirmed by phone.</div>
-          <div class="letter-preview" id="cpin-onsite-letter-preview" style="padding:18px;font-size:12px;margin-top:10px;">
-            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
-            <div>22 June 2026</div>
-            <div style="margin-top:10px;" id="cpin-onsite-letter-addressee">Duty Holder<br>Premises</div>
-            <p id="cpin-onsite-letter-body" style="margin-top:12px;">We intend to carry out an on-site fire safety evaluation following the recent incident reported to us. Please confirm the appointment details below.</p>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-            <button class="btn" type="button" onclick="toggleCpinOnsiteLetterEdit()">Edit letter</button>
-            <button class="btn primary" type="button" onclick="saveCpinOnsiteLetter()">Save letter</button>
+          <h4 style="margin:0 0 8px;font-size:14px;">Appointment letters</h4>
+          <div class="help">Write templated letters to one or more Duty Holders on this CPIN. Saved letters appear here as attachments and in the activity log.</div>
+          <div class="letter-attachment-list" id="cpin-onsite-letters-list"></div>
+          <div class="letter-composer-actions" style="margin-top:10px;">
+            <button class="btn primary" type="button" onclick="openCpinOnsiteLetterComposer()">Write letter</button>
             <button class="btn" type="button" onclick="skipCpinOnsiteLetter()">Skip letter</button>
-            <span id="cpin-onsite-letter-status" style="font-size:12px;color:var(--ink-3);align-self:center;"></span>
-          </div>
-          <div class="audit-note-form" id="cpin-onsite-letter-edit-wrap" hidden style="margin-top:10px;">
-            <label for="cpin-onsite-letter-edit">Letter text</label>
-            <textarea id="cpin-onsite-letter-edit" placeholder="Edit appointment letter text…"></textarea>
+            <span id="cpin-onsite-letter-status" style="font-size:12px;color:var(--ink-3);"></span>
           </div>
         </div>
 
@@ -5334,7 +5830,8 @@
           <div class="view-item" data-view-label="Prisons only" role="menuitem" tabindex="0"><span class="view-item-label">Prisons only</span></div>
           <div class="view-item" data-view-label="SLA approaching" role="menuitem" tabindex="0"><span class="view-item-label">SLA approaching</span></div>
           <div class="view-item" data-view-label="Closed this month" role="menuitem" tabindex="0"><span class="view-item-label">Closed this month</span></div>
-          <div class="view-item" style="color:var(--accent);"><span class="view-item-label">+ Save current view</span></div>
+          <div class="view-item" role="menuitem" tabindex="0" onclick="openSaveProcessViewModal()" style="color:var(--accent);cursor:pointer;"><span class="view-item-label">+ Save current view</span></div>
+          <div id="process-pinned-custom"></div>
         </div>
       </aside>
 
@@ -5367,22 +5864,51 @@
         </div>
 
         <div class="list-results-bar">
-          <div>Showing <strong id="process-results-count" style="color:var(--ink);">0</strong> processes · Sort by <button type="button" class="list-sort-trigger" id="process-sort-trigger" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button></div>
+          <div class="list-results-line">
+            <span class="list-results-seg">Showing <strong id="process-results-count">0</strong> processes</span>
+            <span class="list-results-seg">
+              <span class="list-results-label">Date range</span>
+              <span class="list-control-dropdown" id="process-date-dropdown">
+                <button type="button" class="list-control-trigger" id="process-date-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change date range"><strong>All dates</strong> ▾</button>
+                <div class="list-control-menu" id="process-date-menu" role="listbox" hidden>
+                  <button type="button" class="list-control-option on" role="option" data-process-date="all">All dates</button>
+                  <button type="button" class="list-control-option" role="option" data-process-date="30">Last 30 days</button>
+                  <button type="button" class="list-control-option" role="option" data-process-date="90">Last 90 days</button>
+                  <button type="button" class="list-control-option" role="option" data-process-date="year">This year</button>
+                </div>
+              </span>
+            </span>
+            <span class="list-results-seg">
+              <span class="list-results-label">Sort by</span>
+              <span class="list-control-dropdown" id="process-sort-dropdown">
+                <button type="button" class="list-control-trigger" id="process-sort-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change sort order"><strong>Worst score first</strong> ▾</button>
+                <div class="list-control-menu" id="process-sort-menu" role="listbox" hidden>
+                  <button type="button" class="list-control-option on" role="option" data-process-sort="worst">Worst score first</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="best">Best score first</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="name">Premises A–Z</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="type">Type</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="owner">Owner A–Z</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="age">Oldest first</button>
+                  <button type="button" class="list-control-option" role="option" data-process-sort="status">Status</button>
+                </div>
+              </span>
+            </span>
+          </div>
           <div><a>Export CSV</a></div>
         </div>
 
         <div class="card proc-list-card" style="padding:0;">
-          <div class="proc-row proc-row--head">
+          <div class="proc-row proc-row--head" id="process-list-head">
             <div class="proc-line-primary">
-              <div class="ptype">Type</div>
-              <div class="premises">Premises</div>
-              <div class="proc-score">Score</div>
+              <div class="ptype"><button type="button" class="list-header-sort" data-proc-sort="type">Type <span class="sort-ind">↕</span></button></div>
+              <div class="premises"><button type="button" class="list-header-sort" data-proc-sort="premises">Premises <span class="sort-ind">↕</span></button></div>
+              <div class="proc-score"><button type="button" class="list-header-sort is-active" data-proc-sort="score">Score <span class="sort-ind">↓</span></button></div>
             </div>
             <div class="proc-line-secondary">
-              <div class="status">Stage / status</div>
+              <div class="status"><button type="button" class="list-header-sort" data-proc-sort="status">Stage / status <span class="sort-ind">↕</span></button></div>
               <div class="proc-trailing">
-                <span>Owner</span>
-                <span class="age">Age</span>
+                <span><button type="button" class="list-header-sort" data-proc-sort="owner">Owner <span class="sort-ind">↕</span></button></span>
+                <span class="age"><button type="button" class="list-header-sort" data-proc-sort="age">Age <span class="sort-ind">↕</span></button></span>
               </div>
             </div>
           </div>
@@ -5678,12 +6204,7 @@
           <div class="row"><span class="k">Duty Holders</span><span class="v" id="setup-sum-dh">3</span></div>
           <div class="row"><span class="k">Responsible Persons</span><span class="v" id="setup-sum-rp">2</span></div>
           <div class="row"><span class="k">Appointment</span><span class="v" id="setup-sum-appt">Tue 7 Jul, 10:00</span></div>
-
-          <div style="font-size:11px;color:var(--ink-3);margin:16px 0 8px;">Actions already taken for audit A-2026-0314.</div>
-          <div class="check-row"><span class="tick">✓</span>Audit record A-2026-0314 created</div>
-          <div class="check-row"><span class="tick">✓</span>Appointment letter sent to all Duty Holders</div>
-          <div class="check-row"><span class="tick">✓</span>Calendar event pushed to your Outlook</div>
-          <div class="check-row"><span class="tick">✓</span>CPIN-2026-0418 linked to this audit</div>
+          <div style="font-size:11px;color:var(--ink-3);margin-top:12px;">Setup actions are logged automatically on the audit activity feed.</div>
         </div>
       </div>
     </div>
@@ -5691,7 +6212,49 @@
   </main>
 </div>
 
-<!-- Setup: lookup modal for Duty Holders, RPs, inspectors -->
+<!-- Letter composer (site-wide — CPIN, audits, processes) -->
+<div id="letter-composer-modal" class="modal-backdrop" onclick="if(event.target===this) closeLetterComposer()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2 id="letter-composer-title">Write letter</h2>
+        <div class="sub" id="letter-composer-sub">Pick a template, choose recipients, review and save.</div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeLetterComposer()" title="Close (Esc)">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-group" id="letter-composer-template-group">
+        <div class="modal-group-label">Template</div>
+        <div class="letter-template-grid" id="letter-composer-templates"></div>
+      </div>
+      <div class="modal-group" id="letter-composer-recipient-group">
+        <div class="modal-group-label">Recipients</div>
+        <div class="help" style="margin:-4px 0 8px;">Select Duty Holders attached to this CPIN. One personalised letter is saved per recipient.</div>
+        <div class="letter-recipient-list" id="letter-composer-recipients"></div>
+      </div>
+      <div class="modal-group">
+        <div class="modal-group-label">Letter preview</div>
+        <div class="letter-composer-preview-wrap">
+          <div class="letter-preview" id="letter-composer-preview" style="padding:18px;font-size:12px;">
+            <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+            <div id="letter-composer-date"></div>
+            <div style="margin-top:10px;" id="letter-composer-addressee"></div>
+            <div class="letter-composer-body" id="letter-composer-body" style="margin-top:12px;"></div>
+          </div>
+        </div>
+        <div class="letter-composer-actions" id="letter-composer-edit-actions">
+          <button class="btn" type="button" id="letter-composer-edit-btn" onclick="toggleLetterComposerEdit()">Edit letter</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;" id="letter-composer-footer">
+        <button class="btn" type="button" id="letter-composer-cancel-btn" onclick="closeLetterComposer()">Cancel</button>
+        <button class="btn primary" type="button" id="letter-composer-save-btn" onclick="saveLetterComposer()">Save letters</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Setup: lookup modal for Duty Holders, RPs, inspectors, premises -->
 <div id="setup-lookup-modal" class="modal-backdrop" onclick="if(event.target===this) closeSetupLookupModal()">
   <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
     <div class="modal-header">
@@ -6039,6 +6602,29 @@
   </div>
 </div>
 
+<div id="save-view-modal" class="modal-backdrop" onclick="if(event.target===this) closeSaveProcessViewModal()">
+  <div class="modal" style="max-width:420px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Save pinned view</h2>
+        <div class="sub">Save your current filters and sort as a personal pinned view.</div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeSaveProcessViewModal()" title="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="feedback-field">
+        <label for="save-view-name">View name</label>
+        <input type="text" id="save-view-name" placeholder="e.g. My prisons, open" />
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);margin-top:8px;" id="save-view-summary"></div>
+      <div class="feedback-actions" style="margin-top:16px;">
+        <button type="button" class="btn" onclick="closeSaveProcessViewModal()">Cancel</button>
+        <button type="button" class="btn primary" onclick="confirmSaveProcessView()">Save view</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   // ---------------------------------------------------------
   // Navigation. Hash-based routing so the browser's back and
@@ -6332,6 +6918,8 @@
       layoutAuditStageRail();
       applyAuditStageUI(stage);
       initAuditActivity();
+      renderAuditFindings();
+      updateAuditEditWarning();
       setAuditActivityBarVisible(true);
       return;
     }
@@ -6353,6 +6941,11 @@
     if (screen === 'cpins') initCpinsPage();
     if (screen === 'processes') initProcessesPage();
     if (screen === 'premises') initPremisesPage();
+    if (screen === 'dashboard') initDashboardPage();
+    if (screen === 'audit') {
+      renderAuditFindings();
+      updateAuditEditWarning();
+    }
   }
 
   function render(id) {
@@ -6384,7 +6977,8 @@
       cpins: 'nav-cpins',
       cpin: 'nav-cpins',
       reports: 'nav-reports',
-      time: 'nav-dashboard'
+      time: 'nav-dashboard',
+      admin: null
     };
     const navId = navMap[id];
     if (navId) document.getElementById(navId)?.classList.add('active');
@@ -6473,6 +7067,30 @@
 
   let auditStage = 2;
   let hmctsPlanSettled = false;
+  let auditLettersSent = false;
+  let auditEditPermission = false;
+  let auditEditPermissionRequested = false;
+  let auditFindingEditId = null;
+
+  const AUDIT_DH_OPTIONS = ['HMCTS', 'Equans (FM)', 'The Property Directorate'];
+
+  let auditFindings = [
+    { id: 'f1', articleKey: '7', category: 'Fire Safety Maintenance', score: 2, failureType: 'Fire door defects', example: 'Two fire door closers missing on first-floor corridor (rooms 103, 107). Cold-smoke seal damaged on door 109.', dutyHolders: ['Equans (FM)'] },
+    { id: 'f2', articleKey: '13', category: 'General Fire Precautions', score: 1, failureType: 'Obstructed escape route', example: 'Office furniture stored in the rear escape stairwell.', dutyHolders: ['HMCTS'] }
+  ];
+
+  const SETUP_DH_TO_RP_KEYS = {
+    hmcts: ['mstevens', 'kallen'],
+    equans: ['spatel', 'dhussain'],
+    propdir: ['rbyrne']
+  };
+
+  const SETUP_DH_KEY_BY_NAME = {
+    'HMCTS': 'hmcts',
+    'Equans': 'equans',
+    'The Property Directorate': 'propdir',
+    'Property Directorate': 'propdir'
+  };
 
   const ARTICLE_LABELS = {
     '5': 'Article 5  ·  Emergency routes and exits',
@@ -6612,6 +7230,78 @@
     return LIST_SORT_OPTIONS[(idx + 1) % LIST_SORT_OPTIONS.length].id;
   }
 
+  const PREMISES_SORT_OPTIONS = [
+    { id: 'worst', label: 'Worst score first' },
+    { id: 'best', label: 'Best score first' },
+    { id: 'name', label: 'Name A–Z' },
+    { id: 'audit', label: 'Most recent audit' }
+  ];
+
+  const CPIN_SORT_OPTIONS = [
+    { id: 'recent', label: 'Most recent first' },
+    { id: 'severity', label: 'Severity first' },
+    { id: 'name', label: 'Premises A–Z' }
+  ];
+
+  function closeAllListControlMenus(exceptMenu) {
+    document.querySelectorAll('.list-control-menu').forEach(function (menu) {
+      if (exceptMenu && menu === exceptMenu) return;
+      menu.hidden = true;
+      const trigger = menu.closest('.list-control-dropdown')?.querySelector('.list-control-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function bindListControlMenusOnce() {
+    if (document.body.dataset.listControlMenusBound) return;
+    document.body.dataset.listControlMenusBound = '1';
+    document.addEventListener('mousedown', function (e) {
+      if (e.target.closest('.list-control-dropdown')) return;
+      closeAllListControlMenus();
+    });
+  }
+
+  function initListControlDropdown(dropdownId, onSelect) {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown || dropdown.dataset.bound) return;
+    dropdown.dataset.bound = '1';
+    const trigger = dropdown.querySelector('.list-control-trigger');
+    const menu = dropdown.querySelector('.list-control-menu');
+    if (!trigger || !menu) return;
+    trigger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const open = menu.hidden;
+      closeAllListControlMenus(open ? menu : null);
+      menu.hidden = !open;
+      trigger.setAttribute('aria-expanded', String(open));
+    });
+    menu.querySelectorAll('.list-control-option').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        const value = opt.dataset.premisesDate || opt.dataset.cpinDate || opt.dataset.premisesSort || opt.dataset.cpinSort || opt.dataset.processDate || opt.dataset.processSort;
+        menu.querySelectorAll('.list-control-option').forEach(function (o) {
+          o.classList.toggle('on', o === opt);
+        });
+        const strong = trigger.querySelector('strong');
+        if (strong) strong.textContent = opt.textContent;
+        menu.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+        onSelect(value);
+      });
+    });
+  }
+
+  function syncListControlDropdown(dropdownId, value, dataAttr) {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+    const opt = dropdown.querySelector('.list-control-option[data-' + dataAttr + '="' + value + '"]');
+    const strong = dropdown.querySelector('.list-control-trigger strong');
+    if (!opt || !strong) return;
+    dropdown.querySelectorAll('.list-control-option').forEach(function (o) {
+      o.classList.toggle('on', o === opt);
+    });
+    strong.textContent = opt.textContent;
+  }
+
   function processMatchesType(p) {
     return processesTypeFilter === 'all' || p.type === processesTypeFilter;
   }
@@ -6633,13 +7323,26 @@
     return true;
   }
 
+  function processMatchesDate(p) {
+    return matchesDateFilter(parseDemoAgeDays(p.age), processesDateFilter);
+  }
+
   function getFilteredProcesses() {
-    return sortByListMode(
-      PROCESSES_LIST.filter(p => processMatchesType(p) && processMatchesStatus(p) && processMatchesView(p)),
-      processesSortMode,
-      'score',
-      'premises'
-    );
+    let items = PROCESSES_LIST.filter(function (p) {
+      return processMatchesType(p) && processMatchesStatus(p) && processMatchesView(p) && processMatchesDate(p);
+    });
+    if (processesSortMode === 'type') {
+      items.sort(function (a, b) { return a.type.localeCompare(b.type); });
+    } else if (processesSortMode === 'owner') {
+      items.sort(function (a, b) { return a.owner.localeCompare(b.owner); });
+    } else if (processesSortMode === 'age') {
+      items.sort(function (a, b) { return parseDemoAgeDays(a.age) - parseDemoAgeDays(b.age); });
+    } else if (processesSortMode === 'status') {
+      items.sort(function (a, b) { return a.status.localeCompare(b.status); });
+    } else {
+      items = sortByListMode(items, processesSortMode, 'score', 'premises');
+    }
+    return items;
   }
 
   function countProcessesForView(view) {
@@ -6680,13 +7383,28 @@
     </div>`;
   }
 
+  function syncProcessSortDropdown() {
+    syncListControlDropdown('process-sort-dropdown', processesSortMode, 'process-sort');
+    const headerCol = processesSortMode === 'name' ? 'premises' : processesSortMode === 'score' || processesSortMode === 'worst' || processesSortMode === 'best' ? 'score' : processesSortMode;
+    document.querySelectorAll('[data-proc-sort]').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.procSort === headerCol);
+    });
+  }
+
+  function setProcessSort(mode) {
+    processesSortMode = mode;
+    syncProcessSortDropdown();
+    renderProcessesList();
+  }
+
   function renderProcessesList() {
     const body = document.getElementById('process-list-body');
     const countEl = document.getElementById('process-results-count');
     if (!body) return;
     const items = getFilteredProcesses();
     if (countEl) countEl.textContent = String(items.length);
-    syncListSortTrigger('process-sort-trigger', processesSortMode);
+    syncProcessSortDropdown();
+    syncListControlDropdown('process-date-dropdown', processesDateFilter, 'process-date');
     if (!items.length) {
       body.innerHTML = '<div class="proc-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No processes match your filters.</div>';
     } else {
@@ -6773,6 +7491,7 @@
     layoutProcessViews();
     const screen = document.getElementById('processes');
     if (!screen) return;
+    bindListControlMenusOnce();
     if (!screen.dataset.filtersBound) {
       screen.dataset.filtersBound = '1';
       document.querySelectorAll('.process-filters-type .chip').forEach(chip => {
@@ -6781,7 +7500,12 @@
       document.querySelectorAll('.process-filters-status .chip').forEach(chip => {
         chip.addEventListener('click', () => setProcessStatusFilter(chip.dataset.processStatus));
       });
-      document.getElementById('process-sort-trigger')?.addEventListener('click', cycleProcessSort);
+      initListControlDropdown('process-date-dropdown', setProcessDateFilter);
+      initListControlDropdown('process-sort-dropdown', setProcessSort);
+      document.querySelectorAll('[data-proc-sort]').forEach(function (btn) {
+        btn.addEventListener('click', function () { setProcessHeaderSort(btn.dataset.procSort); });
+      });
+      renderProcessPinnedViews();
       const rail = document.getElementById('process-views-rail');
       if (rail) {
         rail.addEventListener('click', (e) => {
@@ -6802,7 +7526,7 @@
   }
 
   const PREMISES_LIST = [
-    { name: 'Temple Quay House', address: 'Temple Back East, Bristol BS1', category: 'government-office', typeLabel: 'Government office', dept: 'HMCTS', score: 47, scoreClass: 'score-high', lastAudit: 'Jan 2025', lastAuditSort: 202501, patch: true, route: 'premisesdetail', work: { pill: 'blue', label: 'Audit in progress' } },
+    { name: 'Temple Quay House', ref: 'PRM-0001847', address: 'Temple Back East, Bristol BS1', category: 'government-office', typeLabel: 'Government office', dept: 'HMCTS', score: 47, scoreClass: 'score-high', lastAudit: 'Jan 2025', lastAuditSort: 202501, daysSinceAudit: 150, patch: true, route: 'premisesdetail', work: { pill: 'blue', label: 'Audit in progress' } },
     { name: 'HMP Lewes', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 42, scoreClass: 'score-high', lastAudit: 'Oct 2024', lastAuditSort: 202410, patch: true, work: { pill: 'purple', label: 'Follow-up due' } },
     { name: 'HMP Maidstone', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 38, scoreClass: 'score-high', lastAudit: 'Aug 2024', lastAuditSort: 202408, patch: true, work: { pill: 'blue', label: 'Audit in progress' } },
     { name: 'Maidstone Magistrates Court', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 34, scoreClass: 'score-mid', lastAudit: 'Mar 2024', lastAuditSort: 202403, patch: true, work: { pill: 'grey', label: 'Concern open' } },
@@ -6838,13 +7562,35 @@
     return !premisesTypeFilter || p.category === premisesTypeFilter;
   }
 
+  function premisesMatchesDate(p) {
+    return matchesDateFilter(p.daysSinceAudit != null ? p.daysSinceAudit : 180, premisesDateFilter);
+  }
+
+  function sortPremises(items, mode) {
+    const sorted = items.slice();
+    if (mode === 'audit') {
+      sorted.sort(function (a, b) {
+        return (b.lastAuditSort || 0) - (a.lastAuditSort || 0);
+      });
+    } else {
+      return sortByListMode(sorted, mode, 'score', 'name');
+    }
+    return sorted;
+  }
+
   function getFilteredPremises() {
-    return sortByListMode(
-      PREMISES_LIST.filter(p => premisesMatchesScope(p) && premisesMatchesType(p)),
-      premisesSortMode,
-      'score',
-      'name'
-    );
+    const filtered = PREMISES_LIST.filter(function (p) {
+      return premisesMatchesScope(p) && premisesMatchesType(p) && premisesMatchesDate(p);
+    });
+    return sortPremises(filtered, premisesSortMode);
+  }
+
+  function syncPremisesSortDropdown() {
+    syncListControlDropdown('premises-sort-dropdown', premisesSortMode, 'premises-sort');
+    const headerCol = premisesSortMode === 'name' ? 'name' : premisesSortMode === 'audit' ? 'audit' : 'score';
+    document.querySelectorAll('[data-prem-sort]').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.premSort === headerCol);
+    });
   }
 
   function renderPremRow(p) {
@@ -6855,7 +7601,7 @@
       : '<div class="prem-trailing"><span class="prem-work-none">none</span></div>';
     return `<div class="prem-row" ${click}>
       <div class="prem-line-primary">
-        <div class="prem-name"><strong>${p.name}</strong>${address}</div>
+        <div class="prem-name"><strong>${p.name}</strong>${p.ref ? '<span class="prem-ref">' + p.ref + '</span>' : ''}${address}</div>
         <div class="prem-score ${p.scoreClass}">${p.score}</div>
       </div>
       <div class="prem-line-secondary">
@@ -6873,7 +7619,8 @@
     if (!body) return;
     const items = getFilteredPremises();
     if (countEl) countEl.textContent = String(items.length);
-    syncListSortTrigger('premises-sort-trigger', premisesSortMode);
+    syncPremisesSortDropdown();
+    syncListControlDropdown('premises-date-dropdown', premisesDateFilter, 'premises-date');
     if (!items.length) {
       body.innerHTML = '<div class="prem-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No premises match your filters.</div>';
     } else {
@@ -6881,8 +7628,9 @@
     }
   }
 
-  function cyclePremisesSort() {
-    premisesSortMode = cycleListSort(premisesSortMode);
+  function setPremisesSort(mode) {
+    premisesSortMode = mode;
+    syncPremisesSortDropdown();
     renderPremisesList();
   }
 
@@ -6903,9 +7651,192 @@
     renderPremisesList();
   }
 
+  let dashboardCpinView = 'mine';
+  let processesDateFilter = 'all';
+  let premisesDateFilter = 'all';
+  let cpinsDateFilter = 'all';
+  let cpinsSortMode = 'recent';
+  let processPinnedViews = JSON.parse(localStorage.getItem('process-pinned-views') || '[]');
+
+  function parseDemoAgeDays(age) {
+    if (!age) return 60;
+    if (age.includes('day')) return parseInt(age, 10) || 1;
+    if (age.includes('month')) return 45;
+    if (age.includes('week')) return 14;
+    return 30;
+  }
+
+  function parseCpinWhenDays(when) {
+    if (!when) return 90;
+    const w = when.toLowerCase();
+    if (w.includes('today')) return 0;
+    if (w.includes('yest')) return 1;
+    return 14;
+  }
+
+  function matchesDateFilter(days, filter) {
+    if (filter === 'all') return true;
+    if (filter === '7') return days <= 7;
+    if (filter === '30') return days <= 30;
+    if (filter === '90') return days <= 90;
+    if (filter === 'year') return days <= 365;
+    return true;
+  }
+
+  function initDashboardPage() {
+    renderDashboardCpinPanel();
+  }
+
+  function setDashboardCpinView(view) {
+    dashboardCpinView = view;
+    document.getElementById('dash-cpin-toggle-mine')?.classList.toggle('on', view === 'mine');
+    document.getElementById('dash-cpin-toggle-unassigned')?.classList.toggle('on', view === 'unassigned');
+    renderDashboardCpinPanel();
+  }
+
+  function renderDashboardCpinPanel() {
+    const title = document.getElementById('dash-cpin-title');
+    const meta = document.getElementById('dash-cpin-meta');
+    const hero = document.getElementById('dash-cpin-hero');
+    const list = document.getElementById('dash-cpin-list');
+    const listLabel = document.getElementById('dash-cpin-list-label');
+    if (!hero || !list) return;
+
+    const mine = getCpinsForTab('mine').filter(function (c) { return c.workflow !== 'closed'; });
+    const unassigned = getCpinsForTab('unassigned');
+    const items = dashboardCpinView === 'unassigned' ? unassigned : mine;
+
+    if (title) title.textContent = dashboardCpinView === 'unassigned' ? 'Unassigned CPINs' : 'My CPINs';
+    if (meta) meta.textContent = dashboardCpinView === 'unassigned'
+      ? unassigned.length + ' awaiting assignment'
+      : mine.length + ' to action  ·  ' + unassigned.length + ' unassigned';
+
+    const counts = { red: 0, amber: 0, green: 0 };
+    items.forEach(function (c) { if (counts[c.severity] != null) counts[c.severity]++; });
+
+    hero.innerHTML =
+      '<div class="cpin-tile red"><div class="lbl"><span class="dot"></span>Red</div><div class="big">' + counts.red + '</div><div class="sub">Serious, act now</div></div>' +
+      '<div class="cpin-tile amber"><div class="lbl"><span class="dot"></span>Amber</div><div class="big">' + counts.amber + '</div><div class="sub">Review required</div></div>' +
+      '<div class="cpin-tile green"><div class="lbl"><span class="dot"></span>Green</div><div class="big">' + counts.green + '</div><div class="sub">Review needed</div></div>';
+
+    if (listLabel) listLabel.textContent = dashboardCpinView === 'unassigned' ? 'Awaiting assignment' : 'Action now';
+    list.innerHTML = items.slice(0, 3).map(function (c) {
+      return '<div class="cpin-mini ' + c.severity + '" onclick="event.stopPropagation();show(\'cpins\')">' +
+        '<div class="lead"><span class="dot"></span><strong>' + escHtml(c.premises || 'No premises') + '</strong>  ·  ' + escHtml(c.summary) + '</div>' +
+        '<span class="when">' + escHtml(c.when) + '</span></div>';
+    }).join('') || '<div style="font-size:13px;color:var(--ink-3);padding:8px 0;">No CPINs in this queue.</div>';
+  }
+
+  function openSaveProcessViewModal() {
+    const modal = document.getElementById('save-view-modal');
+    const summary = document.getElementById('save-view-summary');
+    if (!modal) return;
+    const parts = [
+      'View: ' + processesActiveView,
+      'Type: ' + processesTypeFilter,
+      'Status: ' + processesStatusFilter,
+      'Date: ' + processesDateFilter,
+      'Sort: ' + getListSortLabel(processesSortMode)
+    ];
+    if (summary) summary.textContent = parts.join('  ·  ');
+    document.getElementById('save-view-name').value = '';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSaveProcessViewModal() {
+    document.getElementById('save-view-modal')?.classList.remove('open');
+    if (!document.getElementById('new-modal')?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  function confirmSaveProcessView() {
+    const name = document.getElementById('save-view-name')?.value.trim();
+    if (!name) {
+      window.alert('Enter a name for this view.');
+      return;
+    }
+    processPinnedViews.push({
+      label: name,
+      view: processesActiveView,
+      type: processesTypeFilter,
+      status: processesStatusFilter,
+      date: processesDateFilter,
+      sort: processesSortMode
+    });
+    localStorage.setItem('process-pinned-views', JSON.stringify(processPinnedViews));
+    renderProcessPinnedViews();
+    closeSaveProcessViewModal();
+    window.alert('View "' + name + '" saved to your pinned views.');
+  }
+
+  function renderProcessPinnedViews() {
+    const container = document.getElementById('process-pinned-custom');
+    if (!container) return;
+    container.innerHTML = processPinnedViews.map(function (v, i) {
+      return '<div class="view-item" data-view-label="' + escHtml(v.label) + '" role="menuitem" tabindex="0" onclick="applyProcessPinnedView(' + i + ')"><span class="view-item-label">' + escHtml(v.label) + '</span><span class="pin">★</span></div>';
+    }).join('');
+  }
+
+  function applyProcessPinnedView(index) {
+    const v = processPinnedViews[index];
+    if (!v) return;
+    processesActiveView = v.view;
+    processesTypeFilter = v.type;
+    processesStatusFilter = v.status;
+    processesDateFilter = v.date;
+    processesSortMode = v.sort;
+    selectProcessView(v.view);
+    setProcessTypeFilter(v.type);
+    setProcessStatusFilter(v.status);
+    setProcessDateFilter(v.date);
+    processesSortMode = v.sort;
+    syncProcessSortDropdown();
+    renderProcessesList();
+  }
+
+  function setProcessDateFilter(date) {
+    processesDateFilter = date;
+    syncListControlDropdown('process-date-dropdown', date, 'process-date');
+    renderProcessesList();
+  }
+
+  function setPremisesDateFilter(date) {
+    premisesDateFilter = date;
+    syncListControlDropdown('premises-date-dropdown', date, 'premises-date');
+    renderPremisesList();
+  }
+
+  function setCpinDateFilter(date) {
+    cpinsDateFilter = date;
+    syncListControlDropdown('cpin-date-dropdown', date, 'cpin-date');
+    renderCpinsLists();
+  }
+
+  function setProcessHeaderSort(col) {
+    if (col === 'score') processesSortMode = processesSortMode === 'worst' ? 'best' : 'worst';
+    else if (col === 'premises') processesSortMode = 'name';
+    else if (col === 'type') processesSortMode = 'type';
+    else if (col === 'status') processesSortMode = 'status';
+    else if (col === 'owner') processesSortMode = 'owner';
+    else if (col === 'age') processesSortMode = 'age';
+    syncProcessSortDropdown();
+    renderProcessesList();
+  }
+
+  function setPremisesHeaderSort(col) {
+    if (col === 'score') premisesSortMode = premisesSortMode === 'worst' ? 'best' : 'worst';
+    else if (col === 'name') premisesSortMode = 'name';
+    else if (col === 'audit') premisesSortMode = 'audit';
+    syncPremisesSortDropdown();
+    renderPremisesList();
+  }
+
   function initPremisesPage() {
     const screen = document.getElementById('premises');
     if (!screen) return;
+    bindListControlMenusOnce();
     if (!screen.dataset.filtersBound) {
       screen.dataset.filtersBound = '1';
       document.querySelectorAll('.premises-filters-scope .chip').forEach(chip => {
@@ -6914,7 +7845,11 @@
       document.querySelectorAll('.premises-filters-type .chip').forEach(chip => {
         chip.addEventListener('click', () => setPremisesTypeFilter(chip.dataset.premisesType));
       });
-      document.getElementById('premises-sort-trigger')?.addEventListener('click', cyclePremisesSort);
+      initListControlDropdown('premises-date-dropdown', setPremisesDateFilter);
+      initListControlDropdown('premises-sort-dropdown', setPremisesSort);
+      document.querySelectorAll('[data-prem-sort]').forEach(function (btn) {
+        btn.addEventListener('click', function () { setPremisesHeaderSort(btn.dataset.premSort); });
+      });
     }
     renderPremisesList();
   }
@@ -7189,57 +8124,228 @@
   }
 
   function initAuditActivity() {
+    if (!auditActivityLog._setupSeeded) {
+      auditActivityLog._setupSeeded = true;
+      [
+        { text: 'Audit record A-2026-0314 created.', at: '18 Jun, 09:00', ts: 1718685600000 },
+        { text: 'CPIN-2026-0418 linked to this audit.', at: '18 Jun, 09:05', ts: 1718685900000 },
+        { text: 'Appointment letter sent to all Duty Holders.', at: '18 Jun, 14:30', ts: 1718705400000 },
+        { text: 'Calendar event pushed to Outlook.', at: '18 Jun, 14:31', ts: 1718705460000 }
+      ].reverse().forEach(function (s) {
+        auditActivityLog.notes.unshift({ id: 'setup-' + s.ts, text: s.text, stage: 1, at: s.at, ts: s.ts });
+      });
+    }
     syncAuditActivityForStage(auditStage);
     renderAuditActivity();
   }
 
+  function auditFindingsLocked() {
+    return auditLettersSent && auditStage >= 4 && !auditEditPermission;
+  }
+
+  function updateAuditEditWarning() {
+    const el = document.getElementById('audit-edit-warning');
+    const action = document.getElementById('audit-edit-warning-action');
+    if (!el) return;
+    const show = auditLettersSent && auditStage <= 3;
+    el.hidden = !show;
+    if (!action || !show) return;
+    if (auditEditPermission) {
+      action.innerHTML = ' <strong>Permission granted</strong> — you may edit findings and reissue letters.';
+    } else if (auditEditPermissionRequested) {
+      action.innerHTML = ' Permission requested — awaiting admin approval. <a onclick="show(\'admin\')">Open admin</a>';
+    } else {
+      action.innerHTML = ' <button type="button" class="btn" style="margin-left:8px;padding:4px 10px;font-size:12px;" onclick="requestAuditEditPermission()">Request permission</button>';
+    }
+  }
+
+  function requestAuditEditPermission() {
+    if (!window.confirm('Audit outcomes already sent. Are you sure you want to edit findings? Permission needs to be requested from an admin user.')) return;
+    auditEditPermissionRequested = true;
+    auditActivityLog.notes.unshift({
+      id: 'n-perm-' + Date.now(),
+      text: 'Edit permission requested — findings amendment after outcome letters sent.',
+      stage: auditStage,
+      at: 'Today',
+      ts: Date.now()
+    });
+    renderAuditActivity();
+    updateAuditEditWarning();
+  }
+
+  function grantAuditEditPermission() {
+    auditEditPermission = true;
+    auditEditPermissionRequested = false;
+    auditActivityLog.notes.unshift({
+      id: 'n-grant-' + Date.now(),
+      text: 'Admin granted permission to amend findings and reissue outcome letters.',
+      stage: auditStage,
+      at: 'Today',
+      ts: Date.now()
+    });
+    renderAuditActivity();
+    updateAuditEditWarning();
+    window.alert('Audit edit permission granted for this session.');
+  }
+
+  function finalizeAuditLetters() {
+    if (auditLettersSent) {
+      setAuditStage(5);
+      return;
+    }
+    auditLettersSent = true;
+    const sentAt = '22 June 2026';
+    [
+      { name: 'HMCTS — 28-Day Action Plan', file: 'Letter-HMCTS-28DAP-2026-06-22.pdf' },
+      { name: 'Equans — 28-Day Action Plan', file: 'Letter-Equans-28DAP-2026-06-22.pdf' },
+      { name: 'Property Directorate — GSS', file: 'Letter-PropertyDirectorate-GSS-2026-06-22.pdf' }
+    ].forEach(function (l) {
+      auditActivityLog.files.unshift({
+        id: 'file-' + l.file,
+        name: l.file,
+        label: l.name,
+        at: sentAt,
+        ts: Date.now()
+      });
+    });
+    auditActivityLog.notes.unshift({
+      id: 'n-letters-' + Date.now(),
+      text: 'Outcome letters finalised and sent to all three Duty Holders. Copies saved to Files.',
+      stage: 4,
+      at: sentAt,
+      ts: Date.now()
+    });
+    renderAuditActivity();
+    updateAuditEditWarning();
+    setAuditStage(5);
+  }
+
+  function renderAuditFindings() {
+    const list = document.getElementById('audit-findings-list');
+    if (!list) return;
+    list.innerHTML = auditFindings.map(function (f) {
+      const articleLabel = ARTICLE_LABELS[f.articleKey] || ('Article ' + f.articleKey);
+      const pillClass = f.score >= 4 ? 'red' : 'amber';
+      const dhSpans = f.dutyHolders.map(function (dh) { return '<span>' + escHtml(dh) + '</span>'; }).join('');
+      const locked = auditFindingsLocked();
+      return '<div class="finding" data-finding-id="' + escHtml(f.id) + '">' +
+        '<div class="article">' + escHtml(articleLabel) +
+        (locked ? '' : ' <span class="edit-finding" onclick="editAuditFinding(\'' + escHtml(f.id) + '\')">Edit</span>') +
+        (locked ? '' : ' <span class="remove-finding" onclick="removeAuditFinding(\'' + escHtml(f.id) + '\')">Remove</span>') +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--ink-3);">Category: ' + escHtml(f.category) + '</div>' +
+        '<div class="scores">' + [0,1,2,3,4,5,6].map(function (s) {
+          return '<button class="score-btn' + (s === f.score ? ' selected' : '') + '" type="button">' + s + '</button>';
+        }).join('') + '</div>' +
+        '<div style="font-size:12px;color:var(--ink-3);">Failure type</div>' +
+        '<div style="margin:4px 0 6px;"><span class="pill ' + pillClass + '">' + escHtml(f.failureType) + '</span></div>' +
+        '<div class="example"><strong>Example seen:</strong> ' + escHtml(f.example) + '</div>' +
+        '<div class="attribution">Attributed to: ' + dhSpans + '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function getSelectedFindingDhs() {
+    return Array.from(document.querySelectorAll('#new-finding-dh-list input:checked')).map(function (el) { return el.value; });
+  }
+
   function toggleAddFindingForm(open) {
+    if (open !== false && auditFindingsLocked()) {
+      window.alert('Audit outcomes already sent. Request admin permission before editing findings.');
+      return;
+    }
     const form = document.getElementById('audit-add-finding-form');
     const btn = document.getElementById('audit-add-finding-btn');
     if (!form || !btn) return;
     const showForm = typeof open === 'boolean' ? open : form.hidden;
+    if (showForm && !auditFindingEditId) resetFindingForm();
     form.hidden = !showForm;
     btn.hidden = showForm;
     if (showForm) document.getElementById('new-finding-type')?.focus();
   }
 
-  function saveNewFinding() {
+  function resetFindingForm() {
+    auditFindingEditId = null;
+    const title = document.getElementById('audit-finding-form-title');
+    const saveBtn = document.getElementById('audit-finding-save-btn');
+    if (title) title.textContent = 'Add a finding';
+    if (saveBtn) saveBtn.textContent = 'Add finding';
+    document.getElementById('new-finding-type').value = '';
+    document.getElementById('new-finding-example').value = '';
+    document.querySelectorAll('#new-finding-dh-list input').forEach(function (el, i) {
+      el.checked = i === 0;
+    });
+  }
+
+  function editAuditFinding(id) {
+    if (auditFindingsLocked()) {
+      window.alert('Audit outcomes already sent. Request admin permission before editing findings.');
+      return;
+    }
+    const f = auditFindings.find(function (x) { return x.id === id; });
+    if (!f) return;
+    auditFindingEditId = id;
+    document.getElementById('audit-finding-form-title').textContent = 'Edit finding';
+    document.getElementById('audit-finding-save-btn').textContent = 'Save changes';
+    document.getElementById('new-finding-article').value = f.articleKey;
+    document.getElementById('new-finding-category').value = f.category;
+    document.getElementById('new-finding-score').value = String(f.score);
+    document.getElementById('new-finding-type').value = f.failureType;
+    document.getElementById('new-finding-example').value = f.example;
+    document.querySelectorAll('#new-finding-dh-list input').forEach(function (el) {
+      el.checked = f.dutyHolders.indexOf(el.value) >= 0;
+    });
+    toggleAddFindingForm(true);
+  }
+
+  function removeAuditFinding(id) {
+    if (auditFindingsLocked()) return;
+    auditFindings = auditFindings.filter(function (f) { return f.id !== id; });
+    renderAuditFindings();
+  }
+
+  function saveAuditFinding() {
+    if (auditFindingsLocked()) return;
     const articleKey = document.getElementById('new-finding-article').value;
     const category = document.getElementById('new-finding-category').value;
-    const score = document.getElementById('new-finding-score').value;
+    const score = parseInt(document.getElementById('new-finding-score').value, 10);
     const failureType = document.getElementById('new-finding-type').value.trim();
     const example = document.getElementById('new-finding-example').value.trim();
-    const dutyHolder = document.getElementById('new-finding-dh').value;
+    const dutyHolders = getSelectedFindingDhs();
 
     if (!failureType || !example) {
       window.alert('Please enter a failure type and an example seen.');
       return;
     }
+    if (!dutyHolders.length) {
+      window.alert('Attribute this finding to at least one Duty Holder.');
+      return;
+    }
 
-    const list = document.getElementById('audit-findings-list');
-    const articleLabel = ARTICLE_LABELS[articleKey] || ('Article ' + articleKey);
-    const pillClass = parseInt(score, 10) >= 4 ? 'red' : 'amber';
+    if (auditFindingEditId) {
+      const f = auditFindings.find(function (x) { return x.id === auditFindingEditId; });
+      if (f) {
+        f.articleKey = articleKey;
+        f.category = category;
+        f.score = score;
+        f.failureType = failureType;
+        f.example = example;
+        f.dutyHolders = dutyHolders;
+      }
+    } else {
+      auditFindings.push({
+        id: 'f' + Date.now(),
+        articleKey: articleKey,
+        category: category,
+        score: score,
+        failureType: failureType,
+        example: example,
+        dutyHolders: dutyHolders
+      });
+    }
 
-    const finding = document.createElement('div');
-    finding.className = 'finding';
-    finding.innerHTML =
-      '<div class="article">' + escHtml(articleLabel) +
-      ' <span class="remove-finding" onclick="this.closest(\'.finding\').remove()">Remove</span></div>' +
-      '<div style="font-size:12px;color:var(--ink-3);">Category: ' + escHtml(category) + '</div>' +
-      '<div class="scores">' +
-      [0,1,2,3,4,5,6].map(s =>
-        '<button class="score-btn' + (s == score ? ' selected' : '') + '">' + s + '</button>'
-      ).join('') +
-      '</div>' +
-      '<div style="font-size:12px;color:var(--ink-3);">Failure type</div>' +
-      '<div style="margin:4px 0 6px;"><span class="pill ' + pillClass + '">' + escHtml(failureType) + '</span></div>' +
-      '<div class="example"><strong>Example seen:</strong> ' + escHtml(example) + '</div>' +
-      '<div class="attribution">Attributed to: <span>' + escHtml(dutyHolder) + '</span></div>';
-
-    list.appendChild(finding);
-
-    document.getElementById('new-finding-type').value = '';
-    document.getElementById('new-finding-example').value = '';
+    renderAuditFindings();
+    resetFindingForm();
     toggleAddFindingForm(false);
   }
 
@@ -7349,14 +8455,21 @@
   let activeCpinId = null;
   let cpinStage = 1;
   let cpinDetailLastId = null;
-  let cpinPremisesEditing = false;
   let cpinSeverityEditing = false;
+  let cpinIntakeDetailsEditing = false;
 
   const CPIN_SEVERITY_LABELS = {
     green: 'Green',
     amber: 'Amber',
     red: 'Red'
   };
+  const CPIN_INCIDENT_STATUS_OPTIONS = [
+    'Incident Dealt with by Staff - No Known Injuries',
+    'Fire Service Fought Fire or Carried Out Rescues',
+    'Injuries as a Result of Fire',
+    'Serious or Fatal Injuries Suspected as Result of Fire'
+  ];
+
   const CPIN_SEVERITY_LONG = {
     green: 'Green — dealt with by staff, no known injuries',
     amber: 'Amber — fire fought, rescue, or injuries',
@@ -7567,6 +8680,30 @@
     return cpinShowsDutyHolders(cpin) && cpinNeedsDeskEval(cpin);
   }
 
+  function cpinRequiresResponsiblePersons(cpin) {
+    return cpinRequiresDutyHolders(cpin);
+  }
+
+  function getCpinResponsiblePersonRecords(cpin) {
+    if (!cpin || !cpin.responsiblePersons) return [];
+    return cpin.responsiblePersons.filter(function (rp) {
+      return rp.status !== 'rejected';
+    });
+  }
+
+  function cpinHasAcceptedResponsiblePersons(cpin) {
+    return getCpinResponsiblePersonRecords(cpin).some(function (rp) {
+      return rp.status === 'accepted';
+    });
+  }
+
+  function cpinPeopleGateOk(cpin) {
+    if (!cpinRequiresDutyHolders(cpin)) return true;
+    if (!cpinHasAcceptedDutyHolders(cpin)) return false;
+    if (cpinRequiresResponsiblePersons(cpin) && !cpinHasAcceptedResponsiblePersons(cpin)) return false;
+    return true;
+  }
+
   function cpinDhRoleForName(name) {
     const catalog = (typeof SETUP_LOOKUP_CATALOG !== 'undefined' && SETUP_LOOKUP_CATALOG.dutyHolder) || [];
     const match = catalog.find(function (e) {
@@ -7637,8 +8774,7 @@
   }
 
   function cpinStage3DutyHoldersOk(cpin) {
-    if (!cpinRequiresDutyHolders(cpin)) return true;
-    return cpinHasAcceptedDutyHolders(cpin);
+    return cpinPeopleGateOk(cpin);
   }
 
   function cpinSeverityRank(severity) {
@@ -7646,9 +8782,35 @@
   }
 
   function sortCpinsBySeverity(items) {
-    return items.slice().sort(function (a, b) {
-      return cpinSeverityRank(a.severity) - cpinSeverityRank(b.severity);
-    });
+    return sortCpinItems(items, 'severity');
+  }
+
+  function sortCpinItems(items, mode) {
+    const sorted = items.slice();
+    if (mode === 'recent') {
+      sorted.sort(function (a, b) {
+        return parseCpinWhenDays(a.when) - parseCpinWhenDays(b.when);
+      });
+    } else if (mode === 'name') {
+      sorted.sort(function (a, b) {
+        return String(a.premises || '').localeCompare(String(b.premises || ''));
+      });
+    } else {
+      sorted.sort(function (a, b) {
+        return cpinSeverityRank(a.severity) - cpinSeverityRank(b.severity);
+      });
+    }
+    return sorted;
+  }
+
+  function syncCpinSortDropdown() {
+    syncListControlDropdown('cpin-sort-dropdown', cpinsSortMode, 'cpin-sort');
+  }
+
+  function setCpinSort(mode) {
+    cpinsSortMode = mode;
+    syncCpinSortDropdown();
+    renderCpinsLists();
   }
 
   function getCpinOnsiteEval(cpin) {
@@ -7674,7 +8836,7 @@
       const o = getCpinOnsiteEval(cpin);
       const apptOk = o.appointmentConfirmed || (o.appointmentDate && o.appointmentTime);
       if (!apptOk) return false;
-      if (!o.letterSent && !o.letterSkipped) return false;
+      if (!cpinOnsiteLettersComplete(cpin)) return false;
       if (!o.siteVisitDone) return false;
       return o.auditRequired === 'yes' || o.auditRequired === 'no';
     }
@@ -7688,7 +8850,7 @@
   function cpinShowsRemoteEval(cpin) {
     if (!cpin || cpin.furtherAction !== 'yes' || cpin.workflow === 'closed') return false;
     if (!cpinNeedsDeskEval(cpin)) return false;
-    if (cpinRequiresDutyHolders(cpin) && !cpinHasAcceptedDutyHolders(cpin)) return false;
+    if (cpinRequiresDutyHolders(cpin) && !cpinPeopleGateOk(cpin)) return false;
     return true;
   }
 
@@ -7703,7 +8865,7 @@
     if (!cpin.furtherAction) return false;
     if (cpin.furtherAction === 'no') return true;
     if (!cpinNeedsDeskEval(cpin)) return true;
-    if (cpinRequiresDutyHolders(cpin) && !cpinHasAcceptedDutyHolders(cpin)) return false;
+    if (cpinRequiresDutyHolders(cpin) && !cpinPeopleGateOk(cpin)) return false;
     return cpinStage4Ready(cpin);
   }
 
@@ -7715,6 +8877,9 @@
     if (cpin.furtherAction === 'yes' && cpinNeedsDeskEval(cpin)) {
       if (cpinRequiresDutyHolders(cpin) && !cpinHasAcceptedDutyHolders(cpin)) {
         return 'Approve at least one Duty Holder before continuing.';
+      }
+      if (cpinRequiresResponsiblePersons(cpin) && !cpinHasAcceptedResponsiblePersons(cpin)) {
+        return 'Approve at least one Responsible Person before continuing.';
       }
       if (!cpin.deskOutcome) return 'Complete remote evaluation and choose what the incident needs.';
       if (!cpinStage4Ready(cpin)) {
@@ -8182,6 +9347,7 @@
   }
 
   function cpinMatchesFilter(item) {
+    if (!matchesDateFilter(parseCpinWhenDays(item.when), cpinsDateFilter)) return false;
     if (cpinsActiveFilter === 'all') return true;
     if (cpinsActiveFilter === 'patch') return item.patch;
     if (cpinsActiveFilter === 'premises-needed') return cpinNeedsPremises(item);
@@ -8221,8 +9387,8 @@
   }
 
   function renderCpinCardsHtml(items) {
-    const pinned = sortCpinsBySeverity(items.filter(i => cpinPins.has(i.id)));
-    const rest = sortCpinsBySeverity(items.filter(i => !cpinPins.has(i.id)));
+    const pinned = sortCpinItems(items.filter(i => cpinPins.has(i.id)), cpinsSortMode);
+    const rest = sortCpinItems(items.filter(i => !cpinPins.has(i.id)), cpinsSortMode);
     let html = '';
 
     if (pinned.length) {
@@ -8245,6 +9411,8 @@
     const el = document.getElementById(panelId);
     if (!el) return;
     const filtered = items.filter(cpinMatchesFilter);
+    const countEl = document.getElementById('cpin-results-count');
+    if (countEl && panelId === 'cpins-panel-list') countEl.textContent = String(filtered.length);
     if (filtered.length === 0) {
       el.innerHTML = '<div class="audit-feed-empty" style="margin:24px 0;">' + escHtml(emptyMsg) + '</div>';
       return;
@@ -8340,6 +9508,8 @@
   }
 
   function renderCpinsLists() {
+    syncCpinSortDropdown();
+    syncListControlDropdown('cpin-date-dropdown', cpinsDateFilter, 'cpin-date');
     if (cpinsActiveTab === 'closed') {
       renderCompletedCpins();
     } else {
@@ -8365,7 +9535,7 @@
 
   function setCpinFilter(filter) {
     cpinsActiveFilter = filter;
-    document.querySelectorAll('.cpin-filters .chip').forEach(chip => {
+    document.querySelectorAll('.cpin-filters-rag .chip, .cpin-filters-queue .chip').forEach(chip => {
       chip.classList.toggle('on', chip.dataset.cpinFilter === filter);
     });
     renderCpinsLists();
@@ -8391,6 +9561,7 @@
     layoutCpinViews();
     loadCpinPins();
     loadCpinOverrides();
+    bindListControlMenusOnce();
     const hash = window.location.hash || '';
     const hashTab = hash.match(/cpins-tab=(\w+)/);
     if (hashTab) {
@@ -8421,8 +9592,12 @@
         });
       }
       document.querySelectorAll('.cpin-filters .chip').forEach(function (chip) {
-        chip.addEventListener('click', function () { setCpinFilter(chip.dataset.cpinFilter); });
+        chip.addEventListener('click', function () {
+          if (chip.dataset.cpinFilter) setCpinFilter(chip.dataset.cpinFilter);
+        });
       });
+      initListControlDropdown('cpin-date-dropdown', setCpinDateFilter);
+      initListControlDropdown('cpin-sort-dropdown', setCpinSort);
       if (!document.body.dataset.cpinViewBound) {
         document.body.dataset.cpinViewBound = '1';
         document.addEventListener('mousedown', function (e) {
@@ -8473,10 +9648,6 @@
     const timeEl = document.getElementById('cpin-onsite-time');
     const findings = document.getElementById('cpin-onsite-findings');
     const visitDone = document.getElementById('cpin-onsite-visit-done');
-    const letterStatus = document.getElementById('cpin-onsite-letter-status');
-    const addressee = document.getElementById('cpin-onsite-letter-addressee');
-    const letterBody = document.getElementById('cpin-onsite-letter-body');
-    const letterEdit = document.getElementById('cpin-onsite-letter-edit');
 
     const durEl = document.getElementById('cpin-onsite-duration');
     if (dateEl) dateEl.value = o.appointmentDate || '';
@@ -8488,18 +9659,7 @@
     document.querySelectorAll('input[name="cpin-onsite-audit"]').forEach(function (inp) {
       inp.checked = o.auditRequired === inp.value;
     });
-    if (addressee && cpin.premises) {
-      const dh = getCpinDutyHolders(cpin)[0];
-      addressee.innerHTML = escHtml(dh ? dh.name : 'Duty Holder') + '<br>' + escHtml(cpin.premises);
-    }
-    const bodyText = o.letterBody || 'We intend to carry out an on-site fire safety evaluation following the recent incident reported to us. Please confirm the appointment details below.';
-    if (letterBody && !o.letterEditing) letterBody.textContent = bodyText;
-    if (letterEdit) letterEdit.value = bodyText;
-    if (letterStatus) {
-      if (o.letterSent) letterStatus.textContent = '✓ Letter saved';
-      else if (o.letterSkipped) letterStatus.textContent = 'Skipped — confirmed by telephone';
-      else letterStatus.textContent = '';
-    }
+    renderCpinOnsiteLetters(cpin);
   }
 
   function renderCpinCloseSection(cpin) {
@@ -8589,15 +9749,55 @@
       else outcomeHint.textContent = '';
     }
 
-    if (showDh) renderCpinDutyHolders(cpin);
+    if (showDh) {
+      renderCpinDutyHolders(cpin);
+      renderCpinResponsiblePersons(cpin);
+    }
     if (showOnsite) renderCpinOnsiteSection(cpin);
     renderCpinCloseSection(cpin);
     renderCpinKeyFieldHighlights(cpin);
   }
 
+  function normalizeIncidentStatus(status) {
+    if (!status) return '';
+    const s = String(status).toLowerCase();
+    if (s.indexOf('serious or fatal') >= 0) return CPIN_INCIDENT_STATUS_OPTIONS[3];
+    if (s.indexOf('fought fire') >= 0 || s.indexOf('rescues') >= 0) return CPIN_INCIDENT_STATUS_OPTIONS[1];
+    if (s.indexOf('dealt with by staff') >= 0 || s.indexOf('no known injuries') >= 0) return CPIN_INCIDENT_STATUS_OPTIONS[0];
+    if (s.indexOf('injuries as a result') >= 0 || s.indexOf('injuries as a result of fire') >= 0) return CPIN_INCIDENT_STATUS_OPTIONS[2];
+    return CPIN_INCIDENT_STATUS_OPTIONS.find(function (opt) {
+      return opt.toLowerCase() === s;
+    }) || status;
+  }
+
+  function severityFromIncidentStatus(status) {
+    const normalized = normalizeIncidentStatus(status);
+    if (normalized === CPIN_INCIDENT_STATUS_OPTIONS[3] || normalized === CPIN_INCIDENT_STATUS_OPTIONS[2]) return 'red';
+    if (normalized === CPIN_INCIDENT_STATUS_OPTIONS[1]) return 'amber';
+    return 'green';
+  }
+
+  function parseCpinIntakeTimeForInput(time) {
+    if (!time) return '';
+    const parts = String(time).split(':');
+    if (parts.length < 2) return '';
+    return parts[0].padStart(2, '0') + ':' + parts[1].padStart(2, '0');
+  }
+
+  function formatCpinIntakeTimeFromInput(value) {
+    if (!value) return '';
+    const parts = value.split(':');
+    return parts[0] + ':' + (parts[1] || '00');
+  }
+
   function renderCpinIntakeGrid(cpin) {
     const grid = document.getElementById('cpin-intake-grid');
-    if (!grid || !cpin.intake) return;
+    const section = document.getElementById('cpin-intake-section');
+    if (!grid || !cpin || !cpin.intake) {
+      if (section) section.hidden = true;
+      return;
+    }
+    if (section) section.hidden = false;
     const i = cpin.intake;
     const rows = [
       ['Incident number', i.incidentNumber],
@@ -8606,25 +9806,181 @@
       ['Fire and Rescue Service', i.frs || '—'],
       ['Point of contact', i.contact],
       ['FRS contact email', i.email],
-      ['Address of premises', cpin.premises || '—'],
-      ['Incident status', i.incidentStatus],
-      ['Description', i.description]
+      ['Address of premises', cpin.premises || i.premisesFree || '—']
     ];
     grid.innerHTML = rows.map(function (row) {
-      const full = row[0] === 'Description';
-      return '<div class="' + (full ? 'full' : '') + '"><div class="k">' + escHtml(row[0]) + '</div><div class="v">' + escHtml(row[1] || '—') + '</div></div>';
+      return '<div><div class="k">' + escHtml(row[0]) + '</div><div class="v">' + escHtml(row[1] || '—') + '</div></div>';
     }).join('');
   }
 
-  function setCpinPremisesEditMode(editing) {
-    cpinPremisesEditing = !!editing;
-    const display = document.getElementById('cpin-premises-display');
-    const edit = document.getElementById('cpin-premises-edit');
-    if (display) display.hidden = cpinPremisesEditing;
-    if (edit) edit.hidden = !cpinPremisesEditing;
-    if (cpinPremisesEditing) {
-      requestAnimationFrame(function () { document.getElementById('cpin-intake-premises')?.focus(); });
+  function setCpinIntakeDetailsEditMode(editing) {
+    cpinIntakeDetailsEditing = !!editing;
+    const display = document.getElementById('cpin-intake-display');
+    const stopDisplay = document.getElementById('cpin-stop-message-display');
+    const stopSection = document.getElementById('cpin-stop-message');
+    const edit = document.getElementById('cpin-intake-edit');
+    const changeBtn = document.getElementById('cpin-intake-change-btn');
+    if (display) display.hidden = cpinIntakeDetailsEditing;
+    if (stopDisplay) stopDisplay.hidden = cpinIntakeDetailsEditing;
+    if (stopSection) stopSection.hidden = cpinIntakeDetailsEditing;
+    if (edit) edit.hidden = !cpinIntakeDetailsEditing;
+    if (changeBtn) changeBtn.hidden = cpinIntakeDetailsEditing;
+    if (cpinIntakeDetailsEditing) {
+      requestAnimationFrame(function () { document.getElementById('cpin-intake-incident-number')?.focus(); });
     }
+  }
+
+  function syncCpinIntakeDetailsEditFields(cpin) {
+    if (!cpin || !cpin.intake) return;
+    const i = cpin.intake;
+    const num = document.getElementById('cpin-intake-incident-number');
+    const date = document.getElementById('cpin-intake-incident-date');
+    const time = document.getElementById('cpin-intake-incident-time');
+    const frs = document.getElementById('cpin-intake-frs');
+    const contact = document.getElementById('cpin-intake-contact');
+    const email = document.getElementById('cpin-intake-email');
+    const premisesFree = document.getElementById('cpin-intake-premises-free');
+    const premisesLinked = document.getElementById('cpin-intake-premises-linked');
+    const desc = document.getElementById('cpin-intake-description');
+    const group = document.getElementById('cpin-stop-status-group');
+    const current = normalizeIncidentStatus(i.incidentStatus);
+    if (num) num.value = i.incidentNumber || '';
+    if (date) date.value = i.incidentDate || '';
+    if (time) time.value = parseCpinIntakeTimeForInput(i.incidentTime);
+    if (frs) frs.value = i.frs || 'Not Given';
+    if (contact) contact.value = i.contact || '';
+    if (email) email.value = i.email || '';
+    if (desc) desc.value = i.description || '';
+    if (group) {
+      group.innerHTML = CPIN_INCIDENT_STATUS_OPTIONS.map(function (opt) {
+        const checked = current === opt;
+        return '<label class="cpin-stop-status-option">' +
+          '<input type="radio" name="cpin-incident-status" value="' + escHtml(opt) + '"' +
+          (checked ? ' checked' : '') + ' />' +
+          '<span>' + escHtml(opt) + '</span></label>';
+      }).join('');
+    }
+    if (cpin.premises) {
+      if (premisesLinked) {
+        premisesLinked.hidden = false;
+        premisesLinked.textContent = cpin.premises + ' — linked via Premises above';
+      }
+      if (premisesFree) premisesFree.hidden = true;
+    } else {
+      if (premisesLinked) premisesLinked.hidden = true;
+      if (premisesFree) {
+        premisesFree.hidden = false;
+        premisesFree.value = i.premisesFree || '';
+      }
+    }
+  }
+
+  function openCpinIntakeDetailsEdit() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    syncCpinIntakeDetailsEditFields(cpin);
+    setCpinIntakeDetailsEditMode(true);
+  }
+
+  function cancelCpinIntakeDetailsEdit() {
+    const cpin = getCpinById(activeCpinId);
+    if (cpin) syncCpinIntakeDetailsEditFields(cpin);
+    setCpinIntakeDetailsEditMode(false);
+  }
+
+  function saveCpinIntakeDetails() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    const statusEl = document.querySelector('input[name="cpin-incident-status"]:checked');
+    const description = (document.getElementById('cpin-intake-description')?.value || '').trim();
+    const status = statusEl ? statusEl.value : normalizeIncidentStatus(cpin.intake?.incidentStatus);
+    const intake = Object.assign({}, cpin.intake || {}, {
+      incidentNumber: document.getElementById('cpin-intake-incident-number')?.value.trim() || '',
+      incidentDate: document.getElementById('cpin-intake-incident-date')?.value.trim() || '',
+      incidentTime: formatCpinIntakeTimeFromInput(document.getElementById('cpin-intake-incident-time')?.value || ''),
+      frs: document.getElementById('cpin-intake-frs')?.value || 'Not Given',
+      contact: document.getElementById('cpin-intake-contact')?.value.trim() || '',
+      email: document.getElementById('cpin-intake-email')?.value.trim() || '',
+      incidentStatus: status,
+      description: description
+    });
+    if (!cpin.premises) {
+      intake.premisesFree = document.getElementById('cpin-intake-premises-free')?.value.trim() || '';
+    }
+    const severity = severityFromIncidentStatus(status);
+    const summary = description
+      ? (description.length > 72 ? description.slice(0, 72) + '…' : description)
+      : cpin.summary;
+    persistCpinPatch(activeCpinId, { intake: intake, severity: severity, summary: summary });
+    cpinIntakeDetailsEditing = false;
+    renderCpinFrsSubmission(getCpinById(activeCpinId));
+    renderCpinRagBanner(getCpinById(activeCpinId));
+    renderCpinSeverityField(getCpinById(activeCpinId));
+    const meta = document.getElementById('cpin-detail-meta');
+    const updated = getCpinById(activeCpinId);
+    if (meta && updated) {
+      meta.innerHTML =
+        '<span class="pill ' + updated.severity + '">' + ({ red: 'Red', amber: 'Amber', green: 'Green' }[updated.severity]) + '</span> ' +
+        escHtml(CPIN_WORKFLOW_LABELS[updated.workflow] || updated.workflow) + '  ·  ' + escHtml(updated.when) +
+        (updated.assignee ? '  ·  ' + escHtml(updated.assignee) : '');
+    }
+  }
+
+  function renderCpinStopMessage(cpin) {
+    const section = document.getElementById('cpin-stop-message');
+    const descValue = document.getElementById('cpin-stop-desc-value');
+    const statusValue = document.getElementById('cpin-stop-status-value');
+    if (!section) return;
+    if (!cpin || !cpin.intake) {
+      section.hidden = true;
+      return;
+    }
+    if (!cpinIntakeDetailsEditing) section.hidden = false;
+    const current = normalizeIncidentStatus(cpin.intake.incidentStatus);
+    if (descValue) descValue.textContent = cpin.intake.description || 'Not recorded';
+    if (statusValue) statusValue.textContent = current || 'Not recorded';
+  }
+
+  function renderCpinFrsSubmission(cpin) {
+    renderCpinIntakeGrid(cpin);
+    renderCpinStopMessage(cpin);
+    syncCpinIntakeDetailsEditFields(cpin);
+    setCpinIntakeDetailsEditMode(cpinIntakeDetailsEditing);
+  }
+
+  const CPIN_EXTRA_PREMISES = ['DWP Canterbury', 'HMCTS Maidstone', 'DWP Brighton', 'Jobcentre Plus Crawley'];
+
+  function getCpinPremisesCatalog() {
+    const seen = new Set();
+    const items = [];
+    PREMISES_LIST.forEach(function (p) {
+      if (seen.has(p.name)) return;
+      seen.add(p.name);
+      items.push({
+        key: p.ref || p.name,
+        name: p.name,
+        ref: p.ref || '',
+        role: (p.typeLabel || 'Premises') + (p.dept ? '  ·  ' + p.dept : ''),
+        initials: setupInitials(p.name)
+      });
+    });
+    CPIN_EXTRA_PREMISES.forEach(function (name) {
+      if (seen.has(name)) return;
+      seen.add(name);
+      items.push({
+        key: name,
+        name: name,
+        ref: '',
+        role: 'Premises record',
+        initials: setupInitials(name)
+      });
+    });
+    return items.sort(function (a, b) { return a.name.localeCompare(b.name); });
+  }
+
+  function openCpinPremisesEdit() {
+    setupLookupTarget = 'cpin';
+    openSetupLookupModal('premises');
   }
 
   function setCpinSeverityEditMode(editing) {
@@ -8636,20 +9992,6 @@
     if (cpinSeverityEditing) {
       requestAnimationFrame(function () { document.getElementById('cpin-severity-select')?.focus(); });
     }
-  }
-
-  function openCpinPremisesEdit() {
-    const cpin = getCpinById(activeCpinId);
-    const sel = document.getElementById('cpin-intake-premises');
-    if (sel && cpin) sel.value = cpin.premises || '';
-    setCpinPremisesEditMode(true);
-  }
-
-  function cancelCpinPremisesEdit() {
-    const cpin = getCpinById(activeCpinId);
-    const sel = document.getElementById('cpin-intake-premises');
-    if (sel && cpin) sel.value = cpin.premises || '';
-    setCpinPremisesEditMode(false);
   }
 
   function openCpinSeverityEdit() {
@@ -8668,10 +10010,8 @@
 
   function renderCpinPremisesPanel(cpin) {
     const status = document.getElementById('cpin-premises-status');
-    const sel = document.getElementById('cpin-intake-premises');
     const valueEl = document.getElementById('cpin-premises-value');
     const changeBtn = document.getElementById('cpin-premises-change-btn');
-    if (sel) sel.value = cpin.premises || '';
     if (valueEl) {
       if (cpin.premises) {
         valueEl.className = 'cpin-key-value';
@@ -8685,8 +10025,9 @@
     if (status) {
       status.textContent = cpin.premises ? 'Anchored to premises record.' : 'Link a premises record.';
     }
-    const forceEdit = cpinNeedsPremises(cpin) && cpin.workflow !== 'closed';
-    setCpinPremisesEditMode(forceEdit || cpinPremisesEditing);
+    if (cpinNeedsPremises(cpin) && cpin.workflow !== 'closed' && cpinDetailLastId !== activeCpinId) {
+      requestAnimationFrame(function () { openCpinPremisesEdit(); });
+    }
   }
 
   function renderCpinSeverityField(cpin) {
@@ -8742,6 +10083,7 @@
       if (rejected.has(name) || onList.has(name)) return;
       holders.push({
         id: 'dh-' + name.replace(/\W+/g, '-').toLowerCase(),
+        key: SETUP_DH_KEY_BY_NAME[name],
         name: name,
         role: cpinDhRoleForName(name),
         initials: setupInitials(name),
@@ -8806,7 +10148,7 @@
     if (hint) {
       if (cpinHasAcceptedDutyHolders(cpin)) {
         hint.textContent = cpinRequiresDutyHolders(cpin)
-          ? 'At least one Duty Holder approved — you can continue.'
+          ? 'At least one Duty Holder approved — approve Responsible Persons below to continue.'
           : '';
       } else if (cpinRequiresDutyHolders(cpin)) {
         hint.textContent = cpinHasPendingDutyHolders(cpin)
@@ -8816,6 +10158,85 @@
         hint.textContent = '';
       }
     }
+  }
+
+  function renderCpinResponsiblePersons(cpin) {
+    const list = document.getElementById('cpin-rp-list');
+    const hint = document.getElementById('cpin-rp-hint');
+    if (!list) return;
+    cpin = getCpinById(activeCpinId) || cpin;
+    if (!cpinShowsDutyHolders(cpin)) {
+      if (hint) hint.textContent = '';
+      return;
+    }
+    const rps = getCpinResponsiblePersonRecords(cpin);
+    if (!rps.length) {
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No Responsible Persons yet. Approve Duty Holders to see suggested contacts here.</p>';
+    } else {
+      list.innerHTML = rps.map(function (rp) {
+        const pill = rp.status === 'suggested'
+          ? '<span class="pill amber">Suggested</span>'
+          : '<span class="pill grey">Approved</span>';
+        const actions = rp.status === 'suggested'
+          ? '<div class="holder-actions">' +
+              '<button class="btn primary" type="button" onclick="acceptCpinResponsiblePerson(\'' + escHtml(rp.id) + '\')">Approve</button>' +
+              '<button class="btn" type="button" onclick="rejectCpinResponsiblePerson(\'' + escHtml(rp.id) + '\')">Reject</button>' +
+            '</div>'
+          : '<div class="holder-actions"><span class="remove" title="Remove" onclick="removeCpinResponsiblePerson(\'' + escHtml(rp.id) + '\')">×</span></div>';
+        return '<div class="holder-card' + (rp.status === 'suggested' ? ' is-suggested' : '') + '" data-id="' + escHtml(rp.id) + '">' +
+          '<div class="avatar-sm">' + escHtml(sanitizeAvatarInitials(rp.initials)) + '</div>' +
+          '<div><div class="name">' + escHtml(rp.name) + (rp.ref ? ' <span class="prem-ref">' + escHtml(rp.ref) + '</span>' : '') + '</div>' +
+          '<div class="role">' + escHtml((rp.role || '').replace(/[\u2013\u2014]/g, '-')) + '</div></div>' +
+          pill + actions + '</div>';
+      }).join('');
+    }
+    if (hint) {
+      if (cpinRequiresResponsiblePersons(cpin)) {
+        if (cpinHasAcceptedResponsiblePersons(cpin)) {
+          hint.textContent = 'At least one Responsible Person approved — you can continue.';
+        } else if (rps.some(function (r) { return r.status === 'suggested'; })) {
+          hint.textContent = 'Approve at least one Responsible Person to continue to remote evaluation.';
+        } else {
+          hint.textContent = 'Add and approve at least one Responsible Person before remote evaluation.';
+        }
+      } else {
+        hint.textContent = '';
+      }
+    }
+  }
+
+  function updateCpinResponsiblePersons(mutator) {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    const next = mutator((cpin.responsiblePersons || []).slice());
+    persistCpinPatch(activeCpinId, { responsiblePersons: next });
+    renderCpinWorkflowSections(getCpinById(activeCpinId));
+  }
+
+  function acceptCpinResponsiblePerson(id) {
+    updateCpinResponsiblePersons(function (rps) {
+      return rps.map(function (rp) {
+        if (rp.id !== id) return rp;
+        return Object.assign({}, rp, { status: 'accepted' });
+      });
+    });
+  }
+
+  function rejectCpinResponsiblePerson(id) {
+    updateCpinResponsiblePersons(function (rps) {
+      return rps.filter(function (rp) { return rp.id !== id; });
+    });
+  }
+
+  function removeCpinResponsiblePerson(id) {
+    updateCpinResponsiblePersons(function (rps) {
+      return rps.filter(function (rp) { return rp.id !== id; });
+    });
+  }
+
+  function addCpinResponsiblePerson() {
+    setupLookupTarget = 'cpin';
+    openSetupLookupModal('responsiblePerson');
   }
 
   function updateCpinDutyHolders(mutator) {
@@ -8838,13 +10259,48 @@
     renderCpinWorkflowSections(getCpinById(activeCpinId));
   }
 
+  function suggestCpinRpsForDh(dhKey) {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin || !dhKey) return;
+    const keys = SETUP_DH_TO_RP_KEYS[dhKey] || [];
+    const catalog = SETUP_LOOKUP_CATALOG.responsiblePerson;
+    const rps = (cpin.responsiblePersons || []).slice();
+    let changed = false;
+    keys.forEach(function (rk) {
+      const entry = catalog.find(function (e) { return e.key === rk; });
+      if (!entry) return;
+      const exists = rps.some(function (r) {
+        return r.key === rk || r.name.toLowerCase() === entry.name.toLowerCase();
+      });
+      if (exists) return;
+      rps.push({
+        id: 'rp-' + rk,
+        key: rk,
+        ref: entry.ref,
+        name: entry.name,
+        role: entry.role,
+        initials: entry.initials,
+        fromPremises: true,
+        status: 'suggested',
+        linkedDh: dhKey
+      });
+      changed = true;
+    });
+    if (changed) persistCpinPatch(activeCpinId, { responsiblePersons: rps });
+  }
+
   function acceptCpinDutyHolder(id) {
+    const cpin = getCpinById(activeCpinId);
+    const record = cpin && getCpinDutyHolderRecords(cpin).find(function (d) { return d.id === id; });
     updateCpinDutyHolders(function (holders) {
       return holders.map(function (dh) {
         if (dh.id !== id && dh.name !== id) return dh;
-        return Object.assign({}, dh, { status: 'accepted' });
+        return Object.assign({}, dh, { status: 'accepted', key: dh.key || SETUP_DH_KEY_BY_NAME[dh.name] });
       });
     });
+    const dhKey = record && (record.key || SETUP_DH_KEY_BY_NAME[record.name]);
+    if (dhKey) suggestCpinRpsForDh(dhKey);
+    renderCpinResponsiblePersons(getCpinById(activeCpinId));
   }
 
   function rejectCpinDutyHolder(id) {
@@ -8903,10 +10359,10 @@
       actions.innerHTML = btn;
     }
     renderCpinRagBanner(cpin);
-    renderCpinIntakeGrid(cpin);
+    renderCpinFrsSubmission(cpin);
     if (cpinDetailLastId !== activeCpinId) {
-      cpinPremisesEditing = false;
       cpinSeverityEditing = false;
+      cpinIntakeDetailsEditing = false;
     }
     renderCpinPremisesPanel(cpin);
     renderCpinRagExplainer(cpin);
@@ -8934,10 +10390,10 @@
     initCpinDetailPage();
   }
 
-  function saveCpinIntakePremises() {
+  function saveCpinIntakePremises(premisesName) {
     const cpin = getCpinById(activeCpinId);
     if (!cpin) return;
-    const premises = document.getElementById('cpin-intake-premises')?.value || null;
+    const premises = premisesName || null;
     let workflow = cpin.workflow;
     if (premises) {
       workflow = cpin.workflow === 'awaiting_premises' ? 'unassigned' : (cpin.workflow === 'incoming' ? 'incoming' : cpin.workflow);
@@ -8952,9 +10408,9 @@
         return { id: dh.id, name: dh.name, role: dh.role, initials: dh.initials, fromPremises: dh.fromPremises, status: dh.status };
       }),
       rejectedDutyHolders: premisesChanged ? [] : (cpin.rejectedDutyHolders || []),
-      suggestedDutyHolders: []
+      suggestedDutyHolders: [],
+      responsiblePersons: premisesChanged ? [] : (cpin.responsiblePersons || [])
     });
-    cpinPremisesEditing = false;
     refreshCpinDetailPage();
   }
 
@@ -9098,47 +10554,11 @@
     renderCpinWorkflowSections(getCpinById(activeCpinId));
   }
 
-  function toggleCpinOnsiteLetterEdit() {
-    const preview = document.getElementById('cpin-onsite-letter-preview');
-    const editWrap = document.getElementById('cpin-onsite-letter-edit-wrap');
-    const edit = document.getElementById('cpin-onsite-letter-edit');
-    const body = document.getElementById('cpin-onsite-letter-body');
-    if (!edit || !editWrap || !preview) return;
-    const showing = !editWrap.hidden;
-    if (showing) {
-      if (body) body.textContent = edit.value;
-      editWrap.hidden = true;
-      preview.hidden = false;
-    } else {
-      edit.value = body?.textContent || edit.value;
-      editWrap.hidden = false;
-      preview.hidden = true;
-      edit.focus();
-    }
-  }
-
-  function saveCpinOnsiteLetter() {
-    const cpin = getCpinById(activeCpinId);
-    if (!cpin) return;
-    const edit = document.getElementById('cpin-onsite-letter-edit');
-    const body = document.getElementById('cpin-onsite-letter-body');
-    const editWrap = document.getElementById('cpin-onsite-letter-edit-wrap');
-    const letterBody = (editWrap && !editWrap.hidden && edit) ? edit.value : (body?.textContent || '');
-    const o = Object.assign({}, getCpinOnsiteEval(cpin), {
-      letterSent: true,
-      letterSkipped: false,
-      letterBody: letterBody
-    });
-    persistCpinPatch(activeCpinId, { onsiteEval: o, workflow: 'desk_eval' });
-    refreshCpinDetailPage();
-  }
-
   function skipCpinOnsiteLetter() {
     const cpin = getCpinById(activeCpinId);
     if (!cpin) return;
     const o = Object.assign({}, getCpinOnsiteEval(cpin), {
-      letterSkipped: true,
-      letterSent: false
+      letterSkipped: true
     });
     persistCpinPatch(activeCpinId, { onsiteEval: o, workflow: 'desk_eval' });
     refreshCpinDetailPage();
@@ -9214,7 +10634,8 @@
   }
   function closeNewModal() {
     document.getElementById('new-modal').classList.remove('open');
-    if (!document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
+    if (!document.getElementById('setup-lookup-modal')?.classList.contains('open') &&
+        !document.getElementById('letter-composer-modal')?.classList.contains('open')) {
       document.body.style.overflow = '';
     }
   }
@@ -9236,6 +10657,8 @@
         closeAuditFloatPanel();
       } else if (document.getElementById('cpin-float-panel')?.classList.contains('open')) {
         closeCpinFloatPanel();
+      } else if (document.getElementById('letter-composer-modal')?.classList.contains('open')) {
+        closeLetterComposer();
       } else if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
         closeSetupLookupModal();
       } else {
@@ -9276,17 +10699,451 @@
     custom: 'the agreed duration'
   };
 
+  // ---------------------------------------------------------
+  // Letter composer (site-wide — CPIN first, reusable elsewhere)
+  // ---------------------------------------------------------
+  const LETTER_TEMPLATES = [
+    {
+      id: 'cpin-onsite-appointment',
+      label: 'On-site evaluation appointment',
+      hint: 'Standard appointment following incident notification',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        const appt = ctx.appointment;
+        return (
+          '<p>Following the incident notification' +
+          (ctx.incidentRef ? ' (<span class="conditional">' + escHtml(ctx.incidentRef) + '</span>)' : '') +
+          ' received in relation to <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'CPFSI intends to carry out an on-site fire safety evaluation on ' +
+          '<span class="conditional">' + escHtml(appt.long) + '</span>. We anticipate the visit will take ' +
+          escHtml(appt.duration) + '.</p>' +
+          '<p>Please confirm that a representative will be available to meet our inspector' +
+          (ctx.assignee ? ' (<span class="conditional">' + escHtml(ctx.assignee) + '</span>)' : '') +
+          ', and that access can be provided to all relevant areas and fire safety documentation.</p>'
+        );
+      }
+    },
+    {
+      id: 'cpin-onsite-urgent',
+      label: 'Urgent on-site evaluation',
+      hint: 'Serious injury or fatality — 24 to 48 hour response',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        const appt = ctx.appointment;
+        return (
+          '<p>Following a serious incident at <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'CPFSI will carry out an urgent on-site fire safety evaluation on ' +
+          '<span class="conditional">' + escHtml(appt.long) + '</span>. This visit is time-critical.</p>' +
+          '<p>Please ensure immediate access is arranged and that your fire safety representative is available. ' +
+          'If you have already confirmed this appointment by telephone, retain this letter as a formal record.</p>'
+        );
+      }
+    },
+    {
+      id: 'cpin-onsite-followup',
+      label: 'Appointment confirmation',
+      hint: 'Follow-up when date was agreed by phone',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        const appt = ctx.appointment;
+        return (
+          '<p>Further to our recent telephone conversation, this letter confirms the on-site fire safety evaluation ' +
+          'at <span class="conditional">' + escHtml(ctx.premises) + '</span> on ' +
+          '<span class="conditional">' + escHtml(appt.long) + '</span>.</p>' +
+          '<p>Please ensure premises access and relevant documentation are available as discussed.</p>'
+        );
+      }
+    },
+    {
+      id: 'cpin-request-docs',
+      label: 'Request for documentation',
+      hint: 'Ask Duty Holder to supply records before the visit',
+      contexts: ['cpin-onsite'],
+      buildBody: function (ctx) {
+        return (
+          '<p>Ahead of the on-site fire safety evaluation at <span class="conditional">' + escHtml(ctx.premises) + '</span>, ' +
+          'please provide the following within five working days:</p>' +
+          '<ul style="margin:8px 0 0 18px;padding:0;">' +
+          '<li>Fire risk assessment and any review records</li>' +
+          '<li>Fire alarm and emergency lighting test records</li>' +
+          '<li>Staff fire training records</li>' +
+          '</ul>' +
+          '<p style="margin-top:12px;">Send documents to your CPFSI contact' +
+          (ctx.assignee ? ' (<span class="conditional">' + escHtml(ctx.assignee) + '</span>)' : '') + '.</p>'
+        );
+      }
+    }
+  ];
+
+  let letterComposerState = null;
+
+  function getLetterTemplatesForContext(context) {
+    return LETTER_TEMPLATES.filter(function (t) {
+      return t.contexts.indexOf(context) >= 0;
+    });
+  }
+
+  function formatCpinAppointment(cpin) {
+    const o = getCpinOnsiteEval(cpin);
+    const dateVal = o.appointmentDate || '';
+    const timeVal = o.appointmentTime || '09:00';
+    const durKey = o.appointmentDuration || 'half';
+    if (!dateVal) {
+      return { label: '—', long: 'the agreed date', duration: DURATION_LABELS.half };
+    }
+    const day = new Date(dateVal).toLocaleDateString('en-GB', { weekday: 'long' });
+    const time = timeVal ? timeVal.slice(0, 5) : '09:00';
+    return {
+      label: day.slice(0, 3) + ' ' + new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' + time,
+      long: day + ' ' + new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + time,
+      duration: DURATION_LABELS[durKey] || DURATION_LABELS.half
+    };
+  }
+
+  function getCpinSavedLetters(cpin) {
+    const o = getCpinOnsiteEval(cpin);
+    if (o.letters && o.letters.length) return o.letters.slice();
+    if (o.letterSent && o.letterBody) {
+      const dh = getCpinDutyHolders(cpin)[0];
+      return [{
+        id: 'legacy-letter',
+        templateId: 'cpin-onsite-appointment',
+        templateLabel: 'On-site evaluation appointment',
+        recipientName: dh ? dh.name : 'Duty Holder',
+        fileName: 'Letter-OnSiteEval-legacy.pdf',
+        body: o.letterBody,
+        at: 'Previously saved',
+        ts: 0
+      }];
+    }
+    return [];
+  }
+
+  function cpinOnsiteLettersComplete(cpin) {
+    const o = getCpinOnsiteEval(cpin);
+    if (o.letterSkipped) return true;
+    return getCpinSavedLetters(cpin).length > 0;
+  }
+
+  function letterComposerTodayLabel() {
+    return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function letterFileSlug(name) {
+    return String(name || 'Recipient').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
+  }
+
+  function buildLetterComposerContext(context, cpin) {
+    const appt = formatCpinAppointment(cpin);
+    return {
+      premises: cpin.premises || 'Premises',
+      appointment: appt,
+      incidentRef: cpin.intake?.incidentNumber || cpin.ref || '',
+      assignee: cpin.assignee || 'CPFSI inspector'
+    };
+  }
+
+  function openLetterComposer(opts) {
+    opts = opts || {};
+    letterComposerState = {
+      context: opts.context || 'cpin-onsite',
+      mode: opts.mode || 'compose',
+      viewLetterId: opts.viewLetterId || null,
+      templateId: opts.templateId || null,
+      recipientIds: opts.recipientIds ? opts.recipientIds.slice() : null,
+      customBody: opts.customBody || null,
+      editing: false
+    };
+    const modal = document.getElementById('letter-composer-modal');
+    if (modal) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    renderLetterComposer();
+  }
+
+  function closeLetterComposer() {
+    const modal = document.getElementById('letter-composer-modal');
+    if (modal) modal.classList.remove('open');
+    letterComposerState = null;
+    if (!document.getElementById('new-modal')?.classList.contains('open') &&
+        !document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  function renderLetterComposer() {
+    if (!letterComposerState) return;
+    const cpin = getCpinById(activeCpinId);
+    const isView = letterComposerState.mode === 'view';
+    const templates = getLetterTemplatesForContext(letterComposerState.context);
+    const holders = getCpinDutyHolders(cpin);
+    const saved = cpin ? getCpinSavedLetters(cpin) : [];
+    const viewLetter = isView && letterComposerState.viewLetterId
+      ? saved.find(function (l) { return l.id === letterComposerState.viewLetterId; })
+      : null;
+
+    const titleEl = document.getElementById('letter-composer-title');
+    const subEl = document.getElementById('letter-composer-sub');
+    const tplGroup = document.getElementById('letter-composer-template-group');
+    const recGroup = document.getElementById('letter-composer-recipient-group');
+    const editActions = document.getElementById('letter-composer-edit-actions');
+    const saveBtn = document.getElementById('letter-composer-save-btn');
+
+    if (titleEl) titleEl.textContent = isView ? 'View letter' : 'Write letter';
+    if (subEl) {
+      subEl.textContent = isView
+        ? 'Saved copy attached to this CPIN.'
+        : 'Pick a template, choose recipients, review and save.';
+    }
+    if (tplGroup) tplGroup.hidden = isView;
+    if (recGroup) recGroup.hidden = isView;
+    if (editActions) editActions.hidden = isView;
+    if (saveBtn) {
+      saveBtn.hidden = isView;
+      if (!isView) saveBtn.textContent = 'Save letters';
+    }
+    const cancelBtn = document.getElementById('letter-composer-cancel-btn');
+    if (cancelBtn) cancelBtn.textContent = isView ? 'Close' : 'Cancel';
+
+    if (!isView) {
+      if (!letterComposerState.templateId && templates.length) {
+        letterComposerState.templateId = templates[0].id;
+      }
+      if (!letterComposerState.recipientIds) {
+        letterComposerState.recipientIds = holders.map(function (dh) { return dh.id; });
+      }
+      const tplEl = document.getElementById('letter-composer-templates');
+      if (tplEl) {
+        tplEl.innerHTML = templates.map(function (t) {
+          const active = t.id === letterComposerState.templateId ? ' active' : '';
+          return '<button type="button" class="letter-template-chip' + active + '" data-template-id="' + escHtml(t.id) + '" onclick="selectLetterTemplate(\'' + escHtml(t.id) + '\')">' +
+            '<strong>' + escHtml(t.label) + '</strong><span>' + escHtml(t.hint) + '</span></button>';
+        }).join('');
+      }
+      const recEl = document.getElementById('letter-composer-recipients');
+      if (recEl) {
+        if (!holders.length) {
+          recEl.innerHTML = '<div class="letter-attachment-empty">No accepted Duty Holders on this CPIN yet. Approve or add Duty Holders before writing letters.</div>';
+        } else {
+          recEl.innerHTML = holders.map(function (dh) {
+            const selected = letterComposerState.recipientIds.indexOf(dh.id) >= 0;
+            return '<label class="letter-recipient-row' + (selected ? ' selected' : '') + '">' +
+              '<input type="checkbox"' + (selected ? ' checked' : '') + ' onchange="toggleLetterRecipient(\'' + escHtml(dh.id) + '\', this.checked)" />' +
+              '<div><div class="name">' + escHtml(dh.name) + '</div>' +
+              (dh.role ? '<div class="role">' + escHtml(dh.role) + '</div>' : '') +
+              '</div></label>';
+          }).join('');
+        }
+      }
+    }
+
+    const dateEl = document.getElementById('letter-composer-date');
+    const addresseeEl = document.getElementById('letter-composer-addressee');
+    const bodyEl = document.getElementById('letter-composer-body');
+    const preview = document.getElementById('letter-composer-preview');
+
+    if (isView && viewLetter) {
+      if (dateEl) dateEl.textContent = viewLetter.at || letterComposerTodayLabel();
+      if (addresseeEl) {
+        addresseeEl.innerHTML = escHtml(viewLetter.recipientName || 'Duty Holder') + '<br>' + escHtml(cpin?.premises || '');
+      }
+      if (bodyEl) bodyEl.innerHTML = viewLetter.body || '';
+      if (preview) preview.classList.remove('editing');
+      return;
+    }
+
+    const template = templates.find(function (t) { return t.id === letterComposerState.templateId; }) || templates[0];
+    const firstDh = holders.find(function (dh) {
+      return letterComposerState.recipientIds && letterComposerState.recipientIds.indexOf(dh.id) >= 0;
+    }) || holders[0];
+
+    if (dateEl) dateEl.textContent = letterComposerTodayLabel();
+    if (addresseeEl && cpin) {
+      const name = firstDh ? firstDh.name : 'Duty Holder';
+      addresseeEl.innerHTML = escHtml(name) + '<br>' + escHtml(cpin.premises || '');
+    }
+    if (bodyEl && template && cpin) {
+      if (letterComposerState.customBody && !letterComposerState.editing) {
+        bodyEl.innerHTML = letterComposerState.customBody;
+      } else if (!letterComposerState.editing) {
+        const ctx = buildLetterComposerContext(letterComposerState.context, cpin);
+        if (firstDh) ctx.addressee = firstDh;
+        bodyEl.innerHTML = template.buildBody(ctx);
+      }
+    }
+    if (preview) preview.classList.toggle('editing', !!letterComposerState.editing);
+    if (bodyEl) bodyEl.contentEditable = letterComposerState.editing ? 'true' : 'false';
+    const editBtn = document.getElementById('letter-composer-edit-btn');
+    if (editBtn) editBtn.textContent = letterComposerState.editing ? 'Done editing' : 'Edit letter';
+  }
+
+  function selectLetterTemplate(id) {
+    if (!letterComposerState) return;
+    letterComposerState.templateId = id;
+    letterComposerState.customBody = null;
+    letterComposerState.editing = false;
+    renderLetterComposer();
+  }
+
+  function toggleLetterRecipient(id, checked) {
+    if (!letterComposerState) return;
+    let ids = (letterComposerState.recipientIds || []).slice();
+    if (checked) {
+      if (ids.indexOf(id) < 0) ids.push(id);
+    } else {
+      ids = ids.filter(function (x) { return x !== id; });
+    }
+    letterComposerState.recipientIds = ids;
+    renderLetterComposer();
+  }
+
+  function toggleLetterComposerEdit() {
+    if (!letterComposerState) return;
+    const bodyEl = document.getElementById('letter-composer-body');
+    if (letterComposerState.editing && bodyEl) {
+      letterComposerState.customBody = bodyEl.innerHTML;
+    }
+    letterComposerState.editing = !letterComposerState.editing;
+    renderLetterComposer();
+    if (letterComposerState.editing && bodyEl) bodyEl.focus();
+  }
+
+  function saveLetterComposer() {
+    if (!letterComposerState || letterComposerState.mode === 'view') return;
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    const holders = getCpinDutyHolders(cpin);
+    const recipientIds = letterComposerState.recipientIds || [];
+    const selected = holders.filter(function (dh) { return recipientIds.indexOf(dh.id) >= 0; });
+    if (!selected.length) {
+      window.alert('Select at least one Duty Holder to send letters to.');
+      return;
+    }
+    const templates = getLetterTemplatesForContext(letterComposerState.context);
+    const template = templates.find(function (t) { return t.id === letterComposerState.templateId; });
+    if (!template) return;
+
+    const bodyEl = document.getElementById('letter-composer-body');
+    if (letterComposerState.editing && bodyEl) {
+      letterComposerState.customBody = bodyEl.innerHTML;
+      letterComposerState.editing = false;
+    }
+    const useSharedBody = !!letterComposerState.customBody;
+    const sharedBody = letterComposerState.customBody || (bodyEl ? bodyEl.innerHTML : '');
+    const ctxBase = buildLetterComposerContext(letterComposerState.context, cpin);
+    const stamp = cpinLogTimestamp();
+    const existing = getCpinSavedLetters(cpin);
+    const newLetters = selected.map(function (dh) {
+      let bodyHtml;
+      if (useSharedBody) {
+        bodyHtml = sharedBody;
+      } else {
+        const ctx = Object.assign({}, ctxBase, { addressee: dh });
+        bodyHtml = template.buildBody(ctx);
+      }
+      const fileName = 'Letter-' + letterFileSlug(dh.name) + '-' + letterFileSlug(template.label) + '-' +
+        new Date().toISOString().slice(0, 10) + '.pdf';
+      return {
+        id: 'ltr-' + Date.now() + '-' + dh.id,
+        templateId: template.id,
+        templateLabel: template.label,
+        recipientId: dh.id,
+        recipientName: dh.name,
+        fileName: fileName,
+        body: bodyHtml,
+        at: stamp.at,
+        ts: stamp.ts
+      };
+    });
+
+    const o = Object.assign({}, getCpinOnsiteEval(cpin), {
+      letters: existing.concat(newLetters),
+      letterSent: true,
+      letterSkipped: false,
+      letterBody: null
+    });
+    persistCpinPatch(activeCpinId, { onsiteEval: o, workflow: 'desk_eval' });
+
+    newLetters.forEach(function (ltr) {
+      cpinActivityLog.files.unshift({
+        id: 'f-' + ltr.id,
+        name: ltr.fileName,
+        description: ltr.templateLabel + ' · ' + ltr.recipientName,
+        at: ltr.at,
+        ts: ltr.ts
+      });
+    });
+    const names = selected.map(function (dh) { return dh.name; });
+    cpinActivityLog.notes.unshift({
+      id: 'n-' + stamp.ts,
+      text: newLetters.length === 1
+        ? 'Appointment letter saved for ' + names[0] + '.'
+        : newLetters.length + ' appointment letters saved for ' + formatDutyHolderList(names) + '.',
+      at: stamp.at,
+      ts: stamp.ts
+    });
+    saveCpinActivityLogToRecord();
+    renderCpinActivity();
+
+    closeLetterComposer();
+    refreshCpinDetailPage();
+  }
+
+  function openCpinOnsiteLetterComposer() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin) return;
+    if (!getCpinDutyHolders(cpin).length) {
+      window.alert('Add and accept at least one Duty Holder before writing letters.');
+      return;
+    }
+    openLetterComposer({ context: 'cpin-onsite' });
+  }
+
+  function viewCpinOnsiteLetter(letterId) {
+    openLetterComposer({ context: 'cpin-onsite', mode: 'view', viewLetterId: letterId });
+  }
+
+  function renderCpinOnsiteLetters(cpin) {
+    const list = document.getElementById('cpin-onsite-letters-list');
+    const status = document.getElementById('cpin-onsite-letter-status');
+    if (!list) return;
+    const letters = getCpinSavedLetters(cpin);
+    const o = getCpinOnsiteEval(cpin);
+
+    if (!letters.length) {
+      list.innerHTML = '<div class="letter-attachment-empty">No letters saved yet. Use Write letter to create templated letters for Duty Holders on this CPIN.</div>';
+    } else {
+      list.innerHTML = letters.map(function (ltr) {
+        const meta = (ltr.templateLabel || 'Letter') + ' · ' + (ltr.recipientName || 'Duty Holder') + (ltr.at ? ' · ' + ltr.at : '');
+        return '<div class="letter-attachment-item">' +
+          '<div class="letter-attachment-icon">PDF</div>' +
+          '<div class="letter-attachment-info"><strong>' + escHtml(ltr.fileName || 'Letter.pdf') + '</strong>' +
+          '<span>' + escHtml(meta) + '</span></div>' +
+          '<button class="btn" type="button" onclick="viewCpinOnsiteLetter(\'' + escHtml(ltr.id) + '\')">View</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    if (status) {
+      if (o.letterSkipped) status.textContent = 'Skipped — confirmed by telephone';
+      else if (letters.length) status.textContent = '✓ ' + letters.length + (letters.length === 1 ? ' letter saved' : ' letters saved');
+      else status.textContent = '';
+    }
+  }
+
+  function defaultSetupDutyHolders() {
+    return [
+      { id: 'dh1', key: 'hmcts', ref: 'DH-0001042', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM', fromPremises: true, status: 'suggested' },
+      { id: 'dh2', key: 'equans', ref: 'DH-0002087', name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ', fromPremises: true, status: 'suggested' },
+      { id: 'dh3', key: 'propdir', ref: 'DH-0000315', name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD', fromPremises: true, status: 'suggested' }
+    ];
+  }
+
   let auditSetup = {
     auditType: 'full',
-    dutyHolders: [
-      { id: 'dh1', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM', fromPremises: true },
-      { id: 'dh2', name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ', fromPremises: true },
-      { id: 'dh3', name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD', fromPremises: true }
-    ],
-    responsiblePersons: [
-      { id: 'rp1', name: 'Mark Stevens', role: 'HMCTS  ·  Property Director', initials: 'MS', fromPremises: true },
-      { id: 'rp2', name: 'Sarah Patel', role: 'Equans  ·  Maintenance Lead', initials: 'SP', fromPremises: true }
-    ],
+    dutyHolders: defaultSetupDutyHolders(),
+    responsiblePersons: [],
     inspectors: [],
     letterCustom: null,
     letterEditing: false
@@ -9295,15 +11152,8 @@
   function defaultAuditSetup() {
     return JSON.parse(JSON.stringify({
       auditType: 'full',
-      dutyHolders: [
-        { id: 'dh1', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM', fromPremises: true },
-        { id: 'dh2', name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ', fromPremises: true },
-        { id: 'dh3', name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD', fromPremises: true }
-      ],
-      responsiblePersons: [
-        { id: 'rp1', name: 'Mark Stevens', role: 'HMCTS  ·  Property Director', initials: 'MS', fromPremises: true },
-        { id: 'rp2', name: 'Sarah Patel', role: 'Equans  ·  Maintenance Lead', initials: 'SP', fromPremises: true }
-      ],
+      dutyHolders: defaultSetupDutyHolders(),
+      responsiblePersons: [],
       inspectors: [],
       letterCustom: null,
       letterEditing: false
@@ -9409,20 +11259,79 @@
     refreshSetupSummary();
   }
 
+  function suggestSetupRpsForDh(dhKey) {
+    const keys = SETUP_DH_TO_RP_KEYS[dhKey] || [];
+    const catalog = SETUP_LOOKUP_CATALOG.responsiblePerson;
+    keys.forEach(function (rk) {
+      const entry = catalog.find(function (e) { return e.key === rk; });
+      if (!entry) return;
+      const exists = auditSetup.responsiblePersons.some(function (r) {
+        return r.key === rk || r.name.toLowerCase() === entry.name.toLowerCase();
+      });
+      if (exists) return;
+      auditSetup.responsiblePersons.push({
+        id: 'rp' + rk,
+        key: rk,
+        ref: entry.ref,
+        name: entry.name,
+        role: entry.role,
+        initials: entry.initials,
+        fromPremises: true,
+        status: 'suggested',
+        linkedDh: dhKey
+      });
+    });
+  }
+
+  function acceptSetupDutyHolder(id) {
+    const dh = auditSetup.dutyHolders.find(function (d) { return d.id === id; });
+    if (!dh || dh.status !== 'suggested') return;
+    dh.status = 'accepted';
+    suggestSetupRpsForDh(dh.key || SETUP_DH_KEY_BY_NAME[dh.name]);
+    renderSetupDutyHolders();
+    renderSetupResponsiblePersons();
+  }
+
+  function rejectSetupDutyHolder(id) {
+    if (auditSetup.dutyHolders.filter(function (d) { return d.status !== 'rejected'; }).length <= 1) {
+      window.alert('At least one Duty Holder is required.');
+      return;
+    }
+    auditSetup.dutyHolders = auditSetup.dutyHolders.filter(function (d) { return d.id !== id; });
+    renderSetupDutyHolders();
+    renderSetupResponsiblePersons();
+    refreshSetupSummary();
+  }
+
+  function acceptSetupResponsiblePerson(id) {
+    const rp = auditSetup.responsiblePersons.find(function (r) { return r.id === id; });
+    if (!rp || rp.status !== 'suggested') return;
+    rp.status = 'accepted';
+    renderSetupResponsiblePersons();
+  }
+
+  function rejectSetupResponsiblePerson(id) {
+    auditSetup.responsiblePersons = auditSetup.responsiblePersons.filter(function (r) { return r.id !== id; });
+    renderSetupResponsiblePersons();
+    refreshSetupSummary();
+  }
+
   function renderSetupDutyHolders() {
     const list = document.getElementById('setup-dh-list');
     if (!list) return;
-    list.innerHTML = auditSetup.dutyHolders.map(dh => `
-      <div class="holder-card" data-id="${dh.id}">
-        <div class="avatar-sm">${escHtml(sanitizeAvatarInitials(dh.initials))}</div>
-        <div>
-          <div class="name">${escHtml(dh.name.replace(/[\u2013\u2014]/g, '-'))}</div>
-          <div class="role">${escHtml(dh.role.replace(/[\u2013\u2014]/g, '-'))}</div>
-        </div>
-        <span class="pill ${dh.fromPremises ? 'blue' : 'grey'}">${dh.fromPremises ? 'From premises' : 'Added'}</span>
-        <span class="remove" title="Remove" onclick="removeSetupDutyHolder('${dh.id}')">×</span>
-      </div>
-    `).join('');
+    list.innerHTML = auditSetup.dutyHolders.map(function (dh) {
+      const pill = dh.status === 'suggested'
+        ? '<span class="pill amber">Suggested</span>'
+        : '<span class="pill ' + (dh.fromPremises ? 'blue' : 'grey') + '">' + (dh.fromPremises ? 'Approved' : 'Added') + '</span>';
+      const actions = dh.status === 'suggested'
+        ? '<div class="holder-actions"><button class="btn primary" type="button" onclick="acceptSetupDutyHolder(\'' + dh.id + '\')">Approve</button><button class="btn" type="button" onclick="rejectSetupDutyHolder(\'' + dh.id + '\')">Reject</button></div>'
+        : '<div class="holder-actions"><span class="remove" title="Remove" onclick="removeSetupDutyHolder(\'' + dh.id + '\')">×</span></div>';
+      return '<div class="holder-card' + (dh.status === 'suggested' ? ' is-suggested' : '') + '" data-id="' + dh.id + '">' +
+        '<div class="avatar-sm">' + escHtml(sanitizeAvatarInitials(dh.initials)) + '</div>' +
+        '<div><div class="name">' + escHtml(dh.name) + ' <span class="prem-ref">' + escHtml(dh.ref || '') + '</span></div>' +
+        '<div class="role">' + escHtml(dh.role.replace(/[\u2013\u2014]/g, '-')) + '</div></div>' +
+        pill + actions + '</div>';
+    }).join('');
     refreshSetupSummary();
     if (!auditSetup.letterCustom) updateSetupLetter();
   }
@@ -9430,17 +11339,24 @@
   function renderSetupResponsiblePersons() {
     const list = document.getElementById('setup-rp-list');
     if (!list) return;
-    list.innerHTML = auditSetup.responsiblePersons.map(rp => `
-      <div class="holder-card" data-id="${rp.id}">
-        <div class="avatar-sm">${escHtml(rp.initials)}</div>
-        <div>
-          <div class="name">${escHtml(rp.name)}</div>
-          <div class="role">${escHtml(rp.role)}</div>
-        </div>
-        <span class="pill ${rp.fromPremises ? 'blue' : 'grey'}">${rp.fromPremises ? 'From premises' : 'Added'}</span>
-        <span class="remove" title="Remove" onclick="removeSetupResponsiblePerson('${rp.id}')">×</span>
-      </div>
-    `).join('');
+    if (!auditSetup.responsiblePersons.length) {
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No Responsible Persons yet. Approve Duty Holders to see suggested contacts here.</p>';
+      refreshSetupSummary();
+      return;
+    }
+    list.innerHTML = auditSetup.responsiblePersons.map(function (rp) {
+      const pill = rp.status === 'suggested'
+        ? '<span class="pill amber">Suggested</span>'
+        : '<span class="pill grey">Approved</span>';
+      const actions = rp.status === 'suggested'
+        ? '<div class="holder-actions"><button class="btn primary" type="button" onclick="acceptSetupResponsiblePerson(\'' + rp.id + '\')">Approve</button><button class="btn" type="button" onclick="rejectSetupResponsiblePerson(\'' + rp.id + '\')">Reject</button></div>'
+        : '<div class="holder-actions"><span class="remove" title="Remove" onclick="removeSetupResponsiblePerson(\'' + rp.id + '\')">×</span></div>';
+      return '<div class="holder-card' + (rp.status === 'suggested' ? ' is-suggested' : '') + '" data-id="' + rp.id + '">' +
+        '<div class="avatar-sm">' + escHtml(sanitizeAvatarInitials(rp.initials)) + '</div>' +
+        '<div><div class="name">' + escHtml(rp.name) + ' <span class="prem-ref">' + escHtml(rp.ref || '') + '</span></div>' +
+        '<div class="role">' + escHtml(rp.role.replace(/[\u2013\u2014]/g, '-')) + '</div></div>' +
+        pill + actions + '</div>';
+    }).join('');
     refreshSetupSummary();
   }
 
@@ -9478,23 +11394,23 @@
 
   const SETUP_LOOKUP_CATALOG = {
     dutyHolder: [
-      { key: 'hmcts', name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM' },
-      { key: 'equans', name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ' },
-      { key: 'propdir', name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD' },
-      { key: 'moj-prop', name: 'Ministry of Justice Property', role: 'Government department  ·  National portfolio', initials: 'MJ' },
-      { key: 'capita', name: 'Capita Facilities Management', role: 'FM company  ·  Hard services', initials: 'CF' },
-      { key: 'g4s', name: 'G4S Facilities', role: 'FM company  ·  Soft services', initials: 'G4' },
-      { key: 'ccs', name: 'Crown Commercial Service', role: 'Contracting authority', initials: 'CC' },
-      { key: 'mitie', name: 'Mitie', role: 'FM company  ·  Maintenance', initials: 'MI' }
+      { key: 'hmcts', ref: 'DH-0001042', usageRank: 1, name: 'HMCTS', role: 'Government department  ·  Property responsibility', initials: 'HM' },
+      { key: 'equans', ref: 'DH-0002087', usageRank: 2, name: 'Equans', role: 'FM company  ·  Maintenance responsibility', initials: 'EQ' },
+      { key: 'propdir', ref: 'DH-0000315', usageRank: 3, name: 'The Property Directorate', role: 'Internal  ·  Strategic property responsibility', initials: 'PD' },
+      { key: 'moj-prop', ref: 'DH-0000891', usageRank: 8, name: 'Ministry of Justice Property', role: 'Government department  ·  National portfolio', initials: 'MJ' },
+      { key: 'capita', ref: 'DH-0001144', usageRank: 9, name: 'Capita Facilities Management', role: 'FM company  ·  Hard services', initials: 'CF' },
+      { key: 'g4s', ref: 'DH-0001203', usageRank: 10, name: 'G4S Facilities', role: 'FM company  ·  Soft services', initials: 'G4' },
+      { key: 'ccs', ref: 'DH-0000440', usageRank: 11, name: 'Crown Commercial Service', role: 'Contracting authority', initials: 'CC' },
+      { key: 'mitie', ref: 'DH-0002101', usageRank: 7, name: 'Mitie', role: 'FM company  ·  Maintenance', initials: 'MI' }
     ],
     responsiblePerson: [
-      { key: 'mstevens', name: 'Mark Stevens', role: 'HMCTS  ·  Property Director', initials: 'MS' },
-      { key: 'spatel', name: 'Sarah Patel', role: 'Equans  ·  Maintenance Lead', initials: 'SP' },
-      { key: 'jwong', name: 'James Wong', role: 'Ministry of Justice Property  ·  Portfolio Manager', initials: 'JW' },
-      { key: 'lchen', name: 'Lisa Chen', role: 'Capita FM  ·  Contract Manager', initials: 'LC' },
-      { key: 'rbyrne', name: 'Robert Byrne', role: 'The Property Directorate  ·  Senior Surveyor', initials: 'RB' },
-      { key: 'kallen', name: 'Karen Allen', role: 'HMCTS  ·  Facilities Coordinator', initials: 'KA' },
-      { key: 'dhussain', name: 'David Hussain', role: 'Equans  ·  Electrical Compliance Lead', initials: 'DH' }
+      { key: 'mstevens', ref: 'RP-0005521', usageRank: 1, name: 'Mark Stevens', role: 'HMCTS  ·  Property Director', initials: 'MS' },
+      { key: 'spatel', ref: 'RP-0005522', usageRank: 2, name: 'Sarah Patel', role: 'Equans  ·  Maintenance Lead', initials: 'SP' },
+      { key: 'jwong', ref: 'RP-0006104', usageRank: 6, name: 'James Wong', role: 'Ministry of Justice Property  ·  Portfolio Manager', initials: 'JW' },
+      { key: 'lchen', ref: 'RP-0006301', usageRank: 8, name: 'Lisa Chen', role: 'Capita FM  ·  Contract Manager', initials: 'LC' },
+      { key: 'rbyrne', ref: 'RP-0004410', usageRank: 4, name: 'Robert Byrne', role: 'The Property Directorate  ·  Senior Surveyor', initials: 'RB' },
+      { key: 'kallen', ref: 'RP-0005528', usageRank: 3, name: 'Karen Allen', role: 'HMCTS  ·  Facilities Coordinator', initials: 'KA' },
+      { key: 'dhussain', ref: 'RP-0005533', usageRank: 5, name: 'David Hussain', role: 'Equans  ·  Electrical Compliance Lead', initials: 'DH' }
     ],
     inspector: [
       { key: 'jcooper', name: 'Jane Cooper', role: 'Fire Safety Inspector  ·  Kent patch', initials: 'JC' },
@@ -9523,6 +11439,12 @@
       sub: 'Search inspectors in your region. Phil Gower is already the lead inspector.',
       placeholder: 'Search inspectors…',
       isAdded: (entry) => entry.key === 'pgower' || auditSetup.inspectors.some(i => i.name.toLowerCase() === entry.name.toLowerCase())
+    },
+    premises: {
+      title: 'Link premises',
+      sub: 'Search the premises register by name or reference. Select a record to anchor this CPIN.',
+      placeholder: 'Search premises by name or ref…',
+      isAdded: () => false
     }
   };
 
@@ -9551,7 +11473,8 @@
   function closeSetupLookupModal() {
     const modal = document.getElementById('setup-lookup-modal');
     if (modal) modal.classList.remove('open');
-    if (!document.getElementById('new-modal')?.classList.contains('open')) {
+    if (!document.getElementById('new-modal')?.classList.contains('open') &&
+        !document.getElementById('letter-composer-modal')?.classList.contains('open')) {
       document.body.style.overflow = '';
     }
     setupLookupMode = null;
@@ -9561,15 +11484,22 @@
   function filterSetupLookup() {
     if (!setupLookupMode) return;
     const q = (document.getElementById('setup-lookup-search')?.value || '').trim().toLowerCase();
-    const catalog = SETUP_LOOKUP_CATALOG[setupLookupMode] || [];
     const meta = SETUP_LOOKUP_META[setupLookupMode];
     const list = document.getElementById('setup-lookup-list');
     const empty = document.getElementById('setup-lookup-empty');
     if (!list || !empty) return;
 
-    const filtered = catalog.filter(entry => {
+    let catalog = SETUP_LOOKUP_CATALOG[setupLookupMode] || [];
+    if (setupLookupMode === 'premises') catalog = getCpinPremisesCatalog();
+
+    let filtered = catalog.filter(entry => {
       if (!q) return true;
-      return (entry.name + ' ' + entry.role).toLowerCase().includes(q);
+      return (entry.name + ' ' + entry.role + ' ' + (entry.ref || '')).toLowerCase().includes(q);
+    });
+    filtered = filtered.slice().sort(function (a, b) {
+      if (q) return 0;
+      if (setupLookupMode === 'premises') return a.name.localeCompare(b.name);
+      return (a.usageRank || 99) - (b.usageRank || 99);
     });
 
     if (filtered.length === 0) {
@@ -9587,11 +11517,23 @@
           return d.name.toLowerCase() === entry.name.toLowerCase();
         });
       }
-      const tag = added ? '<span class="pill grey">Added</span>' : '<span class="pill blue">Select</span>';
+      if (setupLookupTarget === 'cpin' && setupLookupMode === 'responsiblePerson') {
+        const cpin = getCpinById(activeCpinId);
+        added = cpin && getCpinResponsiblePersonRecords(cpin).some(function (r) {
+          return r.name.toLowerCase() === entry.name.toLowerCase();
+        });
+      }
+      if (setupLookupTarget === 'cpin' && setupLookupMode === 'premises') {
+        const cpin = getCpinById(activeCpinId);
+        added = cpin && cpin.premises && cpin.premises.toLowerCase() === entry.name.toLowerCase();
+      }
+      const tag = added
+        ? '<span class="pill grey">' + (setupLookupMode === 'premises' ? 'Current' : 'Added') + '</span>'
+        : '<span class="pill blue">Select</span>';
       return '<button type="button" class="setup-lookup-item"' +
         (added ? ' disabled' : ' onclick="selectSetupLookup(\'' + entry.key + '\')"') + '>' +
         '<div class="avatar-sm">' + escHtml(entry.initials) + '</div>' +
-        '<div><div class="name">' + escHtml(entry.name) + '</div><div class="role">' + escHtml(entry.role) + '</div></div>' +
+        '<div><div class="name">' + escHtml(entry.name) + (entry.ref ? ' <span class="prem-ref">' + escHtml(entry.ref) + '</span>' : '') + '</div><div class="role">' + escHtml(entry.role) + '</div></div>' +
         tag + '</button>';
     }).join('');
   }
@@ -9604,6 +11546,8 @@
     if (setupLookupMode === 'dutyHolder') {
       const dh = {
         id: 'dh' + Date.now(),
+        key: entry.key,
+        ref: entry.ref,
         name: entry.name,
         role: entry.role,
         initials: entry.initials,
@@ -9626,14 +11570,29 @@
         renderSetupDutyHolders();
       }
     } else if (setupLookupMode === 'responsiblePerson') {
-      auditSetup.responsiblePersons.push({
+      const rp = {
         id: 'rp' + Date.now(),
+        key: entry.key,
+        ref: entry.ref,
         name: entry.name,
         role: entry.role,
         initials: entry.initials,
-        fromPremises: false
-      });
-      renderSetupResponsiblePersons();
+        fromPremises: false,
+        status: 'suggested'
+      };
+      if (setupLookupTarget === 'cpin') {
+        const cpin = getCpinById(activeCpinId);
+        if (cpin) {
+          const rps = (cpin.responsiblePersons || []).slice();
+          rps.push(rp);
+          persistCpinPatch(activeCpinId, { responsiblePersons: rps });
+          renderCpinWorkflowSections(getCpinById(activeCpinId));
+        }
+        setupLookupTarget = 'audit';
+      } else {
+        auditSetup.responsiblePersons.push(rp);
+        renderSetupResponsiblePersons();
+      }
     } else if (setupLookupMode === 'inspector') {
       auditSetup.inspectors.push({
         id: 'ins' + Date.now(),
@@ -9642,6 +11601,9 @@
         initials: entry.initials
       });
       renderSetupInspectors();
+    } else if (setupLookupMode === 'premises' && setupLookupTarget === 'cpin') {
+      saveCpinIntakePremises(entry.name);
+      setupLookupTarget = 'audit';
     }
 
     closeSetupLookupModal();
@@ -9839,8 +11801,11 @@
   }
 
   function validateAuditSetup() {
-    if (auditSetup.dutyHolders.length < 1) {
-      window.alert('Add at least one Duty Holder before starting the audit.');
+    const approvedDh = auditSetup.dutyHolders.filter(function (d) {
+      return d.status === 'accepted' || (d.status !== 'suggested' && d.status !== 'rejected' && !d.status);
+    });
+    if (approvedDh.length < 1) {
+      window.alert('Approve at least one Duty Holder before starting the audit.');
       return false;
     }
     const dateEl = document.getElementById('apt-date');

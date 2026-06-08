@@ -97,11 +97,23 @@
       font-weight: 400;
     }
     .status-option input { width: auto; margin-top: 4px; }
+    .stop-message-section {
+      margin: 28px 0 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+    .stop-message-section h2 {
+      margin: 0 0 20px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+    }
     .urgent {
       color: var(--red);
       font-weight: 700;
       font-size: 14px;
-      margin: 12px 0 20px;
+      margin: 12px 0 0;
     }
     .submit-btn {
       width: 100%;
@@ -223,22 +235,26 @@
       <input type="email" id="email" name="email" required />
     </div>
 
-    <div class="field">
-      <label>Incident Status *</label>
-      <div class="status-group">
-        <label class="status-option"><input type="radio" name="incidentStatus" value="Incident Dealt with by Staff - No Known Injuries" required /> Incident Dealt with by Staff - No Known Injuries</label>
-        <label class="status-option"><input type="radio" name="incidentStatus" value="Fire Service Fought Fire or Carried Out Rescues" /> Fire Service Fought Fire or Carried Out Rescues</label>
-        <label class="status-option"><input type="radio" name="incidentStatus" value="Injuries as a Result of Fire" /> Injuries as a Result of Fire</label>
-        <label class="status-option"><input type="radio" name="incidentStatus" value="Serious or Fatal Injuries Suspected as Result of Fire" /> Serious or Fatal Injuries Suspected as Result of Fire</label>
-      </div>
-      <p class="urgent">Please immediately call 0300 1233911 if you select 'Serious or Fatal Injuries Suspected as Result of Fire' (24hr phone line)</p>
-    </div>
+    <section class="stop-message-section" aria-labelledby="stop-message-heading">
+      <h2 id="stop-message-heading">Stop Message</h2>
 
-    <div class="field">
-      <label for="description">Description of Incident *</label>
-      <p class="hint">Message here... Please replace any codes with plain language</p>
-      <textarea id="description" name="description" required></textarea>
-    </div>
+      <div class="field">
+        <label>Incident Status *</label>
+        <div class="status-group">
+          <label class="status-option"><input type="radio" name="incidentStatus" value="Incident Dealt with by Staff - No Known Injuries" required /> Incident Dealt with by Staff - No Known Injuries</label>
+          <label class="status-option"><input type="radio" name="incidentStatus" value="Fire Service Fought Fire or Carried Out Rescues" /> Fire Service Fought Fire or Carried Out Rescues</label>
+          <label class="status-option"><input type="radio" name="incidentStatus" value="Injuries as a Result of Fire" /> Injuries as a Result of Fire</label>
+          <label class="status-option"><input type="radio" name="incidentStatus" value="Serious or Fatal Injuries Suspected as Result of Fire" /> Serious or Fatal Injuries Suspected as Result of Fire</label>
+        </div>
+        <p class="urgent">Please immediately call 0300 1233911 if you select 'Serious or Fatal Injuries Suspected as Result of Fire' (24hr phone line)</p>
+      </div>
+
+      <div class="field" style="margin-top:20px;">
+        <label for="description">Description of Incident *</label>
+        <p class="hint">Message here... Please replace any codes with plain language</p>
+        <textarea id="description" name="description" required></textarea>
+      </div>
+    </section>
 
     <div class="field">
       <label for="password">Password</label>
