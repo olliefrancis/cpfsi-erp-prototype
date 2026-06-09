@@ -756,7 +756,62 @@
     font-size: 14px;
     font-weight: 600;
   }
-  .add-finding-form .field-row { margin-bottom: 10px; }
+  .add-finding-form .finding-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+  }
+  .add-finding-form .finding-form-grid .field--full {
+    grid-column: 1 / -1;
+  }
+  .add-finding-form .field-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .finding-dh-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .add-finding-form .field .finding-dh-option {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    align-items: center;
+    column-gap: 12px;
+    padding: 12px 14px;
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    cursor: pointer;
+    line-height: 1.4;
+    min-height: 44px;
+  }
+  .add-finding-form .field .finding-dh-option:hover { border-color: var(--accent); }
+  .add-finding-form .field .finding-dh-option:has(input:checked) {
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 1px var(--accent-soft) inset;
+  }
+  .add-finding-form .field .finding-dh-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    justify-self: start;
+  }
+  .add-finding-form .field .finding-dh-option span {
+    min-width: 0;
+  }
   .finding .remove-finding {
     float: right;
     font-size: 12px;
@@ -2048,20 +2103,32 @@
     border-color: var(--ink);
   }
   .letter-composer-main {
-    overflow-y: auto;
-    padding: 16px 28px 24px;
+    overflow: hidden;
+    padding: 16px 28px 20px;
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
-  .letter-composer-main .letter-composer-preview-wrap {
+  .letter-composer-preview-section {
     flex: 1;
-    min-height: 320px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
-  .letter-composer-main .letter-preview {
-    min-height: 280px;
+  .letter-composer-preview-wrap {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    margin-top: 4px;
   }
-  .letter-composer-preview-wrap { margin-top: 4px; }
+  .letter-composer-main .letter-preview,
+  #letter-composer-preview {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    overflow-y: auto;
+  }
   #letter-composer-preview.editing {
     outline: 2px solid var(--gov-focus);
     outline-offset: 2px;
@@ -2070,6 +2137,42 @@
     background: #fffceb;
     padding: 6px 8px;
     border-radius: 4px;
+  }
+  .letter-composer-footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .letter-composer-footer-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+  }
+  .letter-composer-edit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .letter-composer-edit-link:hover { text-decoration: underline; }
+  .letter-composer-edit-link svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
   }
   .letter-composer-actions {
     display: flex;
@@ -3272,6 +3375,9 @@
     line-height: 1.35;
   }
   .prem-row .prem-name strong { font-weight: 600; }
+  .prem-row .prem-name .prem-ref {
+    margin-left: 8px;
+  }
   .prem-row .prem-address {
     display: block;
     font-size: 12px;
@@ -3548,6 +3654,38 @@
   }
   .list-control-option:hover { background: var(--line-2); color: var(--ink); }
   .list-control-option.on { font-weight: 600; color: var(--ink); background: var(--line-2); }
+  .list-date-trigger { cursor: pointer; }
+  .list-date-trigger:hover strong { text-decoration: underline; }
+  .date-range-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .date-range-preset {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .date-range-preset:hover { border-color: var(--accent); color: var(--accent); }
+  .date-range-preset.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+    font-weight: 600;
+  }
+  .date-range-custom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .date-range-custom { grid-template-columns: 1fr; }
+  }
   .list-header-sort {
     background: none;
     border: none;
@@ -3600,19 +3738,6 @@
     background: var(--ink);
     color: #fff;
     font-weight: 600;
-  }
-  .finding-dh-checks {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 4px;
-  }
-  .finding-dh-checks label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    cursor: pointer;
   }
   .finding .edit-finding {
     margin-left: 8px;
@@ -4297,6 +4422,12 @@
     .field-row {
       flex-direction: column;
     }
+    .add-finding-form .finding-form-grid {
+      grid-template-columns: 1fr;
+    }
+    .finding-dh-grid {
+      grid-template-columns: 1fr;
+    }
     .holder-card {
       grid-template-columns: auto 1fr auto;
       gap: 10px;
@@ -4701,15 +4832,7 @@
         <span class="list-results-seg">Showing <strong id="premises-results-count">0</strong> premises</span>
         <span class="list-results-seg">
           <span class="list-results-label">Date range</span>
-          <span class="list-control-dropdown" id="premises-date-dropdown">
-            <button type="button" class="list-control-trigger" id="premises-date-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change date range"><strong>All dates</strong> ▾</button>
-            <div class="list-control-menu" id="premises-date-menu" role="listbox" hidden>
-              <button type="button" class="list-control-option on" role="option" data-premises-date="all">All dates</button>
-              <button type="button" class="list-control-option" role="option" data-premises-date="30">Last 30 days</button>
-              <button type="button" class="list-control-option" role="option" data-premises-date="90">Last 90 days</button>
-              <button type="button" class="list-control-option" role="option" data-premises-date="year">This year</button>
-            </div>
-          </span>
+          <button type="button" class="list-control-trigger list-date-trigger" id="premises-date-trigger" aria-label="Change date range" onclick="openListDateRangeModal('premises')"><strong>All dates</strong></button>
         </span>
         <span class="list-results-seg">
           <span class="list-results-label">Sort by</span>
@@ -4960,7 +5083,7 @@
 
           <div class="add-finding-form" id="audit-add-finding-form" hidden>
             <h3 id="audit-finding-form-title">Add a finding</h3>
-            <div class="field-row">
+            <div class="finding-form-grid">
               <div class="field">
                 <label>Article</label>
                 <select id="new-finding-article">
@@ -4978,8 +5101,6 @@
                   <option selected>Fire Safety Maintenance</option>
                 </select>
               </div>
-            </div>
-            <div class="field-row">
               <div class="field">
                 <label>Score (0 = no issue, 6 = serious)</label>
                 <select id="new-finding-score">
@@ -4996,17 +5117,13 @@
                 <label>Failure type</label>
                 <input type="text" id="new-finding-type" placeholder="e.g. Emergency lighting failure" />
               </div>
-            </div>
-            <div class="field">
-              <label>Example seen</label>
-              <textarea id="new-finding-example" rows="2" placeholder="What you observed on site…"></textarea>
-            </div>
-            <div class="field">
-              <label>Attributed to (select one or more)</label>
-              <div class="finding-dh-checks" id="new-finding-dh-list">
-                <label><input type="checkbox" value="HMCTS" checked> HMCTS</label>
-                <label><input type="checkbox" value="Equans (FM)"> Equans (FM)</label>
-                <label><input type="checkbox" value="The Property Directorate"> The Property Directorate</label>
+              <div class="field field--full">
+                <label>Example seen</label>
+                <textarea id="new-finding-example" rows="2" placeholder="What you observed on site…"></textarea>
+              </div>
+              <div class="field field--full">
+                <span class="field-label">Attributed to (select one or more)</span>
+                <div class="finding-dh-grid" id="new-finding-dh-list" role="group" aria-label="Duty Holders to attribute this finding to"></div>
               </div>
             </div>
             <div style="display:flex;gap:8px;margin-top:12px;">
@@ -5260,7 +5377,7 @@
       <div class="audit-recent-hd">
         <h3>Recently on this audit</h3>
         <div class="audit-recent-summary">
-          <span class="audit-recent-count-notes" id="audit-recent-count-notes">3 notes</span>
+          <span class="audit-recent-count-notes" id="audit-recent-count-notes">7 notes</span>
           <span class="audit-recent-count-time" id="audit-recent-count-time">6h 20m logged</span>
         </div>
       </div>
@@ -5349,15 +5466,7 @@
             <span class="list-results-seg">Showing <strong id="cpin-results-count">0</strong> CPINs</span>
             <span class="list-results-seg">
               <span class="list-results-label">Date range</span>
-              <span class="list-control-dropdown" id="cpin-date-dropdown">
-                <button type="button" class="list-control-trigger" id="cpin-date-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change date range"><strong>All dates</strong> ▾</button>
-                <div class="list-control-menu" id="cpin-date-menu" role="listbox" hidden>
-                  <button type="button" class="list-control-option on" role="option" data-cpin-date="all">All dates</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-date="7">Last 7 days</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-date="30">Last 30 days</button>
-                  <button type="button" class="list-control-option" role="option" data-cpin-date="90">Last 90 days</button>
-                </div>
-              </span>
+              <button type="button" class="list-control-trigger list-date-trigger" id="cpin-date-trigger" aria-label="Change date range" onclick="openListDateRangeModal('cpin')"><strong>All dates</strong></button>
             </span>
             <span class="list-results-seg">
               <span class="list-results-label">Sort by</span>
@@ -6004,15 +6113,7 @@
             <span class="list-results-seg">Showing <strong id="process-results-count">0</strong> processes</span>
             <span class="list-results-seg">
               <span class="list-results-label">Date range</span>
-              <span class="list-control-dropdown" id="process-date-dropdown">
-                <button type="button" class="list-control-trigger" id="process-date-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Change date range"><strong>All dates</strong> ▾</button>
-                <div class="list-control-menu" id="process-date-menu" role="listbox" hidden>
-                  <button type="button" class="list-control-option on" role="option" data-process-date="all">All dates</button>
-                  <button type="button" class="list-control-option" role="option" data-process-date="30">Last 30 days</button>
-                  <button type="button" class="list-control-option" role="option" data-process-date="90">Last 90 days</button>
-                  <button type="button" class="list-control-option" role="option" data-process-date="year">This year</button>
-                </div>
-              </span>
+              <button type="button" class="list-control-trigger list-date-trigger" id="process-date-trigger" aria-label="Change date range" onclick="openListDateRangeModal('process')"><strong>All dates</strong></button>
             </span>
             <span class="list-results-seg">
               <span class="list-results-label">Sort by</span>
@@ -6195,7 +6296,7 @@
 
     <div style="display:flex;justify-content:space-between;align-items:baseline;">
       <div>
-        <h1>Start an audit</h1>
+        <h1>Audit  ·  A-2026-0314</h1>
         <div class="meta">
           Stage 1 of 6  ·  Setup pre-audit  ·
           <span class="pill blue" style="margin-left:6px;">Reactive</span>
@@ -6259,15 +6360,17 @@
         <!-- Duty Holders -->
         <div class="setup-section">
           <h3>3. Duty Holders and Responsible Persons</h3>
-          <div class="help">Pre-suggested from this premises. Review and add or remove as needed. Not pre-locked, since who is on site can change.</div>
+          <div class="help">Duty Holders are pre-suggested on load. Approve, reject or add organisations first — Responsible Persons are then suggested for each approved Duty Holder.</div>
 
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders (organisations)</div>
           <div id="setup-dh-list"></div>
           <div class="add-holder-btn" onclick="addSetupDutyHolder()">+ Add a Duty Holder</div>
+          <p id="setup-dh-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
 
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:16px 0 6px;">Responsible Persons (individuals)</div>
           <div id="setup-rp-list"></div>
           <div class="add-holder-btn" onclick="addSetupResponsiblePerson()">+ Add a Responsible Person</div>
+          <p id="setup-rp-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
         </div>
 
         <!-- Appointment -->
@@ -6339,8 +6442,8 @@
       <div class="audit-recent-hd">
         <h3>Recently on this audit</h3>
         <div class="audit-recent-summary">
-          <span class="audit-recent-count-notes">0 notes</span>
-          <span class="audit-recent-count-time">0m logged</span>
+          <span class="audit-recent-count-notes" id="auditsetup-recent-count-notes">7 notes</span>
+          <span class="audit-recent-count-time" id="auditsetup-recent-count-time">6h 20m logged</span>
         </div>
       </div>
       <div class="process-filters-bar cpin-activity-filters-bar">
@@ -6356,11 +6459,48 @@
         </div>
       </div>
       <div class="audit-activity-feed">
-        <div class="audit-activity-feed-list"></div>
+        <div class="audit-activity-feed-list" id="auditsetup-activity-feed-list"></div>
       </div>
     </section>
 
   </main>
+</div>
+
+<!-- List views: date range picker (premises, CPINs, processes) -->
+<div id="list-date-range-modal" class="modal-backdrop" onclick="if(event.target===this) closeListDateRangeModal()">
+  <div class="modal" style="max-width:440px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2 id="list-date-range-title">Date range</h2>
+        <div class="sub" id="list-date-range-sub">Filter results by date.</div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeListDateRangeModal()" title="Close (Esc)">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-group">
+        <div class="modal-group-label">Quick ranges</div>
+        <div class="date-range-presets" id="list-date-range-presets"></div>
+      </div>
+      <div class="modal-group">
+        <div class="modal-group-label">Custom range</div>
+        <div class="help" style="margin:-4px 0 10px;">Pick a start and end date, then Apply.</div>
+        <div class="date-range-custom">
+          <div class="field">
+            <label for="list-date-from">From</label>
+            <input type="date" id="list-date-from" />
+          </div>
+          <div class="field">
+            <label for="list-date-to">To</label>
+            <input type="date" id="list-date-to" />
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button type="button" class="btn" onclick="closeListDateRangeModal()">Cancel</button>
+        <button type="button" class="btn primary" onclick="applyListDateRange()">Apply</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Letter composer (site-wide — CPIN, audits, processes) -->
@@ -6388,21 +6528,26 @@
           </div>
         </aside>
         <main class="letter-composer-main">
-          <div class="modal-group-label">Letter preview</div>
-          <div class="letter-composer-preview-wrap">
-            <div class="letter-preview" id="letter-composer-preview" style="padding:18px;font-size:12px;">
-              <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
-              <div id="letter-composer-date"></div>
-              <div style="margin-top:10px;" id="letter-composer-addressee"></div>
-              <div class="letter-composer-body" id="letter-composer-body" style="margin-top:12px;"></div>
+          <div class="letter-composer-preview-section">
+            <div class="modal-group-label">Letter preview</div>
+            <div class="letter-composer-preview-wrap">
+              <div class="letter-preview" id="letter-composer-preview" style="padding:18px;font-size:12px;">
+                <div class="head">CPFSI · Crown Premises Fire Safety Inspectorate</div>
+                <div id="letter-composer-date"></div>
+                <div style="margin-top:10px;" id="letter-composer-addressee"></div>
+                <div class="letter-composer-body" id="letter-composer-body" style="margin-top:12px;"></div>
+              </div>
             </div>
           </div>
-          <div class="letter-composer-actions" id="letter-composer-edit-actions">
-            <button class="btn" type="button" id="letter-composer-edit-btn" onclick="toggleLetterComposerEdit()">Edit letter</button>
-          </div>
-          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;" id="letter-composer-footer">
-            <button class="btn" type="button" id="letter-composer-cancel-btn" onclick="closeLetterComposer()">Cancel</button>
-            <button class="btn primary" type="button" id="letter-composer-save-btn" onclick="saveLetterComposer()">Save letters</button>
+          <div class="letter-composer-footer" id="letter-composer-footer">
+            <button type="button" class="letter-composer-edit-link" id="letter-composer-edit-btn" onclick="toggleLetterComposerEdit()">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M11.5 2.5a1.4 1.4 0 0 1 2 2L5.8 12.2l-2.6.7.7-2.6 8.6-8.6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              <span id="letter-composer-edit-label">Edit</span>
+            </button>
+            <div class="letter-composer-footer-actions">
+              <button class="btn" type="button" id="letter-composer-cancel-btn" onclick="closeLetterComposer()">Cancel</button>
+              <button class="btn primary" type="button" id="letter-composer-save-btn" onclick="saveLetterComposer()">Save letters</button>
+            </div>
           </div>
         </main>
       </div>
@@ -6502,7 +6647,7 @@
   <div class="audit-float-bar-strip">
     <strong class="audit-float-bar-title" style="font-size:13px;color:var(--ink);">Activity</strong>
     <div class="counts">
-      <span id="audit-count-notes">3 notes</span>
+      <span id="audit-count-notes">7 notes</span>
       <span id="audit-count-files">0 files</span>
       <span id="audit-count-time">6h 20m logged</span>
     </div>
@@ -7129,6 +7274,7 @@
       applyAuditStageUI(stage);
       initAuditActivity();
       renderAuditFindings();
+      renderFindingDutyHolderOptions();
       updateAuditEditWarning();
       return;
     }
@@ -7250,8 +7396,15 @@
     6: ['Desk-based investigation', 'General admin', 'Phone call']
   };
 
-  let auditActivityLog = {
+  const AUDIT_ACTIVITY_KEY = 'audit-activity-log-v1';
+  const PROTOTYPE_AUDIT_ID = 'A-2026-0314';
+
+  const DEFAULT_AUDIT_ACTIVITY_LOG = {
     notes: [
+      { id: 'setup-created', text: 'Audit record A-2026-0314 created.', stage: 1, at: '18 Jun, 09:00', ts: 1718685600000 },
+      { id: 'setup-cpin', text: 'CPIN-2026-0418 linked to this audit.', stage: 1, at: '18 Jun, 09:05', ts: 1718685900000 },
+      { id: 'setup-letter', text: 'Appointment letter sent to all Duty Holders.', stage: 1, at: '18 Jun, 14:30', ts: 1718705400000 },
+      { id: 'setup-outlook', text: 'Calendar event pushed to Outlook.', stage: 1, at: '18 Jun, 14:31', ts: 1718705460000 },
       { id: 'n1', text: 'Pre-audit call with HMCTS — confirmed Duty Holders attending on 7 Jul.', stage: 1, at: '18 Jun, 14:20', ts: 1718714400000 },
       { id: 'n2', text: 'Site photos uploaded (corridor fire doors, rear stairwell).', stage: 2, at: '22 Jun, 11:40', ts: 1719049200000 },
       { id: 'n3', text: 'EMM discussion with line manager — 28-DAP appropriate for HMCTS and Equans.', stage: 3, at: '22 Jun, 15:05', ts: 1719061500000 }
@@ -7264,6 +7417,33 @@
     interim: [],
     files: []
   };
+
+  function loadAuditActivityLog() {
+    try {
+      const raw = localStorage.getItem(AUDIT_ACTIVITY_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return {
+          notes: Array.isArray(parsed.notes) ? parsed.notes : [],
+          times: Array.isArray(parsed.times) ? parsed.times : [],
+          interim: Array.isArray(parsed.interim) ? parsed.interim : [],
+          files: Array.isArray(parsed.files) ? parsed.files : []
+        };
+      }
+    } catch (e) { /* use default */ }
+    return JSON.parse(JSON.stringify(DEFAULT_AUDIT_ACTIVITY_LOG));
+  }
+
+  function saveAuditActivityLog() {
+    localStorage.setItem(AUDIT_ACTIVITY_KEY, JSON.stringify({
+      notes: auditActivityLog.notes,
+      times: auditActivityLog.times,
+      interim: auditActivityLog.interim,
+      files: auditActivityLog.files
+    }));
+  }
+
+  let auditActivityLog = loadAuditActivityLog();
 
   let auditActivityPanel = null;
   let auditLogType = 'time';
@@ -7293,6 +7473,19 @@
   let auditFindingEditId = null;
 
   const AUDIT_DH_OPTIONS = ['HMCTS', 'Equans (FM)', 'The Property Directorate'];
+
+  const AUDIT_FINDING_DUTY_HOLDERS = [
+    'HMCTS',
+    'Equans (FM)',
+    'The Property Directorate',
+    'Ministry of Justice Property',
+    'Capita Facilities Management',
+    'G4S Facilities',
+    'Crown Commercial Service',
+    'Mitie',
+    'Equans',
+    'Property Directorate'
+  ];
 
   let auditFindings = [
     { id: 'f1', articleKey: '7', category: 'Fire Safety Maintenance', score: 2, failureType: 'Fire door defects', example: 'Two fire door closers missing on first-floor corridor (rooms 103, 107). Cold-smoke seal damaged on door 109.', dutyHolders: ['Equans (FM)'] },
@@ -7337,31 +7530,21 @@
     auditSetup = payload;
     localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(payload));
 
+    const stamp = cpinLogTimestamp();
     const letters = getAuditSetupSavedLetters();
     if (letters.length && !auditSetup.letterSkipped) {
-      const stamp = cpinLogTimestamp();
-      const names = letters.map(function (ltr) { return ltr.recipientName; });
-      letters.forEach(function (ltr, i) {
-        const entryTs = stamp.ts - i;
-        auditActivityLog.files.unshift({
-          id: 'f-setup-' + ltr.id,
-          name: ltr.fileName,
-          description: ltr.templateLabel + ' · ' + ltr.recipientName,
-          at: ltr.at,
-          ts: entryTs
-        });
-      });
+      appendAuditLettersToActivity(letters, stamp, { skipIfExists: true });
+    }
+    if (!auditActivityLog.notes.some(function (n) { return n.id === 'n-audit-started'; })) {
       auditActivityLog.notes.unshift({
-        id: 'n-setup-' + stamp.ts,
-        text: letters.length === 1
-          ? 'Appointment letter saved for ' + names[0] + '.'
-          : letters.length + ' appointment letters saved for ' + formatDutyHolderList(names) + '.',
+        id: 'n-audit-started',
+        text: 'Audit started — appointment confirmed and letters sent.',
         stage: 1,
         at: stamp.at,
         ts: stamp.ts
       });
-      renderAuditActivity();
     }
+    touchAuditActivity();
 
     auditStage = 2;
     window.location.hash = 'audit-stage-2';
@@ -7585,7 +7768,7 @@
   }
 
   function processMatchesDate(p) {
-    return matchesDateFilter(parseDemoAgeDays(p.age), processesDateFilter);
+    return matchesDateRangeFilter(parseDemoAgeDays(p.age), processesDateFilter);
   }
 
   function getFilteredProcesses() {
@@ -7665,7 +7848,7 @@
     const items = getFilteredProcesses();
     if (countEl) countEl.textContent = String(items.length);
     syncProcessSortDropdown();
-    syncListControlDropdown('process-date-dropdown', processesDateFilter, 'process-date');
+    syncDateRangeTrigger('process');
     if (!items.length) {
       body.innerHTML = '<div class="proc-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No processes match your filters.</div>';
     } else {
@@ -7761,7 +7944,6 @@
       document.querySelectorAll('.process-filters-status .chip').forEach(chip => {
         chip.addEventListener('click', () => setProcessStatusFilter(chip.dataset.processStatus));
       });
-      initListControlDropdown('process-date-dropdown', setProcessDateFilter);
       initListControlDropdown('process-sort-dropdown', setProcessSort);
       document.querySelectorAll('[data-proc-sort]').forEach(function (btn) {
         btn.addEventListener('click', function () { setProcessHeaderSort(btn.dataset.procSort); });
@@ -7787,28 +7969,28 @@
   }
 
   const PREMISES_LIST = [
-    { name: 'Temple Quay House', ref: 'PRM-0001847', address: 'Temple Back East, Bristol BS1', category: 'government-office', typeLabel: 'Government office', dept: 'HMCTS', score: 47, scoreClass: 'score-high', lastAudit: 'Jan 2025', lastAuditSort: 202501, daysSinceAudit: 150, patch: true, route: 'premisesdetail', work: { pill: 'blue', label: 'Audit in progress' } },
-    { name: 'HMP Lewes', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 42, scoreClass: 'score-high', lastAudit: 'Oct 2024', lastAuditSort: 202410, patch: true, work: { pill: 'purple', label: 'Follow-up due' } },
-    { name: 'HMP Maidstone', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 38, scoreClass: 'score-high', lastAudit: 'Aug 2024', lastAuditSort: 202408, patch: true, work: { pill: 'blue', label: 'Audit in progress' } },
-    { name: 'Maidstone Magistrates Court', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 34, scoreClass: 'score-mid', lastAudit: 'Mar 2024', lastAuditSort: 202403, patch: true, work: { pill: 'grey', label: 'Concern open' } },
-    { name: 'Charing Cross House refurb', category: 'government-office', typeLabel: 'Government office', dept: 'MoJ', score: 36, scoreClass: 'score-mid', lastAudit: 'May 2024', lastAuditSort: 202405, patch: true, work: { pill: 'grey', label: 'Consultation open' } },
-    { name: 'Crawley Job Centre Plus', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 31, scoreClass: 'score-mid', lastAudit: 'Jul 2024', lastAuditSort: 202407, patch: false, work: null },
-    { name: 'DWP Crawley', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 31, scoreClass: 'score-mid', lastAudit: 'Jun 2024', lastAuditSort: 202406, patch: false, work: { pill: 'blue', label: 'Action plan review' } },
-    { name: 'HMP Belmarsh', category: 'prison', typeLabel: 'Prison · Cat A', dept: 'HMPPS', score: 29, scoreClass: 'score-mid', lastAudit: 'Feb 2024', lastAuditSort: 202402, patch: false, work: { pill: 'purple', label: 'Follow-up visit due' } },
-    { name: 'Lewes Crown Court', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 30, scoreClass: 'score-mid', lastAudit: 'Apr 2024', lastAuditSort: 202404, patch: true, work: { pill: 'grey', label: 'Concern investigating' } },
-    { name: 'Royal Courts of Justice', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 22, scoreClass: 'score-low', lastAudit: 'Dec 2024', lastAuditSort: 202412, patch: true, work: { pill: 'grey', label: 'Support meeting' } },
-    { name: 'HMP Bristol', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 44, scoreClass: 'score-high', lastAudit: 'Sep 2024', lastAuditSort: 202409, patch: true, work: { pill: 'blue', label: 'Audit planning' } },
-    { name: 'HMP Swaleside', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 41, scoreClass: 'score-high', lastAudit: 'Nov 2024', lastAuditSort: 202411, patch: true, work: { pill: 'amber', label: 'CPIN open' } },
-    { name: 'HMP Wandsworth', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 35, scoreClass: 'score-mid', lastAudit: 'Jan 2024', lastAuditSort: 202401, patch: false, work: { pill: 'grey', label: 'Appeal lodged' } },
-    { name: 'HMP Isis', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 33, scoreClass: 'score-mid', lastAudit: 'Oct 2023', lastAuditSort: 202310, patch: true, work: { pill: 'purple', label: 'Follow-up opened' } },
-    { name: 'Bristol Crown Court', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 27, scoreClass: 'score-mid', lastAudit: 'May 2025', lastAuditSort: 202505, patch: false, work: { pill: 'grey', label: 'Consultation new' } },
-    { name: 'Folkestone Tribunal Hearing Centre', category: 'court', typeLabel: 'Tribunal', dept: 'HMCTS', score: 22, scoreClass: 'score-low', lastAudit: 'Nov 2024', lastAuditSort: 202411, patch: false, work: null },
-    { name: 'Reading Job Centre Plus', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 28, scoreClass: 'score-mid', lastAudit: 'Feb 2025', lastAuditSort: 202502, patch: false, work: { pill: 'amber', label: 'CPIN awaiting response' } },
-    { name: 'MoJ HQ London', category: 'government-office', typeLabel: 'Government office', dept: 'MoJ', score: 19, scoreClass: 'score-low', lastAudit: 'Aug 2023', lastAuditSort: 202308, patch: false, work: { pill: 'grey', label: 'Support workshop' } },
-    { name: 'HMCTS Guildford', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 24, scoreClass: 'score-low', lastAudit: 'Dec 2023', lastAuditSort: 202312, patch: false, work: null },
-    { name: 'HMP Durham', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 52, scoreClass: 'score-high', lastAudit: 'May 2025', lastAuditSort: 202505, patch: false, work: null },
-    { name: 'HMP Pentonville', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 26, scoreClass: 'score-mid', lastAudit: 'Jun 2023', lastAuditSort: 202306, patch: true, work: null },
-    { name: 'HMP Rochester', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 39, scoreClass: 'score-high', lastAudit: 'Mar 2025', lastAuditSort: 202503, patch: true, work: null }
+    { name: 'Temple Quay House', ref: 'PRM-0001847', address: 'Temple Back East, Bristol BS1 6BH', category: 'government-office', typeLabel: 'Government office', dept: 'HMCTS', score: 47, scoreClass: 'score-high', lastAudit: 'Jan 2025', lastAuditSort: 202501, daysSinceAudit: 150, patch: true, route: 'premisesdetail', work: { pill: 'blue', label: 'Audit in progress' } },
+    { name: 'HMP Lewes', ref: 'PRM-0002103', address: 'Brighton Road, Lewes BN7 1FX', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 42, scoreClass: 'score-high', lastAudit: 'Oct 2024', lastAuditSort: 202410, patch: true, work: { pill: 'purple', label: 'Follow-up due' } },
+    { name: 'HMP Maidstone', ref: 'PRM-0002118', address: 'County Road, Maidstone ME14 1UZ', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 38, scoreClass: 'score-high', lastAudit: 'Aug 2024', lastAuditSort: 202408, patch: true, work: { pill: 'blue', label: 'Audit in progress' } },
+    { name: 'Maidstone Magistrates Court', ref: 'PRM-0001922', address: 'Barker Road, Maidstone ME16 8EQ', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 34, scoreClass: 'score-mid', lastAudit: 'Mar 2024', lastAuditSort: 202403, patch: true, work: { pill: 'grey', label: 'Concern open' } },
+    { name: 'Charing Cross House refurb', ref: 'PRM-0001756', address: 'Charing Cross, London WC2N 5HS', category: 'government-office', typeLabel: 'Government office', dept: 'MoJ', score: 36, scoreClass: 'score-mid', lastAudit: 'May 2024', lastAuditSort: 202405, patch: true, work: { pill: 'grey', label: 'Consultation open' } },
+    { name: 'Crawley Job Centre Plus', ref: 'PRM-0002201', address: 'County Oak Way, Crawley RH11 7EL', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 31, scoreClass: 'score-mid', lastAudit: 'Jul 2024', lastAuditSort: 202407, patch: false, work: null },
+    { name: 'DWP Crawley', ref: 'PRM-0002204', address: 'Fleming Way, Crawley RH10 9DF', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 31, scoreClass: 'score-mid', lastAudit: 'Jun 2024', lastAuditSort: 202406, patch: false, work: { pill: 'blue', label: 'Action plan review' } },
+    { name: 'HMP Belmarsh', ref: 'PRM-0002088', address: 'Western Way, Thamesmead SE28 0EB', category: 'prison', typeLabel: 'Prison · Cat A', dept: 'HMPPS', score: 29, scoreClass: 'score-mid', lastAudit: 'Feb 2024', lastAuditSort: 202402, patch: false, work: { pill: 'purple', label: 'Follow-up visit due' } },
+    { name: 'Lewes Crown Court', ref: 'PRM-0001935', address: 'High Street, Lewes BN7 2UX', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 30, scoreClass: 'score-mid', lastAudit: 'Apr 2024', lastAuditSort: 202404, patch: true, work: { pill: 'grey', label: 'Concern investigating' } },
+    { name: 'Royal Courts of Justice', ref: 'PRM-0001601', address: 'Strand, London WC2A 2LL', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 22, scoreClass: 'score-low', lastAudit: 'Dec 2024', lastAuditSort: 202412, patch: true, work: { pill: 'grey', label: 'Support meeting' } },
+    { name: 'HMP Bristol', ref: 'PRM-0002140', address: 'Cambridge Grove, Bristol BS7 8PS', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 44, scoreClass: 'score-high', lastAudit: 'Sep 2024', lastAuditSort: 202409, patch: true, work: { pill: 'blue', label: 'Audit planning' } },
+    { name: 'HMP Swaleside', ref: 'PRM-0002155', address: 'Brabazon Road, Eastchurch ME12 4AX', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 41, scoreClass: 'score-high', lastAudit: 'Nov 2024', lastAuditSort: 202411, patch: true, work: { pill: 'amber', label: 'CPIN open' } },
+    { name: 'HMP Wandsworth', ref: 'PRM-0002095', address: 'Heathfield Road, London SW18 3HU', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 35, scoreClass: 'score-mid', lastAudit: 'Jan 2024', lastAuditSort: 202401, patch: false, work: { pill: 'grey', label: 'Appeal lodged' } },
+    { name: 'HMP Isis', ref: 'PRM-0002162', address: 'Marsh Way, Thamesmead SE28 0NZ', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 33, scoreClass: 'score-mid', lastAudit: 'Oct 2023', lastAuditSort: 202310, patch: true, work: { pill: 'purple', label: 'Follow-up opened' } },
+    { name: 'Bristol Crown Court', ref: 'PRM-0001910', address: 'Redcliffe Hill, Bristol BS1 6QS', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 27, scoreClass: 'score-mid', lastAudit: 'May 2025', lastAuditSort: 202505, patch: false, work: { pill: 'grey', label: 'Consultation new' } },
+    { name: 'Folkestone Tribunal Hearing Centre', ref: 'PRM-0001988', address: 'Folkestone CT20 2QY', category: 'court', typeLabel: 'Tribunal', dept: 'HMCTS', score: 22, scoreClass: 'score-low', lastAudit: 'Nov 2024', lastAuditSort: 202411, patch: false, work: null },
+    { name: 'Reading Job Centre Plus', ref: 'PRM-0002215', address: 'Admiralty House, Reading RG1 3EU', category: 'government-office', typeLabel: 'DWP office', dept: 'DWP', score: 28, scoreClass: 'score-mid', lastAudit: 'Feb 2025', lastAuditSort: 202502, patch: false, work: { pill: 'amber', label: 'CPIN awaiting response' } },
+    { name: 'MoJ HQ London', ref: 'PRM-0001702', address: '102 Petty France, London SW1H 9AJ', category: 'government-office', typeLabel: 'Government office', dept: 'MoJ', score: 19, scoreClass: 'score-low', lastAudit: 'Aug 2023', lastAuditSort: 202308, patch: false, work: { pill: 'grey', label: 'Support workshop' } },
+    { name: 'HMCTS Guildford', ref: 'PRM-0001944', address: 'Mount Street, Guildford GU1 3SX', category: 'court', typeLabel: 'Court', dept: 'HMCTS', score: 24, scoreClass: 'score-low', lastAudit: 'Dec 2023', lastAuditSort: 202312, patch: false, work: null },
+    { name: 'HMP Durham', ref: 'PRM-0002178', address: 'Old Elvet, Durham DH1 3HU', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 52, scoreClass: 'score-high', lastAudit: 'May 2025', lastAuditSort: 202505, patch: false, work: null },
+    { name: 'HMP Pentonville', ref: 'PRM-0002185', address: 'Caledonian Road, London N7 8TT', category: 'prison', typeLabel: 'Prison · Cat B', dept: 'HMPPS', score: 26, scoreClass: 'score-mid', lastAudit: 'Jun 2023', lastAuditSort: 202306, patch: true, work: null },
+    { name: 'HMP Rochester', ref: 'PRM-0002192', address: 'Fort Road, Rochester ME1 3QS', category: 'prison', typeLabel: 'Prison · Cat C', dept: 'HMPPS', score: 39, scoreClass: 'score-high', lastAudit: 'Mar 2025', lastAuditSort: 202503, patch: true, work: null }
   ];
 
   let premisesScopeFilter = 'patch';
@@ -7824,7 +8006,7 @@
   }
 
   function premisesMatchesDate(p) {
-    return matchesDateFilter(p.daysSinceAudit != null ? p.daysSinceAudit : 180, premisesDateFilter);
+    return matchesDateRangeFilter(p.daysSinceAudit != null ? p.daysSinceAudit : 180, premisesDateFilter);
   }
 
   function sortPremises(items, mode) {
@@ -7881,7 +8063,7 @@
     const items = getFilteredPremises();
     if (countEl) countEl.textContent = String(items.length);
     syncPremisesSortDropdown();
-    syncListControlDropdown('premises-date-dropdown', premisesDateFilter, 'premises-date');
+    syncDateRangeTrigger('premises');
     if (!items.length) {
       body.innerHTML = '<div class="prem-row" style="cursor:default;padding:28px 16px;justify-content:center;color:var(--ink-3);font-size:13px;">No premises match your filters.</div>';
     } else {
@@ -7913,9 +8095,9 @@
   }
 
   let dashboardCpinView = 'mine';
-  let processesDateFilter = 'all';
-  let premisesDateFilter = 'all';
-  let cpinsDateFilter = 'all';
+  let processesDateFilter = { type: 'all' };
+  let premisesDateFilter = { type: 'all' };
+  let cpinsDateFilter = { type: 'all' };
   let cpinsSortMode = 'recent';
   let processPinnedViews = JSON.parse(localStorage.getItem('process-pinned-views') || '[]');
 
@@ -7935,13 +8117,221 @@
     return 14;
   }
 
-  function matchesDateFilter(days, filter) {
-    if (filter === 'all') return true;
-    if (filter === '7') return days <= 7;
-    if (filter === '30') return days <= 30;
-    if (filter === '90') return days <= 90;
-    if (filter === 'year') return days <= 365;
+  const LIST_DATE_RANGE_CONFIG = {
+    premises: {
+      title: 'Premises date range',
+      sub: 'Filter by when the last audit was completed.',
+      triggerId: 'premises-date-trigger',
+      presets: [
+        { id: 'all', label: 'All dates' },
+        { id: '30', label: 'Last 30 days' },
+        { id: '90', label: 'Last 90 days' },
+        { id: 'year', label: 'This year' }
+      ]
+    },
+    cpin: {
+      title: 'CPIN date range',
+      sub: 'Filter by when the CPIN was received.',
+      triggerId: 'cpin-date-trigger',
+      presets: [
+        { id: 'all', label: 'All dates' },
+        { id: '7', label: 'Last 7 days' },
+        { id: '30', label: 'Last 30 days' },
+        { id: '90', label: 'Last 90 days' }
+      ]
+    },
+    process: {
+      title: 'Process date range',
+      sub: 'Filter by how recently the process was opened or updated.',
+      triggerId: 'process-date-trigger',
+      presets: [
+        { id: 'all', label: 'All dates' },
+        { id: '30', label: 'Last 30 days' },
+        { id: '90', label: 'Last 90 days' },
+        { id: 'year', label: 'This year' }
+      ]
+    }
+  };
+
+  let listDateRangeContext = null;
+  let listDateRangeDraft = { type: 'all' };
+
+  function normalizeDateFilter(saved) {
+    if (!saved || saved === 'all') return { type: 'all' };
+    if (typeof saved === 'string') return { type: 'preset', value: saved };
+    if (saved && saved.type) return saved;
+    return { type: 'all' };
+  }
+
+  function cloneDateFilter(filter) {
+    return JSON.parse(JSON.stringify(normalizeDateFilter(filter)));
+  }
+
+  function presetDateLabel(presets, value) {
+    const p = presets.find(function (x) { return x.id === value; });
+    return p ? p.label : 'Custom';
+  }
+
+  function formatDateRangeLabel(filter, context) {
+    filter = normalizeDateFilter(filter);
+    const presets = (LIST_DATE_RANGE_CONFIG[context] || {}).presets || [];
+    if (filter.type === 'all') return 'All dates';
+    if (filter.type === 'preset') return presetDateLabel(presets, filter.value);
+    if (filter.type === 'custom' && filter.from && filter.to) {
+      const from = new Date(filter.from + 'T12:00:00');
+      const to = new Date(filter.to + 'T12:00:00');
+      const fmt = function (d) {
+        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      };
+      return fmt(from) + ' – ' + fmt(to);
+    }
+    return 'All dates';
+  }
+
+  function syncDateRangeTrigger(context) {
+    const cfg = LIST_DATE_RANGE_CONFIG[context];
+    if (!cfg) return;
+    const trigger = document.getElementById(cfg.triggerId);
+    if (!trigger) return;
+    const strong = trigger.querySelector('strong');
+    const filter = getListDateFilter(context);
+    if (strong) strong.textContent = formatDateRangeLabel(filter, context);
+  }
+
+  function getListDateFilter(context) {
+    if (context === 'premises') return premisesDateFilter;
+    if (context === 'cpin') return cpinsDateFilter;
+    if (context === 'process') return processesDateFilter;
+    return { type: 'all' };
+  }
+
+  function setListDateFilter(context, filter) {
+    filter = normalizeDateFilter(filter);
+    if (context === 'premises') {
+      premisesDateFilter = filter;
+      syncDateRangeTrigger('premises');
+      renderPremisesList();
+    } else if (context === 'cpin') {
+      cpinsDateFilter = filter;
+      syncDateRangeTrigger('cpin');
+      renderCpinsLists();
+    } else if (context === 'process') {
+      processesDateFilter = filter;
+      syncDateRangeTrigger('process');
+      renderProcessesList();
+    }
+  }
+
+  function parseDateInput(val) {
+    const d = new Date(val + 'T12:00:00');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function demoDateFromDaysAgo(daysAgo) {
+    const d = new Date();
+    d.setHours(12, 0, 0, 0);
+    d.setDate(d.getDate() - (daysAgo || 0));
+    return d;
+  }
+
+  function matchesPresetDays(days, value) {
+    if (value === 'all') return true;
+    if (value === '7') return days <= 7;
+    if (value === '30') return days <= 30;
+    if (value === '90') return days <= 90;
+    if (value === 'year') return days <= 365;
     return true;
+  }
+
+  function matchesDateRangeFilter(daysAgo, filter) {
+    filter = normalizeDateFilter(filter);
+    if (filter.type === 'all') return true;
+    if (filter.type === 'preset') return matchesPresetDays(daysAgo, filter.value);
+    if (filter.type === 'custom' && filter.from && filter.to) {
+      const itemDate = demoDateFromDaysAgo(daysAgo);
+      const from = parseDateInput(filter.from);
+      const to = parseDateInput(filter.to);
+      if (!from || !to) return true;
+      to.setHours(23, 59, 59, 999);
+      return itemDate >= from && itemDate <= to;
+    }
+    return true;
+  }
+
+  function renderListDateRangeModal() {
+    const cfg = LIST_DATE_RANGE_CONFIG[listDateRangeContext];
+    if (!cfg) return;
+    const presetsEl = document.getElementById('list-date-range-presets');
+    const titleEl = document.getElementById('list-date-range-title');
+    const subEl = document.getElementById('list-date-range-sub');
+    const fromEl = document.getElementById('list-date-from');
+    const toEl = document.getElementById('list-date-to');
+    if (titleEl) titleEl.textContent = cfg.title;
+    if (subEl) subEl.textContent = cfg.sub;
+    if (presetsEl) {
+      presetsEl.innerHTML = cfg.presets.map(function (p) {
+        const active = listDateRangeDraft.type === 'preset' && listDateRangeDraft.value === p.id;
+        const allActive = listDateRangeDraft.type === 'all' && p.id === 'all';
+        return '<button type="button" class="date-range-preset' + (active || allActive ? ' active' : '') + '" onclick="selectListDatePreset(\'' + escHtml(p.id) + '\')">' + escHtml(p.label) + '</button>';
+      }).join('');
+    }
+    if (fromEl) fromEl.value = listDateRangeDraft.type === 'custom' ? (listDateRangeDraft.from || '') : '';
+    if (toEl) toEl.value = listDateRangeDraft.type === 'custom' ? (listDateRangeDraft.to || '') : '';
+  }
+
+  function openListDateRangeModal(context) {
+    listDateRangeContext = context;
+    listDateRangeDraft = cloneDateFilter(getListDateFilter(context));
+    const modal = document.getElementById('list-date-range-modal');
+    if (modal) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    renderListDateRangeModal();
+  }
+
+  function closeListDateRangeModal() {
+    const modal = document.getElementById('list-date-range-modal');
+    if (modal) modal.classList.remove('open');
+    listDateRangeContext = null;
+    if (!document.getElementById('new-modal')?.classList.contains('open') &&
+        !document.getElementById('setup-lookup-modal')?.classList.contains('open') &&
+        !document.getElementById('letter-composer-modal')?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  function selectListDatePreset(id) {
+    if (id === 'all') listDateRangeDraft = { type: 'all' };
+    else listDateRangeDraft = { type: 'preset', value: id };
+    const fromEl = document.getElementById('list-date-from');
+    const toEl = document.getElementById('list-date-to');
+    if (fromEl) fromEl.value = '';
+    if (toEl) toEl.value = '';
+    renderListDateRangeModal();
+  }
+
+  function applyListDateRange() {
+    if (!listDateRangeContext) return;
+    const fromEl = document.getElementById('list-date-from');
+    const toEl = document.getElementById('list-date-to');
+    const from = fromEl?.value || '';
+    const to = toEl?.value || '';
+    let filter;
+    if (from && to) {
+      if (from > to) {
+        window.alert('End date must be on or after the start date.');
+        return;
+      }
+      filter = { type: 'custom', from: from, to: to };
+    } else if (from || to) {
+      window.alert('Pick both a start and end date for a custom range, or clear them to use a quick range.');
+      return;
+    } else {
+      filter = cloneDateFilter(listDateRangeDraft);
+    }
+    setListDateFilter(listDateRangeContext, filter);
+    closeListDateRangeModal();
   }
 
   function initDashboardPage() {
@@ -7996,7 +8386,7 @@
       'View: ' + processesActiveView,
       'Type: ' + processesTypeFilter,
       'Status: ' + processesStatusFilter,
-      'Date: ' + processesDateFilter,
+      'Date: ' + formatDateRangeLabel(processesDateFilter, 'process'),
       'Sort: ' + getListSortLabel(processesSortMode)
     ];
     if (summary) summary.textContent = parts.join('  ·  ');
@@ -8023,7 +8413,7 @@
       view: processesActiveView,
       type: processesTypeFilter,
       status: processesStatusFilter,
-      date: processesDateFilter,
+      date: cloneDateFilter(processesDateFilter),
       sort: processesSortMode
     });
     localStorage.setItem('process-pinned-views', JSON.stringify(processPinnedViews));
@@ -8046,33 +8436,14 @@
     processesActiveView = v.view;
     processesTypeFilter = v.type;
     processesStatusFilter = v.status;
-    processesDateFilter = v.date;
+    processesDateFilter = normalizeDateFilter(v.date);
     processesSortMode = v.sort;
     selectProcessView(v.view);
     setProcessTypeFilter(v.type);
     setProcessStatusFilter(v.status);
-    setProcessDateFilter(v.date);
-    processesSortMode = v.sort;
+    syncDateRangeTrigger('process');
     syncProcessSortDropdown();
     renderProcessesList();
-  }
-
-  function setProcessDateFilter(date) {
-    processesDateFilter = date;
-    syncListControlDropdown('process-date-dropdown', date, 'process-date');
-    renderProcessesList();
-  }
-
-  function setPremisesDateFilter(date) {
-    premisesDateFilter = date;
-    syncListControlDropdown('premises-date-dropdown', date, 'premises-date');
-    renderPremisesList();
-  }
-
-  function setCpinDateFilter(date) {
-    cpinsDateFilter = date;
-    syncListControlDropdown('cpin-date-dropdown', date, 'cpin-date');
-    renderCpinsLists();
   }
 
   function setProcessHeaderSort(col) {
@@ -8106,7 +8477,6 @@
       document.querySelectorAll('.premises-filters-type .chip').forEach(chip => {
         chip.addEventListener('click', () => setPremisesTypeFilter(chip.dataset.premisesType));
       });
-      initListControlDropdown('premises-date-dropdown', setPremisesDateFilter);
       initListControlDropdown('premises-sort-dropdown', setPremisesSort);
       document.querySelectorAll('[data-prem-sort]').forEach(function (btn) {
         btn.addEventListener('click', function () { setPremisesHeaderSort(btn.dataset.premSort); });
@@ -8363,11 +8733,52 @@
       ).join('');
     }
     if (what) {
-      what.value = 'A-2026-0314  ·  Temple Quay House audit';
+      what.value = PROTOTYPE_AUDIT_ID + '  ·  Temple Quay House audit';
     }
     if (hint) {
       hint.textContent = 'Logged against Phil Gower on this audit process.';
     }
+  }
+
+  function touchAuditActivity() {
+    saveAuditActivityLog();
+    renderAuditActivity();
+  }
+
+  function syncAuditActivityFromSetupLetters() {
+    const letters = getAuditSetupSavedLetters();
+    if (!letters.length) return false;
+    let changed = false;
+    letters.forEach(function (ltr, i) {
+      const fileId = 'f-setup-' + ltr.id;
+      if (auditActivityLog.files.some(function (f) { return f.id === fileId; })) return;
+      auditActivityLog.files.unshift({
+        id: fileId,
+        name: ltr.fileName,
+        description: ltr.templateLabel + ' · ' + ltr.recipientName,
+        at: ltr.at,
+        ts: ltr.ts || (Date.now() - i)
+      });
+      changed = true;
+    });
+    const hasLetterNote = auditActivityLog.notes.some(function (n) {
+      return n.id.indexOf('n-setup-ltr-') === 0 || n.id.indexOf('n-setup-') === 0;
+    });
+    if (changed && !hasLetterNote) {
+      const names = letters.map(function (ltr) { return ltr.recipientName; });
+      const stamp = cpinLogTimestamp();
+      auditActivityLog.notes.unshift({
+        id: 'n-setup-ltr-' + stamp.ts,
+        text: letters.length === 1
+          ? 'Appointment letter saved for ' + names[0] + '.'
+          : letters.length + ' appointment letters saved for ' + formatDutyHolderList(names) + '.',
+        stage: 1,
+        at: stamp.at,
+        ts: stamp.ts
+      });
+      changed = true;
+    }
+    return changed;
   }
 
   function renderAuditActivity() {
@@ -8526,22 +8937,24 @@
       if (fd) fd.value = '';
     }
 
-    renderAuditActivity();
+    touchAuditActivity();
     closeAuditFloatPanel();
   }
 
+  function ensureAuditSetupDraftForActivity() {
+    const draft = localStorage.getItem(SETUP_DRAFT_KEY);
+    if (!draft) return;
+    try {
+      const parsed = JSON.parse(draft);
+      if (parsed.letters && parsed.letters.length && (!auditSetup.letters || !auditSetup.letters.length)) {
+        auditSetup.letters = parsed.letters;
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   function initAuditActivity() {
-    if (!auditActivityLog._setupSeeded) {
-      auditActivityLog._setupSeeded = true;
-      [
-        { text: 'Audit record A-2026-0314 created.', at: '18 Jun, 09:00', ts: 1718685600000 },
-        { text: 'CPIN-2026-0418 linked to this audit.', at: '18 Jun, 09:05', ts: 1718685900000 },
-        { text: 'Appointment letter sent to all Duty Holders.', at: '18 Jun, 14:30', ts: 1718705400000 },
-        { text: 'Calendar event pushed to Outlook.', at: '18 Jun, 14:31', ts: 1718705460000 }
-      ].reverse().forEach(function (s) {
-        auditActivityLog.notes.unshift({ id: 'setup-' + s.ts, text: s.text, stage: 1, at: s.at, ts: s.ts });
-      });
-    }
+    ensureAuditSetupDraftForActivity();
+    if (syncAuditActivityFromSetupLetters()) saveAuditActivityLog();
     syncAuditActivityForStage(auditStage);
     if (!document.body.dataset.auditActivityFiltersBound) {
       document.querySelectorAll('.audit-activity-filters .chip').forEach(function (chip) {
@@ -8584,7 +8997,7 @@
       at: 'Today',
       ts: Date.now()
     });
-    renderAuditActivity();
+    touchAuditActivity();
     updateAuditEditWarning();
   }
 
@@ -8598,7 +9011,7 @@
       at: 'Today',
       ts: Date.now()
     });
-    renderAuditActivity();
+    touchAuditActivity();
     updateAuditEditWarning();
     window.alert('Audit edit permission granted for this session.');
   }
@@ -8630,7 +9043,7 @@
       at: sentAt,
       ts: Date.now()
     });
-    renderAuditActivity();
+    touchAuditActivity();
     updateAuditEditWarning();
     setAuditStage(5);
   }
@@ -8660,6 +9073,35 @@
     }).join('');
   }
 
+  function getAuditFindingDutyHolders() {
+    const fromSetup = (auditSetup && auditSetup.dutyHolders || [])
+      .filter(function (d) { return d.status !== 'rejected'; })
+      .map(function (d) { return d.name; });
+    if (fromSetup.length) {
+      const seen = new Set();
+      return fromSetup.filter(function (name) {
+        if (seen.has(name)) return false;
+        seen.add(name);
+        return true;
+      });
+    }
+    return AUDIT_FINDING_DUTY_HOLDERS.slice();
+  }
+
+  function renderFindingDutyHolderOptions(selectedNames) {
+    const list = document.getElementById('new-finding-dh-list');
+    if (!list) return;
+    const holders = getAuditFindingDutyHolders();
+    const selected = selectedNames || [];
+    list.innerHTML = holders.map(function (name, i) {
+      const checked = selected.length ? selected.indexOf(name) >= 0 : i === 0;
+      const id = 'finding-dh-opt-' + i;
+      return '<label class="finding-dh-option" for="' + id + '">' +
+        '<input type="checkbox" id="' + id + '" value="' + escHtml(name) + '"' + (checked ? ' checked' : '') + ' />' +
+        '<span>' + escHtml(name) + '</span></label>';
+    }).join('');
+  }
+
   function getSelectedFindingDhs() {
     return Array.from(document.querySelectorAll('#new-finding-dh-list input:checked')).map(function (el) { return el.value; });
   }
@@ -8674,6 +9116,7 @@
     if (!form || !btn) return;
     const showForm = typeof open === 'boolean' ? open : form.hidden;
     if (showForm && !auditFindingEditId) resetFindingForm();
+    if (showForm) renderFindingDutyHolderOptions(auditFindingEditId ? getSelectedFindingDhs() : null);
     form.hidden = !showForm;
     btn.hidden = showForm;
     if (showForm) document.getElementById('new-finding-type')?.focus();
@@ -8687,9 +9130,7 @@
     if (saveBtn) saveBtn.textContent = 'Add finding';
     document.getElementById('new-finding-type').value = '';
     document.getElementById('new-finding-example').value = '';
-    document.querySelectorAll('#new-finding-dh-list input').forEach(function (el, i) {
-      el.checked = i === 0;
-    });
+    renderFindingDutyHolderOptions();
   }
 
   function editAuditFinding(id) {
@@ -8707,9 +9148,7 @@
     document.getElementById('new-finding-score').value = String(f.score);
     document.getElementById('new-finding-type').value = f.failureType;
     document.getElementById('new-finding-example').value = f.example;
-    document.querySelectorAll('#new-finding-dh-list input').forEach(function (el) {
-      el.checked = f.dutyHolders.indexOf(el.value) >= 0;
-    });
+    renderFindingDutyHolderOptions(f.dutyHolders);
     toggleAddFindingForm(true);
   }
 
@@ -9888,7 +10327,7 @@
   }
 
   function cpinMatchesFilter(item) {
-    if (!matchesDateFilter(parseCpinWhenDays(item.when), cpinsDateFilter)) return false;
+    if (!matchesDateRangeFilter(parseCpinWhenDays(item.when), cpinsDateFilter)) return false;
     if (cpinsActiveFilter === 'all') return true;
     if (cpinsActiveFilter === 'patch') return item.patch;
     if (cpinsActiveFilter === 'premises-needed') return cpinNeedsPremises(item);
@@ -10050,7 +10489,7 @@
 
   function renderCpinsLists() {
     syncCpinSortDropdown();
-    syncListControlDropdown('cpin-date-dropdown', cpinsDateFilter, 'cpin-date');
+    syncDateRangeTrigger('cpin');
     if (cpinsActiveTab === 'closed') {
       renderCompletedCpins();
     } else {
@@ -10137,7 +10576,6 @@
           if (chip.dataset.cpinFilter) setCpinFilter(chip.dataset.cpinFilter);
         });
       });
-      initListControlDropdown('cpin-date-dropdown', setCpinDateFilter);
       initListControlDropdown('cpin-sort-dropdown', setCpinSort);
       if (!document.body.dataset.cpinViewBound) {
         document.body.dataset.cpinViewBound = '1';
@@ -11218,7 +11656,8 @@
   function closeNewModal() {
     document.getElementById('new-modal').classList.remove('open');
     if (!document.getElementById('setup-lookup-modal')?.classList.contains('open') &&
-        !document.getElementById('letter-composer-modal')?.classList.contains('open')) {
+        !document.getElementById('letter-composer-modal')?.classList.contains('open') &&
+        !document.getElementById('list-date-range-modal')?.classList.contains('open')) {
       document.body.style.overflow = '';
     }
   }
@@ -11244,6 +11683,8 @@
         closeGlobalFloatPanel();
       } else if (document.getElementById('letter-composer-modal')?.classList.contains('open')) {
         closeLetterComposer();
+      } else if (document.getElementById('list-date-range-modal')?.classList.contains('open')) {
+        closeListDateRangeModal();
       } else if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
         closeSetupLookupModal();
       } else {
@@ -11717,7 +12158,8 @@
     if (modal) modal.classList.remove('open');
     letterComposerState = null;
     if (!document.getElementById('new-modal')?.classList.contains('open') &&
-        !document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
+        !document.getElementById('setup-lookup-modal')?.classList.contains('open') &&
+        !document.getElementById('list-date-range-modal')?.classList.contains('open')) {
       document.body.style.overflow = '';
     }
   }
@@ -11738,7 +12180,7 @@
     const layout = document.querySelector('.letter-composer-layout');
     const tplGroup = document.getElementById('letter-composer-template-group');
     const recGroup = document.getElementById('letter-composer-recipient-group');
-    const editActions = document.getElementById('letter-composer-edit-actions');
+    const editBtn = document.getElementById('letter-composer-edit-btn');
     const saveBtn = document.getElementById('letter-composer-save-btn');
     const searchEl = document.getElementById('letter-composer-template-search');
 
@@ -11747,7 +12189,7 @@
       if (isView) {
         subEl.textContent = 'Use View on each saved letter to read it in the preview panel.';
       } else if (letterComposerState.saveTo === 'activity-files' || letterComposerState.saveTo === 'audit-activity-files') {
-        subEl.textContent = 'Choose a template and recipients — use View to preview each letter. Saved copies go to Files only.';
+        subEl.textContent = 'Choose a template and recipients — use View to preview each letter. Saved copies appear in All and Files on this CPIN.';
       } else if (letterComposerState.context === 'audit-setup') {
         subEl.textContent = 'Choose a template and recipients — letters are saved here and sent when you start the audit.';
       } else {
@@ -11764,7 +12206,7 @@
         ? 'Use View to read each saved letter in the preview panel.'
         : 'Tick recipients to include when saving. Use View to read each person\'s letter in the preview.';
     }
-    if (editActions) editActions.hidden = isView;
+    if (editBtn) editBtn.hidden = isView;
     if (saveBtn) {
       saveBtn.hidden = isView;
       if (!isView) {
@@ -11884,8 +12326,8 @@
     }
     if (preview) preview.classList.toggle('editing', !!letterComposerState.editing);
     if (bodyEl) bodyEl.contentEditable = letterComposerState.editing ? 'true' : 'false';
-    const editBtn = document.getElementById('letter-composer-edit-btn');
-    if (editBtn) editBtn.textContent = letterComposerState.editing ? 'Done editing' : 'Edit letter';
+    const editLabel = document.getElementById('letter-composer-edit-label');
+    if (editLabel) editLabel.textContent = letterComposerState.editing ? 'Done editing' : 'Edit';
   }
 
   function selectLetterTemplate(id) {
@@ -11917,6 +12359,74 @@
     letterComposerState.editing = !letterComposerState.editing;
     renderLetterComposer();
     if (letterComposerState.editing && bodyEl) bodyEl.focus();
+  }
+
+  function appendAuditLettersToActivity(letters, stamp, opts) {
+    opts = opts || {};
+    const names = letters.map(function (ltr) { return ltr.recipientName; });
+    let addedFiles = 0;
+    letters.forEach(function (ltr, i) {
+      const fileId = 'f-setup-' + ltr.id;
+      if (opts.skipIfExists && auditActivityLog.files.some(function (f) { return f.id === fileId; })) return;
+      const entryTs = stamp.ts - i;
+      auditActivityLog.files.unshift({
+        id: fileId,
+        name: ltr.fileName,
+        description: ltr.templateLabel + ' · ' + ltr.recipientName,
+        at: ltr.at,
+        ts: entryTs
+      });
+      addedFiles++;
+    });
+    const noteId = 'n-setup-ltr-' + stamp.ts;
+    const hasNote = opts.skipIfExists && auditActivityLog.notes.some(function (n) {
+      return n.id.indexOf('n-setup-ltr-') === 0;
+    });
+    if (addedFiles && !hasNote) {
+      auditActivityLog.notes.unshift({
+        id: noteId,
+        text: letters.length === 1
+          ? 'Appointment letter saved for ' + names[0] + '.'
+          : letters.length + ' appointment letters saved for ' + formatDutyHolderList(names) + '.',
+        stage: 1,
+        at: stamp.at,
+        ts: stamp.ts
+      });
+    }
+    touchAuditActivity();
+  }
+
+  function appendCpinLettersToActivity(letters, stamp, opts) {
+    opts = opts || {};
+    letters.forEach(function (ltr, i) {
+      const entryTs = stamp.ts - i;
+      cpinActivityLog.files.unshift({
+        id: 'f-' + ltr.id,
+        name: ltr.fileName,
+        description: ltr.templateLabel + ' · ' + ltr.recipientName,
+        at: ltr.at,
+        ts: entryTs
+      });
+      if (opts.activityBar) {
+        cpinActivityLog.notes.unshift({
+          id: 'n-ltr-' + ltr.id,
+          text: 'Letter saved for ' + ltr.recipientName + ' (' + ltr.fileName + ').',
+          at: ltr.at,
+          ts: entryTs
+        });
+      }
+    });
+    if (!opts.activityBar && letters.length) {
+      const names = letters.map(function (ltr) { return ltr.recipientName; });
+      cpinActivityLog.notes.unshift({
+        id: 'n-' + stamp.ts,
+        text: letters.length === 1
+          ? 'Letter saved for ' + names[0] + '.'
+          : letters.length + ' letters saved for ' + formatDutyHolderList(names) + '.',
+        at: stamp.at,
+        ts: stamp.ts
+      });
+    }
   }
 
   function saveLetterComposer() {
@@ -11974,53 +12484,19 @@
       auditSetup.letterSkipped = false;
       auditSetup.letterSent = true;
       localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(getAuditSetupPayload()));
+      appendAuditLettersToActivity(newLetters, stamp);
       renderSetupAppointmentLetters();
       closeLetterComposer();
       return;
     }
 
     if (saveTo === 'audit-activity-files') {
-      newLetters.forEach(function (ltr, i) {
-        const entryTs = stamp.ts - i;
-        auditActivityLog.files.unshift({
-          id: 'f-' + ltr.id,
-          name: ltr.fileName,
-          description: ltr.templateLabel + ' · ' + ltr.recipientName,
-          at: ltr.at,
-          ts: entryTs
-        });
-        auditActivityLog.interim.unshift({
-          id: 'i-' + ltr.id,
-          title: ltr.templateLabel,
-          text: 'Letter for ' + ltr.recipientName + ' saved to files.',
-          at: ltr.at,
-          ts: entryTs
-        });
-      });
-      renderAuditActivity();
+      appendAuditLettersToActivity(newLetters, stamp);
       closeLetterComposer();
       return;
     }
 
-    newLetters.forEach(function (ltr, i) {
-      const entryTs = stamp.ts - i;
-      cpinActivityLog.files.unshift({
-        id: 'f-' + ltr.id,
-        name: ltr.fileName,
-        description: ltr.templateLabel + ' · ' + ltr.recipientName,
-        at: ltr.at,
-        ts: entryTs
-      });
-      if (saveTo === 'activity-files') {
-        cpinActivityLog.interim.unshift({
-          id: 'i-' + ltr.id,
-          title: ltr.templateLabel,
-          text: 'Letter for ' + ltr.recipientName + ' saved to files.',
-          at: ltr.at,
-          ts: entryTs
-        });
-      }
-    });
+    appendCpinLettersToActivity(newLetters, stamp, { activityBar: saveTo === 'activity-files' });
     saveCpinActivityLogToRecord();
     renderCpinActivity();
 
@@ -12038,15 +12514,6 @@
     });
     persistCpinPatch(activeCpinId, { onsiteEval: o, workflow: 'desk_eval' });
 
-    const names = selected.map(function (rp) { return rp.name; });
-    cpinActivityLog.notes.unshift({
-      id: 'n-' + stamp.ts,
-      text: newLetters.length === 1
-        ? 'Letter saved for ' + names[0] + '.'
-        : newLetters.length + ' letters saved for ' + formatDutyHolderList(names) + '.',
-      at: stamp.at,
-      ts: stamp.ts
-    });
     saveCpinActivityLogToRecord();
     renderCpinActivity();
 
@@ -12222,12 +12689,30 @@
       setup.dutyHolders = dhList.map(function (dh) {
         return {
           id: dh.id,
+          key: dh.key || SETUP_DH_KEY_BY_NAME[dh.name],
           name: dh.name,
           role: dh.role,
           initials: dh.initials,
-          fromPremises: !!dh.fromPremises
+          fromPremises: !!dh.fromPremises,
+          status: 'accepted'
         };
       });
+      const rpList = getCpinResponsiblePersonsForDutyHolders(cpin, { acceptedOnly: true });
+      if (rpList.length) {
+        setup.responsiblePersons = rpList.map(function (rp) {
+          return {
+            id: rp.id,
+            key: rp.key,
+            ref: rp.ref,
+            name: rp.name,
+            role: rp.role,
+            initials: rp.initials,
+            fromPremises: !!rp.fromPremises,
+            status: 'accepted',
+            linkedDh: rp.linkedDh
+          };
+        });
+      }
     }
     if (cpin.assignee) {
       setup.inspectors = [{
@@ -12246,6 +12731,19 @@
     localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(setup));
   }
 
+  function normalizeAuditSetupDutyHolders() {
+    (auditSetup.dutyHolders || []).forEach(function (dh) {
+      if (!dh.status) dh.status = 'suggested';
+      if (!dh.key && dh.name) dh.key = SETUP_DH_KEY_BY_NAME[dh.name] || null;
+    });
+  }
+
+  function ensureSetupResponsiblePersonSuggestions() {
+    getSetupAcceptedDhKeys().forEach(function (dhKey) {
+      suggestSetupRpsForDh(dhKey);
+    });
+  }
+
   function initAuditSetupPage() {
     const draft = localStorage.getItem(SETUP_DRAFT_KEY);
     if (draft) {
@@ -12255,7 +12753,10 @@
       } catch (e) {
         auditSetup = defaultAuditSetup();
       }
+    } else {
+      auditSetup = defaultAuditSetup();
     }
+    normalizeAuditSetupDutyHolders();
     renderSetupDutyHolders();
     renderSetupResponsiblePersons();
     renderSetupInspectors();
@@ -12399,6 +12900,7 @@
 
   function renderSetupDutyHolders() {
     const list = document.getElementById('setup-dh-list');
+    const hint = document.getElementById('setup-dh-hint');
     if (!list) return;
     list.innerHTML = auditSetup.dutyHolders.map(function (dh) {
       const pill = dh.status === 'suggested'
@@ -12413,16 +12915,36 @@
         '<div class="role">' + escHtml(dh.role.replace(/[\u2013\u2014]/g, '-')) + '</div></div>' +
         pill + actions + '</div>';
     }).join('');
+    if (hint) {
+      const pending = auditSetup.dutyHolders.some(function (d) { return d.status === 'suggested'; });
+      const accepted = setupHasAcceptedDutyHolders();
+      if (accepted && !pending) {
+        hint.textContent = 'Duty Holders approved — review suggested Responsible Persons below.';
+      } else if (pending) {
+        hint.textContent = 'Approve at least one Duty Holder — suggested Responsible Persons will appear for each organisation.';
+      } else {
+        hint.textContent = '';
+      }
+    }
     refreshSetupSummary();
   }
 
   function renderSetupResponsiblePersons() {
     const list = document.getElementById('setup-rp-list');
+    const hint = document.getElementById('setup-rp-hint');
     if (!list) return;
+    if (setupHasAcceptedDutyHolders()) ensureSetupResponsiblePersonSuggestions();
     pruneSetupResponsiblePersons();
     const rps = getSetupResponsiblePersonsForDutyHolders();
+    if (!setupHasAcceptedDutyHolders()) {
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">Approve or add Duty Holders above first — contacts are suggested for each approved organisation.</p>';
+      if (hint) hint.textContent = '';
+      refreshSetupSummary();
+      return;
+    }
     if (!rps.length) {
-      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No suggested contacts for the approved Duty Holders. Use + Add to search the directory.</p>';
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No suggested contacts yet for the approved Duty Holders. Use + Add to search the directory.</p>';
+      if (hint) hint.textContent = '';
       refreshSetupSummary();
       return;
     }
@@ -12442,6 +12964,16 @@
         '</div>' +
         pill + actions + '</div>';
     }).join('');
+    if (hint) {
+      const acceptedRps = rps.filter(function (r) { return r.status === 'accepted'; });
+      if (acceptedRps.length) {
+        hint.textContent = '';
+      } else if (rps.some(function (r) { return r.status === 'suggested'; })) {
+        hint.textContent = 'Approve at least one Responsible Person before starting the audit.';
+      } else {
+        hint.textContent = '';
+      }
+    }
     refreshSetupSummary();
   }
 
@@ -12571,7 +13103,8 @@
     const modal = document.getElementById('setup-lookup-modal');
     if (modal) modal.classList.remove('open');
     if (!document.getElementById('new-modal')?.classList.contains('open') &&
-        !document.getElementById('letter-composer-modal')?.classList.contains('open')) {
+        !document.getElementById('letter-composer-modal')?.classList.contains('open') &&
+        !document.getElementById('list-date-range-modal')?.classList.contains('open')) {
       document.body.style.overflow = '';
     }
     setupLookupMode = null;
