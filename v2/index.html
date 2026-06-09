@@ -888,6 +888,9 @@
     gap: 12px;
     align-items: end;
   }
+  #global-log-fields-time .audit-quick-log {
+    grid-template-columns: 1fr 1fr 120px;
+  }
   .audit-quick-log label,
   .audit-note-form label {
     display: block;
@@ -5553,7 +5556,7 @@
 
       <div class="setup-section cpin-workflow-section" id="cpin-section-dh" hidden>
         <h3>Duty Holders and Responsible Persons</h3>
-        <div class="help">Pre-suggested from this premises when further action is needed. Review and add or remove as needed — not pre-locked, since who is on site can change.</div>
+        <div class="help">Duty Holders are pre-suggested from this premises. Responsible Persons are suggested for each Duty Holder — approve both before remote evaluation unlocks.</div>
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders (organisations)</div>
         <div id="cpin-dh-list"></div>
         <div class="add-holder-btn" onclick="addCpinDutyHolder()">+ Add a Duty Holder</div>
@@ -5562,6 +5565,9 @@
         <div id="cpin-rp-list"></div>
         <div class="add-holder-btn" onclick="addCpinResponsiblePerson()">+ Add a Responsible Person</div>
         <p id="cpin-rp-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
+        <div class="inset" id="cpin-people-next-steps" hidden style="margin-top:12px;background:var(--green-soft);border-color:var(--green);color:var(--ink);">
+          <strong>Duty Holders and Responsible Persons approved.</strong> Continue to remote evaluation below.
+        </div>
       </div>
 
       <div class="setup-section cpin-workflow-section" id="cpin-section-remote" hidden>
@@ -7296,14 +7302,26 @@
   const SETUP_DH_TO_RP_KEYS = {
     hmcts: ['mstevens', 'kallen'],
     equans: ['spatel', 'dhussain'],
-    propdir: ['rbyrne']
+    propdir: ['rbyrne'],
+    'hmpps-se': ['jgower', 'smitchell'],
+    'hmpps-lon': ['jgower', 'sreid'],
+    'hmpps-kent': ['smitchell', 'jgower'],
+    serco: ['tclarke', 'nroberts'],
+    dwp: ['pbanks', 'swood'],
+    mitie: ['dhussain', 'tclarke']
   };
 
   const SETUP_DH_KEY_BY_NAME = {
     'HMCTS': 'hmcts',
     'Equans': 'equans',
     'The Property Directorate': 'propdir',
-    'Property Directorate': 'propdir'
+    'Property Directorate': 'propdir',
+    'HMPPS - South East': 'hmpps-se',
+    'HMPPS - London': 'hmpps-lon',
+    'HMPPS - Kent': 'hmpps-kent',
+    'Serco FM': 'serco',
+    'DWP Estates': 'dwp',
+    'Mitie': 'mitie'
   };
 
   const ARTICLE_LABELS = {
@@ -9115,9 +9133,23 @@
     return getCpinDutyHolders(cpin).map(getCpinDutyHolderKey).filter(Boolean);
   }
 
+  function getCpinDutyHolderKeysOnList(cpin) {
+    return getCpinDutyHolderRecords(cpin).map(function (dh) {
+      return dh.key || SETUP_DH_KEY_BY_NAME[dh.name] || getCpinDutyHolderKey(dh);
+    }).filter(Boolean);
+  }
+
+  function getCpinDutyHolderNameForKey(cpin, key) {
+    if (!cpin || !key) return '';
+    const match = getCpinDutyHolderRecords(cpin).find(function (dh) {
+      return (dh.key || SETUP_DH_KEY_BY_NAME[dh.name]) === key;
+    });
+    return match ? match.name : '';
+  }
+
   function getCpinResponsiblePersonsForDutyHolders(cpin, opts) {
     opts = opts || {};
-    const dhKeys = getAcceptedDutyHolderKeys(cpin);
+    const dhKeys = opts.acceptedOnly ? getAcceptedDutyHolderKeys(cpin) : getCpinDutyHolderKeysOnList(cpin);
     if (!dhKeys.length) return [];
     return getCpinResponsiblePersonRecords(cpin).filter(function (rp) {
       if (opts.acceptedOnly && rp.status !== 'accepted') return false;
@@ -9132,7 +9164,7 @@
 
   function pruneCpinResponsiblePersons(cpin) {
     if (!cpin) return false;
-    const dhKeys = getAcceptedDutyHolderKeys(cpin);
+    const dhKeys = getCpinDutyHolderKeysOnList(cpin);
     const rps = (cpin.responsiblePersons || []).filter(function (rp) {
       if (!rp.linkedDh) return true;
       return dhKeys.indexOf(rp.linkedDh) >= 0;
@@ -9184,6 +9216,7 @@
     }
     return {
       id: 'dh-' + String(idx) + '-' + (dh.name || 'x').replace(/\W+/g, '').slice(0, 8).toLowerCase(),
+      key: dh.key || SETUP_DH_KEY_BY_NAME[dh.name] || null,
       name: dh.name,
       role: cpinDhRoleForName(dh.name),
       initials: setupInitials(dh.name),
@@ -10661,18 +10694,35 @@
       }).join('');
     }
     if (hint) {
-      if (cpinHasAcceptedDutyHolders(cpin)) {
-        hint.textContent = cpinRequiresDutyHolders(cpin)
-          ? 'At least one Duty Holder approved — approve Responsible Persons below to continue.'
-          : '';
+      if (cpinRequiresDutyHolders(cpin) && cpinPeopleGateOk(cpin)) {
+        hint.textContent = '';
+      } else if (cpinHasAcceptedDutyHolders(cpin)) {
+        hint.textContent = 'Approve at least one linked Responsible Person below to unlock remote evaluation.';
       } else if (cpinRequiresDutyHolders(cpin)) {
         hint.textContent = cpinHasPendingDutyHolders(cpin)
-          ? 'Approve at least one Duty Holder to continue to remote evaluation.'
+          ? 'Approve at least one Duty Holder — suggested Responsible Persons will appear for each organisation.'
           : 'Add and approve at least one Duty Holder before remote evaluation.';
       } else {
         hint.textContent = '';
       }
     }
+    const nextSteps = document.getElementById('cpin-people-next-steps');
+    if (nextSteps) {
+      nextSteps.hidden = !(cpinRequiresDutyHolders(cpin) && cpinPeopleGateOk(cpin));
+    }
+  }
+
+  function ensureCpinResponsiblePersonSuggestions() {
+    const cpin = getCpinById(activeCpinId);
+    if (!cpin || !cpinShowsDutyHolders(cpin)) return false;
+    const holders = getCpinDutyHolderRecords(cpin);
+    if (!holders.length) return false;
+    let changed = false;
+    holders.forEach(function (dh) {
+      const dhKey = dh.key || SETUP_DH_KEY_BY_NAME[dh.name] || getCpinDutyHolderKey(dh);
+      if (dhKey && suggestCpinRpsForDh(dhKey)) changed = true;
+    });
+    return changed;
   }
 
   function renderCpinResponsiblePersons(cpin) {
@@ -10684,14 +10734,17 @@
       if (hint) hint.textContent = '';
       return;
     }
+    ensureCpinResponsiblePersonSuggestions();
     pruneCpinResponsiblePersons(cpin);
     cpin = getCpinById(activeCpinId) || cpin;
     const rps = getCpinResponsiblePersonsForDutyHolders(cpin);
     if (!rps.length) {
-      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">No suggested contacts for the approved Duty Holders. Use + Add to search the directory.</p>';
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">Suggested contacts appear here for each Duty Holder above. Use + Add to search the directory.</p>';
     } else {
       list.innerHTML = rps.map(function (rp) {
-        const dhLabel = rp.linkedDh ? getDutyHolderLabelForKey(rp.linkedDh) : '';
+        const dhLabel = rp.linkedDh
+          ? (getDutyHolderLabelForKey(rp.linkedDh) || getCpinDutyHolderNameForKey(cpin, rp.linkedDh))
+          : '';
         const pill = rp.status === 'suggested'
           ? '<span class="pill amber">Suggested</span>'
           : '<span class="pill grey">Approved</span>';
@@ -10711,17 +10764,23 @@
       }).join('');
     }
     if (hint) {
-      if (cpinRequiresResponsiblePersons(cpin)) {
-        if (cpinHasAcceptedResponsiblePersons(cpin)) {
-          hint.textContent = 'At least one Responsible Person approved — you can continue.';
-        } else if (rps.some(function (r) { return r.status === 'suggested'; })) {
-          hint.textContent = 'Approve at least one Responsible Person to continue to remote evaluation.';
+      if (cpinRequiresResponsiblePersons(cpin) && cpinPeopleGateOk(cpin)) {
+        hint.textContent = '';
+      } else if (cpinRequiresResponsiblePersons(cpin)) {
+        if (cpinHasAcceptedDutyHolders(cpin) && rps.some(function (r) { return r.status === 'suggested'; })) {
+          hint.textContent = 'Approve at least one Responsible Person linked to an approved Duty Holder to unlock remote evaluation.';
+        } else if (!cpinHasAcceptedDutyHolders(cpin)) {
+          hint.textContent = 'Approve Duty Holders above first — contacts are suggested for each organisation.';
         } else {
           hint.textContent = 'Add and approve at least one Responsible Person before remote evaluation.';
         }
       } else {
         hint.textContent = '';
       }
+    }
+    const nextSteps = document.getElementById('cpin-people-next-steps');
+    if (nextSteps) {
+      nextSteps.hidden = !(cpinRequiresDutyHolders(cpin) && cpinPeopleGateOk(cpin));
     }
   }
 
@@ -10781,7 +10840,7 @@
 
   function suggestCpinRpsForDh(dhKey) {
     const cpin = getCpinById(activeCpinId);
-    if (!cpin || !dhKey) return;
+    if (!cpin || !dhKey) return false;
     const keys = SETUP_DH_TO_RP_KEYS[dhKey] || [];
     const catalog = SETUP_LOOKUP_CATALOG.responsiblePerson;
     const rps = (cpin.responsiblePersons || []).slice();
@@ -10790,11 +10849,11 @@
       const entry = catalog.find(function (e) { return e.key === rk; });
       if (!entry) return;
       const exists = rps.some(function (r) {
-        return r.key === rk || r.name.toLowerCase() === entry.name.toLowerCase();
+        return (r.key === rk || r.name.toLowerCase() === entry.name.toLowerCase()) && r.linkedDh === dhKey;
       });
       if (exists) return;
       rps.push({
-        id: 'rp-' + rk,
+        id: 'rp-' + dhKey + '-' + rk,
         key: rk,
         ref: entry.ref,
         name: entry.name,
@@ -10807,6 +10866,7 @@
       changed = true;
     });
     if (changed) persistCpinPatch(activeCpinId, { responsiblePersons: rps });
+    return changed;
   }
 
   function acceptCpinDutyHolder(id) {
@@ -12435,7 +12495,14 @@
       { key: 'lchen', ref: 'RP-0006301', usageRank: 8, name: 'Lisa Chen', role: 'Capita FM  ·  Contract Manager', initials: 'LC' },
       { key: 'rbyrne', ref: 'RP-0004410', usageRank: 4, name: 'Robert Byrne', role: 'The Property Directorate  ·  Senior Surveyor', initials: 'RB' },
       { key: 'kallen', ref: 'RP-0005528', usageRank: 3, name: 'Karen Allen', role: 'HMCTS  ·  Facilities Coordinator', initials: 'KA' },
-      { key: 'dhussain', ref: 'RP-0005533', usageRank: 5, name: 'David Hussain', role: 'Equans  ·  Electrical Compliance Lead', initials: 'DH' }
+      { key: 'dhussain', ref: 'RP-0005533', usageRank: 5, name: 'David Hussain', role: 'Equans  ·  Electrical Compliance Lead', initials: 'DH' },
+      { key: 'jgower', ref: 'RP-0007102', usageRank: 12, name: 'James Gower', role: 'HMPPS  ·  Regional Fire Safety Lead', initials: 'JG' },
+      { key: 'smitchell', ref: 'RP-0007108', usageRank: 13, name: 'Sarah Mitchell', role: 'HMPPS  ·  Estates Manager', initials: 'SM' },
+      { key: 'sreid', ref: 'RP-0007110', usageRank: 14, name: 'Simon Reid', role: 'HMPPS London  ·  Portfolio Manager', initials: 'SR' },
+      { key: 'tclarke', ref: 'RP-0007201', usageRank: 15, name: 'Tom Clarke', role: 'Serco FM  ·  Contract Manager', initials: 'TC' },
+      { key: 'nroberts', ref: 'RP-0007204', usageRank: 16, name: 'Nicola Roberts', role: 'Serco FM  ·  Compliance Lead', initials: 'NR' },
+      { key: 'pbanks', ref: 'RP-0007301', usageRank: 17, name: 'Paula Banks', role: 'DWP Estates  ·  Regional Manager', initials: 'PB' },
+      { key: 'swood', ref: 'RP-0007305', usageRank: 18, name: 'Simon Wood', role: 'DWP Estates  ·  Facilities Coordinator', initials: 'SW' }
     ],
     inspector: [
       { key: 'jcooper', name: 'Jane Cooper', role: 'Fire Safety Inspector  ·  Kent patch', initials: 'JC' },
@@ -12599,8 +12666,9 @@
         renderSetupDutyHolders();
       }
     } else if (setupLookupMode === 'responsiblePerson') {
+      const cpinForLink = setupLookupTarget === 'cpin' ? getCpinById(activeCpinId) : null;
       const linkedDh = getDhKeyForRpKey(entry.key) ||
-        (setupLookupTarget === 'cpin' && getCpinById(activeCpinId) ? getAcceptedDutyHolderKeys(getCpinById(activeCpinId))[0] : null) ||
+        (cpinForLink ? (getAcceptedDutyHolderKeys(cpinForLink)[0] || getCpinDutyHolderKeysOnList(cpinForLink)[0]) : null) ||
         (setupHasAcceptedDutyHolders() ? getSetupAcceptedDhKeys()[0] : null);
       const rp = {
         id: 'rp' + Date.now(),
