@@ -1,6 +1,6 @@
 ---
 description: Update root index BUILD_STAMPS whenever the prototype changes
-globs: index.html,v1/**,v2/**
+globs: index.html,v1/**,v2/**,v3/**
 alwaysApply: true
 ---
 
@@ -14,7 +14,8 @@ UK style: `D Mon YYYY, HH:MM` (24-hour), e.g. `8 Jun 2026, 13:48`.
 
 ## Which keys to bump
 
-- **`v2`** — any edit under `v2/` (main workstream).
+- **`v3`** — any edit under `v3/` (main workstream).
+- **`v2`** — any edit under `v2/`.
 - **`v1`** — any edit under `v1/`.
 
 Only V1 and V2 cards show stamps; do not add a chooser-page stamp.

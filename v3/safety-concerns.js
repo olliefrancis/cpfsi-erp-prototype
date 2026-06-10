@@ -1,0 +1,948 @@
+/* Safety Concerns workflow — mirrors CPIN patterns with FIS / hazard terminology */
+(function () {
+  'use strict';
+
+  const SC_PIN_KEY = 'sc-pins-v1';
+  const SC_OVERRIDE_KEY = 'sc-overrides-v1';
+  const SC_CURRENT_INSPECTOR = 'Phil Gower';
+  const SC_IN_PROGRESS_WF = new Set(['assigned', 'triage', 'desk_eval', 'awaiting_info', 'audit_spawned', 'in_review', 'audit']);
+
+  const SC_WORKFLOW_LABELS = {
+    incoming: 'Incoming',
+    awaiting_premises: 'Awaiting premises',
+    unassigned: 'Unassigned',
+    assigned: 'Assigned',
+    triage: 'Triage',
+    desk_eval: 'Examine hazard',
+    awaiting_info: 'Awaiting info',
+    audit_spawned: 'Audit created',
+    closed: 'Closed',
+    in_review: 'Triage',
+    audit: 'Audit created'
+  };
+
+  const SC_SEVERITY_LONG = {
+    green: 'Green — low risk hazard, no immediate injury concern',
+    amber: 'Amber — moderate risk, action may be required',
+    red: 'Red — serious hazard, urgent attention required'
+  };
+
+  const SC_DH_BY_PREMISES = {
+    'MoJ HQ London': ['Ministry of Justice Property', 'Equans'],
+    'Charing Cross House refurb': ['MoJ', 'Capita Facilities Management'],
+    'Temple Quay House': ['HMCTS', 'Equans', 'Property Directorate'],
+    'HMP Bristol': ['HMPPS - South West', 'Serco FM'],
+    'DWP Canterbury': ['DWP Estates', 'Mitie'],
+    'Reading Job Centre Plus': ['DWP Estates']
+  };
+
+  const CONCERNS_INCOMING = [
+    { id: 'sc-in-0151', ref: 'SC-2026-0151', severity: 'amber', severityScore: 2, when: '25 min ago', premises: 'MoJ HQ London', summary: 'Combustible storage in basement plant room', patch: false, workflow: 'incoming', assignee: null, intake: { reportRef: 'FIS-3301', reportDate: '10/06/2026', reporter: 'Union safety rep', source: 'FIS direct report', hazardType: 'Combustible materials', description: 'Pallets of packaging stored within 1m of electrical switchgear. Reported by onsite union rep.', premisesFree: '' } },
+    { id: 'sc-in-0152', ref: 'SC-2026-0152', severity: 'green', severityScore: 0, when: '1 hr ago', premises: 'Reading Job Centre Plus', summary: 'Fire door wedged open during delivery', patch: false, workflow: 'incoming', assignee: null, intake: { reportRef: 'FIS-3302', reportDate: '10/06/2026', reporter: 'Duty Holder', source: 'Duty Holder portal', hazardType: 'Fire door defect', description: 'Rear fire door propped open for deliveries. DH self-reported and states now closed.', premisesFree: '' } }
+  ];
+
+  const CONCERNS_MINE = [
+    { id: 'sc-0142', ref: 'SC-2026-0142', severity: 'amber', severityScore: 2, when: '2 days ago', premises: 'MoJ HQ London', summary: 'Blocked fire exit — storage in stairwell', patch: true, workflow: 'triage', assignee: 'Phil Gower', furtherAction: null, intake: { reportRef: 'FIS-3288', reportDate: '08/06/2026', reporter: 'Mark Stevens (Duty Holder)', source: 'FIS intake', hazardType: 'Blocked escape route', description: 'Filing cabinets and archive boxes stored in rear escape stairwell on level 3.', premisesFree: '' } },
+    { id: 'sc-0138', ref: 'SC-2026-0138', severity: 'red', severityScore: 5, when: '5 days ago', premises: 'Charing Cross House refurb', summary: 'Hot works without permit — active refurbishment', patch: true, workflow: 'desk_eval', assignee: 'Phil Gower', furtherAction: 'yes', deskOutcome: 'remote_eval', deskNotes: 'Contractor hot works observed without CPFSI notification. Spoke to MoJ project lead and contractor FM.', dutyHolders: [{ id: 'dh-moj', key: 'propdir', name: 'MoJ', role: 'Government department  ·  Project authority', initials: 'MJ', fromPremises: true, status: 'accepted' }], remoteEval: { appointmentDate: '2026-06-12', appointmentTime: '14:00', appointmentConfirmed: true, letterSkipped: false, letterSent: true, siteVisitNotes: '', siteVisitDone: false }, intake: { reportRef: 'FIS-3271', reportDate: '05/06/2026', reporter: 'Site manager', source: 'FIS site visit', hazardType: 'Hot works', description: 'Welding on level 4 without hot works permit or fire watch.', premisesFree: '' } },
+    { id: 'sc-0131', ref: 'SC-2026-0131', severity: 'green', severityScore: 0, when: '12 Jun', premises: 'Temple Quay House', summary: 'Emergency lighting test failure — one fitting', patch: true, workflow: 'closed', assignee: 'Phil Gower', furtherAction: 'no', auditRequired: 'no', closeReason: 'DH replaced fitting same day — no further action.', intake: { reportRef: 'FIS-3250', reportDate: '11/06/2026', reporter: 'Equans FM', source: 'FM company', hazardType: 'Emergency lighting', description: 'Monthly test log shows one fitting failed on level 2 corridor. Replaced 11 Jun.', premisesFree: '' } },
+    { id: 'sc-0125', ref: 'SC-2026-0125', severity: 'amber', severityScore: 3, when: '10 Jun', premises: null, summary: 'Hazard report — premises link required', patch: true, workflow: 'awaiting_premises', assignee: null, intake: { reportRef: 'FIS-3244', reportDate: '09/06/2026', reporter: 'Anonymous', source: 'FIS web form', hazardType: 'Unknown premises', description: 'Smell of burning from government office on high street — address in free text only.', premisesFree: '42 High Street, Guildford' } }
+  ];
+
+  const CONCERNS_UNASSIGNED = [
+    { id: 'sc-u-0148', ref: 'SC-2026-0148', severity: 'red', severityScore: 6, when: 'Yesterday', premises: 'HMP Bristol', summary: 'Cell door fire seal missing — wing C', patch: false, workflow: 'unassigned', assignee: null, intake: { reportRef: 'FIS-3295', reportDate: '09/06/2026', reporter: 'HMPPS regional lead', source: 'FIS escalation', hazardType: 'Fire compartmentation', description: 'Intumescent seal missing on cell door 14C. Reported during routine inspection.', premisesFree: '' } },
+    { id: 'sc-u-0144', ref: 'SC-2026-0144', severity: 'amber', severityScore: 1, when: '8 Jun', premises: 'DWP Canterbury', summary: 'Portable heater near combustibles', patch: false, workflow: 'unassigned', assignee: null, intake: { reportRef: 'FIS-3280', reportDate: '07/06/2026', reporter: 'Staff member', source: 'Duty Holder portal', hazardType: 'Ignition source', description: 'Oil-filled radiator within 30cm of paper store in back office.', premisesFree: '' } }
+  ];
+
+  const CONCERNS_COMPLETED = Array.from({ length: 18 }, function (_, i) {
+    return {
+      id: 'sc-c-' + (100 + i),
+      ref: 'SC-2025-' + String(1100 + i).padStart(4, '0'),
+      severity: i % 4 === 0 ? 'red' : (i % 2 === 0 ? 'amber' : 'green'),
+      when: (i % 10) + 1 + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May'][i % 5] + ' 2026',
+      premises: ['MoJ HQ London', 'Temple Quay House', 'DWP Canterbury', 'HMP Bristol'][i % 4],
+      summary: ['Closed after DH action', 'No further action', 'Audit spawned', 'Monitoring only'][i % 4],
+      patch: true,
+      workflow: 'closed',
+      assignee: 'Phil Gower'
+    };
+  });
+
+  let scPins = new Set();
+  let scOverrides = {};
+  let concernsActiveFilter = 'all';
+  let concernsActiveTab = 'all';
+  let completedConcernsShown = 20;
+  let activeConcernId = null;
+  let concernDetailLastId = null;
+  let concernSeverityEditing = false;
+  let concernsSortMode = 'recent';
+  let concernsDateFilter = { type: 'all' };
+  let concernActivityLog = { notes: [], times: [], interim: [], files: [] };
+  let concernLogType = 'time';
+  let concernActivityFeedFilter = 'all';
+
+  function loadScPins() {
+    try {
+      const raw = localStorage.getItem(SC_PIN_KEY);
+      if (raw) scPins = new Set(JSON.parse(raw));
+    } catch (e) { scPins = new Set(); }
+  }
+
+  function saveScPins() {
+    localStorage.setItem(SC_PIN_KEY, JSON.stringify(Array.from(scPins)));
+  }
+
+  function loadScOverrides() {
+    try {
+      const raw = localStorage.getItem(SC_OVERRIDE_KEY);
+      if (raw) scOverrides = JSON.parse(raw);
+    } catch (e) { scOverrides = {}; }
+  }
+
+  function saveScOverrides() {
+    localStorage.setItem(SC_OVERRIDE_KEY, JSON.stringify(scOverrides));
+  }
+
+  function mergeConcernRecord(base) {
+    return Object.assign({}, base, scOverrides[base.id] || {});
+  }
+
+  function getAllConcernRecords() {
+    const seen = new Set();
+    const out = [];
+    CONCERNS_INCOMING.concat(CONCERNS_MINE, CONCERNS_UNASSIGNED, CONCERNS_COMPLETED).forEach(function (c) {
+      if (seen.has(c.id)) return;
+      seen.add(c.id);
+      out.push(mergeConcernRecord(c));
+    });
+    return out;
+  }
+
+  function getConcernById(id) {
+    const base = getAllConcernRecords().find(function (c) { return c.id === id; });
+    return base || null;
+  }
+
+  function persistConcernPatch(id, patch) {
+    scOverrides[id] = Object.assign({}, scOverrides[id] || {}, patch);
+    saveScOverrides();
+  }
+
+  function concernNeedsPremises(c) {
+    return !c.premises && (c.workflow === 'awaiting_premises' || c.workflow === 'incoming');
+  }
+
+  function concernIsInProgress(c) {
+    return c.workflow !== 'closed' && SC_IN_PROGRESS_WF.has(c.workflow) && !!c.assignee;
+  }
+
+  function concernRowStatusLabel(item) {
+    if (item.workflow === 'closed') return '';
+    if (concernNeedsPremises(item)) return 'Premises needed';
+    if (!item.assignee) return 'Unassigned';
+    if (concernIsInProgress(item)) return 'In progress';
+    return '';
+  }
+
+  function concernMatchesFilter(item) {
+    if (typeof matchesDateRangeFilter === 'function' && typeof parseCpinWhenDays === 'function') {
+      if (!matchesDateRangeFilter(parseCpinWhenDays(item.when), concernsDateFilter)) return false;
+    }
+    if (concernsActiveFilter === 'all') return true;
+    if (concernsActiveFilter === 'patch') return item.patch;
+    if (concernsActiveFilter === 'premises-needed') return concernNeedsPremises(item);
+    if (concernsActiveFilter === 'in-progress') return concernIsInProgress(item);
+    if (concernsActiveFilter === 'gov-dept') return typeof isGovernmentDeptPremises === 'function' && isGovernmentDeptPremises(item.premises);
+    return item.severity === concernsActiveFilter;
+  }
+
+  function getConcernsForTab(tab) {
+    const all = getAllConcernRecords();
+    if (tab === 'closed') return all.filter(function (c) { return c.workflow === 'closed'; });
+    const open = all.filter(function (c) { return c.workflow !== 'closed'; });
+    if (tab === 'all') return open;
+    if (tab === 'unassigned') {
+      return open.filter(function (c) {
+        return !c.assignee || c.workflow === 'incoming' || c.workflow === 'unassigned' || c.workflow === 'awaiting_premises';
+      });
+    }
+    if (tab === 'mine') {
+      return open.filter(function (c) {
+        return c.assignee === SC_CURRENT_INSPECTOR && SC_IN_PROGRESS_WF.has(c.workflow);
+      });
+    }
+    return open;
+  }
+
+  function sortConcernItems(items, mode) {
+    const list = items.slice();
+    if (mode === 'severity') {
+      list.sort(function (a, b) {
+        const order = { red: 0, amber: 1, green: 2 };
+        return (order[a.severity] || 9) - (order[b.severity] || 9);
+      });
+    } else if (mode === 'name') {
+      list.sort(function (a, b) { return (a.premises || '').localeCompare(b.premises || ''); });
+    }
+    return list;
+  }
+
+  function buildConcernCard(item) {
+    const pinned = scPins.has(item.id);
+    const pillText = { red: 'Red', amber: 'Amber', green: 'Green' }[item.severity] || 'Green';
+    const statusLabel = concernRowStatusLabel(item);
+    const premisesHtml = item.premises
+      ? '<div class="premises">' + escHtml(item.premises) + '</div>'
+      : '<div class="premises" style="color:var(--ink-3);font-weight:500;">No premises linked</div>';
+    const assigneeHtml = item.assignee ? '<div class="cpin-assignee">' + escHtml(item.assignee) + '</div>' : '';
+    let statusClass = ' is-unassigned';
+    if (statusLabel === 'Premises needed') statusClass = ' is-premises';
+    else if (statusLabel === 'In progress') statusClass = ' is-progress';
+    const statusHtml = statusLabel
+      ? '<div class="cpin-status-label' + statusClass + '">' + escHtml(statusLabel) + '</div>'
+      : '<div class="cpin-workflow">Closed</div>';
+
+    return '<div class="cpin-card ' + item.severity + (pinned ? ' is-pinned' : '') + '" role="button" tabindex="0" onclick="openConcern(\'' + item.id + '\', event)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){openConcern(\'' + item.id + '\', event);}">' +
+      '<div class="cpin-severity"><span class="pill ' + item.severity + '">' + pillText + '</span></div>' +
+      '<div class="cpin-body">' +
+        '<div style="font-size:12px;color:var(--ink-3);">' + escHtml(item.ref) + '  ·  ' + escHtml(item.when) + '</div>' +
+        premisesHtml +
+        '<div class="summary">' + escHtml(item.summary) + '</div>' +
+        statusHtml +
+      '</div>' +
+      '<div class="cpin-meta">' + assigneeHtml +
+        '<button type="button" class="cpin-pin' + (pinned ? ' pinned' : '') + '" title="' + (pinned ? 'Unpin' : 'Pin') + '" onclick="toggleConcernPin(\'' + item.id + '\', event)">' + (pinned ? '★' : '☆') + '</button>' +
+      '</div></div>';
+  }
+
+  function renderConcernCardsHtml(items) {
+    const pinned = sortConcernItems(items.filter(function (i) { return scPins.has(i.id); }), concernsSortMode);
+    const rest = sortConcernItems(items.filter(function (i) { return !scPins.has(i.id); }), concernsSortMode);
+    let html = '';
+    if (pinned.length) {
+      html += '<section class="cpins-pinned-section" aria-label="Pinned safety concerns">' +
+        '<h3 class="cpins-section-label"><span class="star" aria-hidden="true">★</span> Pinned</h3>' +
+        '<div class="cpins-card-stack">' + pinned.map(buildConcernCard).join('') + '</div></section>';
+    }
+    if (rest.length) {
+      html += '<div class="cpins-card-stack' + (pinned.length ? ' cpins-card-stack--rest' : '') + '">' + rest.map(buildConcernCard).join('') + '</div>';
+    }
+    return html;
+  }
+
+  function renderConcernPanel(panelId, items, emptyMsg) {
+    const el = document.getElementById(panelId);
+    if (!el) return;
+    const filtered = items.filter(concernMatchesFilter);
+    const countEl = document.getElementById('concern-results-count');
+    if (countEl && panelId === 'concerns-panel-list') countEl.textContent = String(filtered.length);
+    if (!filtered.length) {
+      el.innerHTML = '<div class="audit-feed-empty" style="margin:24px 0;">' + escHtml(emptyMsg) + '</div>';
+      return;
+    }
+    el.innerHTML = renderConcernCardsHtml(filtered);
+  }
+
+  function renderConcernsLists() {
+    const emptyMsgs = {
+      all: 'No open safety concerns match this filter.',
+      unassigned: 'No unassigned safety concerns.',
+      mine: 'No safety concerns in your queue.',
+      closed: 'No closed safety concerns match this filter.'
+    };
+    const closedPanel = document.getElementById('concerns-panel-closed');
+    const listPanel = document.getElementById('concerns-panel-list');
+    if (concernsActiveTab === 'closed') {
+      if (listPanel) listPanel.hidden = true;
+      if (closedPanel) closedPanel.hidden = false;
+      const el = document.getElementById('concerns-completed-list');
+      const filtered = CONCERNS_COMPLETED.map(mergeConcernRecord).filter(concernMatchesFilter);
+      const slice = filtered.slice(0, completedConcernsShown);
+      if (el) {
+        el.innerHTML = slice.length ? renderConcernCardsHtml(slice) : '<div class="audit-feed-empty" style="margin:24px 0;">No closed safety concerns.</div>';
+      }
+      const countEl = document.getElementById('concern-results-count');
+      if (countEl) countEl.textContent = String(filtered.length);
+    } else {
+      if (listPanel) listPanel.hidden = false;
+      if (closedPanel) closedPanel.hidden = true;
+      renderConcernPanel('concerns-panel-list', getConcernsForTab(concernsActiveTab), emptyMsgs[concernsActiveTab] || emptyMsgs.all);
+    }
+    document.querySelectorAll('[data-concern-view-count]').forEach(function (el) {
+      const tab = el.dataset.concernViewCount;
+      const n = getConcernsForTab(tab).filter(concernMatchesFilter).length;
+      el.textContent = n ? String(n) : '';
+    });
+  }
+
+  function setConcernFilter(filter) {
+    if (concernsActiveFilter === filter && filter !== 'all') concernsActiveFilter = 'all';
+    else concernsActiveFilter = filter;
+    document.querySelectorAll('.concern-filters .chip').forEach(function (chip) {
+      chip.classList.toggle('on', chip.dataset.concernFilter === concernsActiveFilter);
+    });
+    renderConcernsLists();
+  }
+
+  const CONCERN_VIEW_LABELS = { all: 'All', unassigned: 'Unassigned', mine: 'My concerns', closed: 'Closed' };
+
+  function closeConcernViewMenu() {
+    const menu = document.getElementById('concern-view-menu');
+    const btn = document.getElementById('concern-view-toggle');
+    if (menu) menu.hidden = true;
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function layoutConcernViews() {
+    const rail = document.getElementById('concern-views-rail');
+    const sidebar = document.getElementById('concern-views-sidebar');
+    const menu = document.getElementById('concern-view-menu');
+    if (!rail || !sidebar || !menu) return;
+    if (typeof isMobileNavLayout === 'function' && isMobileNavLayout()) {
+      if (rail.parentElement !== menu) menu.appendChild(rail);
+      sidebar.hidden = true;
+    } else {
+      if (rail.parentElement !== sidebar) sidebar.appendChild(rail);
+      sidebar.hidden = false;
+      closeConcernViewMenu();
+    }
+  }
+
+  function toggleConcernViewMenu() {
+    layoutConcernViews();
+    const menu = document.getElementById('concern-view-menu');
+    const btn = document.getElementById('concern-view-toggle');
+    if (!menu || !btn) return;
+    const open = menu.hidden;
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  }
+
+  function switchConcernsTab(tab) {
+    concernsActiveTab = tab || 'all';
+    document.querySelectorAll('[data-concern-view]').forEach(function (el) {
+      el.classList.toggle('active', el.dataset.concernView === tab);
+    });
+    const sel = document.getElementById('concern-view-selected');
+    if (sel) sel.textContent = CONCERN_VIEW_LABELS[tab] || tab;
+    closeConcernViewMenu();
+    renderConcernsLists();
+  }
+
+  function toggleConcernPin(id, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    if (scPins.has(id)) scPins.delete(id); else scPins.add(id);
+    saveScPins();
+    renderConcernsLists();
+  }
+
+  function openConcern(id, e) {
+    if (e) e.stopPropagation();
+    show('concern/' + id);
+  }
+
+  function initConcernsPage() {
+    loadScPins();
+    loadScOverrides();
+    if (!document.getElementById('concerns')?.dataset.viewsBound) {
+      const rail = document.getElementById('concern-views-rail');
+      if (rail) {
+        rail.addEventListener('click', function (e) {
+          const item = e.target.closest('.view-item[data-concern-view]');
+          if (item) switchConcernsTab(item.dataset.concernView);
+        });
+      }
+      document.querySelectorAll('.concern-filters .chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          if (chip.dataset.concernFilter) setConcernFilter(chip.dataset.concernFilter);
+        });
+      });
+      document.getElementById('concerns').dataset.viewsBound = '1';
+    }
+    layoutConcernViews();
+    switchConcernsTab(concernsActiveTab);
+    setConcernFilter(concernsActiveFilter);
+  }
+
+  /* ---- Detail workflow ---- */
+
+  function concernIsDelegatedAway(c) {
+    return !!c && !!c.assignee && c.assignee !== SC_CURRENT_INSPECTOR;
+  }
+
+  function concernNeedsDeskEval(c) {
+    return c && c.furtherAction === 'yes';
+  }
+
+  function concernShowsTriage(c) {
+    return !!(c && c.premises && c.assignee && c.workflow !== 'closed');
+  }
+
+  function getConcernDutyHolderRecords(c) {
+    return (c && c.dutyHolders) ? c.dutyHolders.filter(function (d) { return d.status !== 'rejected'; }) : [];
+  }
+
+  function concernHasAcceptedDutyHolders(c) {
+    return getConcernDutyHolderRecords(c).some(function (d) { return d.status === 'accepted'; });
+  }
+
+  function concernShowsDutyHolders(c) {
+    return c && c.furtherAction === 'yes';
+  }
+
+  function concernShowsRemoteEval(c) {
+    if (!c || c.furtherAction !== 'yes' || c.workflow === 'closed') return false;
+    if (!concernNeedsDeskEval(c)) return false;
+    if (concernShowsDutyHolders(c) && !concernHasAcceptedDutyHolders(c)) return false;
+    return true;
+  }
+
+  function getConcernRemoteEval(c) {
+    return (c && c.remoteEval) ? c.remoteEval : {};
+  }
+
+  function concernStage4Ready(c) {
+    if (!c || !c.deskOutcome) return false;
+    if (c.deskOutcome === 'no_action' || c.deskOutcome === 'audit') return true;
+    if (c.deskOutcome === 'remote_eval') {
+      const o = getConcernRemoteEval(c);
+      return !!(o.siteVisitDone && (c.auditRequired === 'yes' || c.auditRequired === 'no'));
+    }
+    return false;
+  }
+
+  function concernCanClose(c) {
+    if (!c || c.workflow === 'closed') return false;
+    if (!c.premises || !c.assignee) return false;
+    if (!c.furtherAction) return false;
+    if (c.furtherAction === 'no') return true;
+    if (!concernNeedsDeskEval(c)) return true;
+    if (concernShowsDutyHolders(c) && !concernHasAcceptedDutyHolders(c)) return false;
+    return concernStage4Ready(c);
+  }
+
+  function concernWorkflowStage(c) {
+    if (!c) return 1;
+    if (c.workflow === 'closed') return 5;
+    if (c.workflow === 'desk_eval') return 4;
+    if (c.furtherAction || c.workflow === 'triage') return 3;
+    if (c.assignee) return 2;
+    return 1;
+  }
+
+  function renderConcernRagBanner(c) {
+    const banner = document.getElementById('concern-rag-strip');
+    const label = document.getElementById('concern-rag-strip-label');
+    const detail = document.getElementById('concern-rag-strip-detail');
+    if (!banner || !c) return;
+    const sev = c.severity || 'green';
+    banner.className = 'cpin-rag-strip ' + sev;
+    const screen = document.getElementById('concern');
+    if (screen) screen.dataset.severity = sev;
+    const labels = { red: 'RED CONCERN', amber: 'AMBER CONCERN', green: 'GREEN CONCERN' };
+    if (label) label.textContent = labels[sev] || 'CONCERN';
+    if (detail) detail.textContent = SC_SEVERITY_LONG[sev] || '';
+  }
+
+  function renderConcernIntakeGrid(c) {
+    const grid = document.getElementById('concern-intake-grid');
+    const section = document.getElementById('concern-intake-section');
+    if (!grid || !c || !c.intake) { if (section) section.hidden = true; return; }
+    if (section) section.hidden = false;
+    const i = c.intake;
+    const rows = [
+      ['Report reference', i.reportRef],
+      ['Date reported', i.reportDate],
+      ['Reporter', i.reporter],
+      ['Source', i.source || '—'],
+      ['Hazard type', i.hazardType],
+      ['Premises', c.premises || i.premisesFree || '—']
+    ];
+    grid.innerHTML = rows.map(function (row) {
+      return '<div><div class="k">' + escHtml(row[0]) + '</div><div class="v">' + escHtml(row[1] || '—') + '</div></div>';
+    }).join('');
+    const desc = document.getElementById('concern-hazard-desc-value');
+    if (desc) desc.textContent = i.description || '—';
+  }
+
+  function renderConcernPremisesPanel(c) {
+    const valueEl = document.getElementById('concern-premises-value');
+    const changeBtn = document.getElementById('concern-premises-change-btn');
+    const status = document.getElementById('concern-premises-status');
+    if (valueEl) {
+      if (c.premises) {
+        valueEl.className = 'cpin-key-value';
+        valueEl.textContent = c.premises;
+      } else {
+        valueEl.className = 'cpin-key-value is-empty';
+        valueEl.textContent = 'No premises linked';
+      }
+    }
+    if (changeBtn) changeBtn.textContent = c.premises ? 'Change' : 'Link';
+    if (status) status.textContent = c.premises ? 'Attributed to premises record.' : 'Link a premises to continue.';
+  }
+
+  function renderConcernAssigneeHint(c) {
+    const el = document.getElementById('concern-assignee-hint');
+    if (!el) return;
+    if (concernIsDelegatedAway(c)) {
+      el.textContent = 'Assigned to a colleague — not in your queue.';
+    } else if (c.assignee) {
+      el.textContent = 'Inspector responsible for this safety concern.';
+    } else {
+      el.textContent = 'Assign to a fire safety inspector.';
+    }
+  }
+
+  function renderConcernKeyFieldHighlights(c) {
+    const premisesEl = document.getElementById('concern-field-premises');
+    const assigneeEl = document.getElementById('concern-field-assignee');
+    if (premisesEl) premisesEl.classList.remove('is-next-action');
+    if (assigneeEl) assigneeEl.classList.remove('is-next-action');
+    if (!c || c.workflow === 'closed' || concernIsDelegatedAway(c)) return;
+    if (concernNeedsPremises(c)) {
+      if (premisesEl) premisesEl.classList.add('is-next-action');
+    } else if (!c.assignee) {
+      if (assigneeEl) assigneeEl.classList.add('is-next-action');
+    }
+  }
+
+  function renderConcernSeverityField(c) {
+    const sel = document.getElementById('concern-severity-select');
+    const valueEl = document.getElementById('concern-severity-value');
+    const sev = c.severity || 'green';
+    if (sel) sel.value = sev;
+    if (valueEl) valueEl.textContent = SC_SEVERITY_LONG[sev] || sev;
+    const edit = document.getElementById('concern-severity-edit');
+    const display = document.getElementById('concern-severity-display');
+    if (edit) edit.hidden = !concernSeverityEditing;
+    if (display) display.hidden = concernSeverityEditing;
+  }
+
+  function renderConcernDutyHolders(c) {
+    const list = document.getElementById('concern-dh-list');
+    if (!list || !concernShowsDutyHolders(c)) return;
+    const holders = getConcernDutyHolderRecords(c);
+    if (!holders.length) {
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;">Add Duty Holders for this premises.</p>';
+      return;
+    }
+    list.innerHTML = holders.map(function (dh) {
+      const pill = dh.status === 'suggested' ? '<span class="pill amber">Suggested</span>' : '<span class="pill blue">Approved</span>';
+      const actions = dh.status === 'suggested'
+        ? '<div class="holder-actions"><button class="btn primary" type="button" onclick="acceptConcernDutyHolder(\'' + dh.id + '\')">Approve</button><button class="btn" type="button" onclick="removeConcernDutyHolder(\'' + dh.id + '\')">Reject</button></div>'
+        : '<div class="holder-actions"><span class="remove" onclick="removeConcernDutyHolder(\'' + dh.id + '\')">×</span></div>';
+      return '<div class="holder-card' + (dh.status === 'suggested' ? ' is-suggested' : '') + '">' +
+        '<div class="avatar-sm">' + escHtml(dh.initials || 'DH') + '</div>' +
+        '<div><div class="name">' + escHtml(dh.name) + '</div><div class="role">' + escHtml(dh.role || '') + '</div></div>' +
+        pill + actions + '</div>';
+    }).join('');
+  }
+
+  function ensureConcernDutyHolderSuggestions(c) {
+    const fromMap = SC_DH_BY_PREMISES[c.premises] || [];
+    const holders = getConcernDutyHolderRecords(c).slice();
+    const onList = new Set(holders.map(function (d) { return d.name; }));
+    let changed = false;
+    fromMap.forEach(function (name) {
+      if (onList.has(name)) return;
+      holders.push({
+        id: 'dh-' + name.replace(/\W+/g, '-').toLowerCase(),
+        key: typeof SETUP_DH_KEY_BY_NAME !== 'undefined' ? SETUP_DH_KEY_BY_NAME[name] : null,
+        name: name,
+        role: 'Duty Holder',
+        initials: typeof setupInitials === 'function' ? setupInitials(name) : 'DH',
+        fromPremises: true,
+        status: 'suggested'
+      });
+      onList.add(name);
+      changed = true;
+    });
+    if (changed) persistConcernPatch(c.id, { dutyHolders: holders });
+  }
+
+  function renderConcernWorkflowSections(c) {
+    const triage = document.getElementById('concern-section-triage');
+    const dh = document.getElementById('concern-section-dh');
+    const remote = document.getElementById('concern-section-remote');
+    const outcome = document.getElementById('concern-section-outcome');
+    const remoteVisit = document.getElementById('concern-section-remote-visit');
+    const closeSec = document.getElementById('concern-section-close');
+    const canWork = !concernIsDelegatedAway(c);
+    const showTriage = canWork && concernShowsTriage(c);
+    const showDh = canWork && showTriage && concernShowsDutyHolders(c);
+    const showRemote = canWork && concernShowsRemoteEval(c);
+    const showOutcome = showRemote;
+    const showRemoteVisit = showRemote && c.deskOutcome === 'remote_eval';
+    const showClose = c.workflow === 'closed' || (canWork && concernCanClose(c)) || c.furtherAction === 'no';
+
+    if (triage) triage.hidden = !showTriage;
+    if (dh) {
+      dh.hidden = !showDh;
+      if (showDh) {
+        ensureConcernDutyHolderSuggestions(c);
+        renderConcernDutyHolders(getConcernById(c.id) || c);
+      }
+    }
+    if (remote) remote.hidden = !showRemote;
+    if (outcome) outcome.hidden = !showOutcome;
+    if (remoteVisit) remoteVisit.hidden = !showRemoteVisit;
+    if (closeSec) closeSec.hidden = !showClose && c.workflow !== 'closed';
+
+    const stageHint = document.getElementById('concern-detail-stage-hint');
+    if (stageHint && c.workflow !== 'closed') {
+      const stages = ['', 'Submission and intake', 'Assignment', 'Triage and decision', 'Examine the hazard', 'Close'];
+      stageHint.textContent = 'Stage ' + concernWorkflowStage(c) + ' of 5  ·  ' + stages[concernWorkflowStage(c)];
+    }
+
+    renderConcernCloseSection(c);
+  }
+
+  function renderConcernCloseSection(c) {
+    const open = document.getElementById('concern-close-open');
+    const done = document.getElementById('concern-close-done');
+    const btn = document.getElementById('concern-close-btn');
+    const blocked = document.getElementById('concern-close-blocked');
+    if (c.workflow === 'closed') {
+      if (open) open.hidden = true;
+      if (done) {
+        done.hidden = false;
+        const txt = document.getElementById('concern-close-done-text');
+        if (txt) txt.textContent = c.closeReason || 'Closed.';
+      }
+    } else {
+      if (open) open.hidden = false;
+      if (done) done.hidden = true;
+      if (btn) btn.disabled = !concernCanClose(c);
+      if (blocked) {
+        blocked.hidden = concernCanClose(c);
+        if (!concernCanClose(c)) blocked.textContent = 'Complete premises, assignment, triage and evaluation steps first.';
+      }
+    }
+  }
+
+  function initConcernActivity() {
+    const c = getConcernById(activeConcernId);
+    if (c && c.activityLog) concernActivityLog = JSON.parse(JSON.stringify(c.activityLog));
+    else if (!concernActivityLog.notes.length) {
+      concernActivityLog = {
+        notes: [{ id: 'sn1', text: 'Safety concern received via FIS intake.', at: 'Today', ts: Date.now() }],
+        times: [], interim: [], files: []
+      };
+    }
+    renderConcernActivity();
+  }
+
+  function renderConcernActivity() {
+    const feed = document.getElementById('concern-activity-feed-list');
+    const notesEl = document.getElementById('concern-count-notes');
+    const timeEl = document.getElementById('concern-count-time');
+    const noteCount = concernActivityLog.notes.length + concernActivityLog.interim.length;
+    const totalMin = concernActivityLog.times.reduce(function (s, t) { return s + t.minutes; }, 0);
+    const notesLabel = noteCount + (noteCount === 1 ? ' note' : ' notes');
+    const timeLabel = (typeof formatAuditMinutes === 'function' ? formatAuditMinutes(totalMin) : totalMin + 'm') + ' logged';
+    if (notesEl) notesEl.textContent = notesLabel;
+    if (timeEl) timeEl.textContent = timeLabel;
+    document.querySelectorAll('#concern-recent-on-concern .audit-recent-count-notes, #concern-recent-count-notes').forEach(function (el) { el.textContent = notesLabel; });
+    document.querySelectorAll('#concern-recent-on-concern .audit-recent-count-time, #concern-recent-count-time').forEach(function (el) { el.textContent = timeLabel; });
+    if (!feed) return;
+    const items = [];
+    concernActivityLog.times.forEach(function (t) { items.push({ ts: t.ts || 0, at: t.at, type: 'time', activity: t.activity, minutes: t.minutes }); });
+    concernActivityLog.notes.forEach(function (n) { items.push({ ts: n.ts || 0, at: n.at, type: 'note', text: n.text }); });
+    concernActivityLog.interim.forEach(function (n) { items.push({ ts: n.ts || 0, at: n.at, type: 'interim', title: n.title, text: n.text }); });
+    concernActivityLog.files.forEach(function (f) { items.push({ ts: f.ts || 0, at: f.at, type: 'file', name: f.name, description: f.description }); });
+    items.sort(function (a, b) { return b.ts - a.ts; });
+    const filtered = concernActivityFeedFilter === 'all' ? items : items.filter(function (i) { return i.type === concernActivityFeedFilter; });
+    if (!filtered.length) {
+      feed.innerHTML = '<div class="audit-feed-empty">No activity logged yet on this safety concern.</div>';
+      return;
+    }
+    feed.innerHTML = filtered.map(function (item) {
+      let pillClass = 'grey', pillLabel = 'Note', textHtml = escHtml(item.text || '');
+      if (item.type === 'time') { pillClass = 'blue'; pillLabel = 'Time'; textHtml = escHtml(item.activity) + ' · <strong>' + escHtml(String(item.minutes)) + 'm</strong>'; }
+      else if (item.type === 'interim') { pillClass = 'amber'; pillLabel = 'Interim'; textHtml = '<strong>' + escHtml(item.title) + '</strong>'; }
+      else if (item.type === 'file') { pillClass = 'purple'; pillLabel = 'File'; textHtml = '<strong>' + escHtml(item.name) + '</strong>'; }
+      return '<div class="audit-feed-item"><div class="audit-feed-meta"><span class="audit-feed-when">' + escHtml(item.at) + '</span></div>' +
+        '<div class="audit-feed-body"><span class="pill ' + pillClass + '">' + pillLabel + '</span><span class="audit-feed-text">' + textHtml + '</span></div></div>';
+    }).join('');
+  }
+
+  function initConcernDetailPage() {
+    loadScOverrides();
+    const c = getConcernById(activeConcernId);
+    if (!c) { show('concerns'); return; }
+
+    const title = document.getElementById('concern-detail-title');
+    const meta = document.getElementById('concern-detail-meta');
+    if (title) title.textContent = c.ref;
+    if (meta) {
+      meta.innerHTML = '<span class="pill ' + c.severity + '">' + ({ red: 'Red', amber: 'Amber', green: 'Green' }[c.severity]) + '</span> ' +
+        escHtml(SC_WORKFLOW_LABELS[c.workflow] || c.workflow) + '  ·  ' + escHtml(c.when) +
+        (c.assignee ? '  ·  ' + escHtml(c.assignee) : '');
+    }
+
+    renderConcernRagBanner(c);
+    renderConcernIntakeGrid(c);
+    renderConcernPremisesPanel(c);
+    renderConcernSeverityField(c);
+    renderConcernAssigneeHint(c);
+    renderConcernKeyFieldHighlights(c);
+
+    const assignee = document.getElementById('concern-assignee');
+    const review = document.getElementById('concern-review-notes');
+    const desk = document.getElementById('concern-desk-notes');
+    if (assignee) assignee.value = c.assignee || '';
+    if (review) review.value = c.reviewNotes || '';
+    if (desk) desk.value = c.deskNotes || '';
+
+    document.querySelectorAll('input[name="concern-further-action"]').forEach(function (inp) {
+      inp.checked = c.furtherAction === inp.value;
+    });
+    document.querySelectorAll('input[name="concern-desk-outcome"]').forEach(function (inp) {
+      inp.checked = c.deskOutcome === inp.value;
+    });
+    document.querySelectorAll('input[name="concern-remote-audit"]').forEach(function (inp) {
+      inp.checked = c.auditRequired === inp.value;
+    });
+
+    const remote = getConcernRemoteEval(c);
+    const remoteDate = document.getElementById('concern-remote-date');
+    const remoteTime = document.getElementById('concern-remote-time');
+    const remoteFindings = document.getElementById('concern-remote-findings');
+    const remoteDone = document.getElementById('concern-remote-visit-done');
+    if (remoteDate) remoteDate.value = remote.appointmentDate || '';
+    if (remoteTime) remoteTime.value = remote.appointmentTime || '';
+    if (remoteFindings) remoteFindings.value = remote.siteVisitNotes || '';
+    if (remoteDone) remoteDone.checked = !!remote.siteVisitDone;
+
+    if (concernDetailLastId !== activeConcernId) concernSeverityEditing = false;
+    concernDetailLastId = activeConcernId;
+    initConcernActivity();
+    renderConcernWorkflowSections(c);
+    setConcernActivityBarVisible(c.workflow !== 'closed' && !concernIsDelegatedAway(c));
+  }
+
+  function refreshConcernDetailPage() {
+    initConcernDetailPage();
+  }
+
+  function saveConcernAssignment() {
+    const c = getConcernById(activeConcernId);
+    if (!c) return;
+    const assignee = document.getElementById('concern-assignee')?.value || '';
+    let workflow = c.workflow;
+    if (assignee && (workflow === 'unassigned' || workflow === 'incoming')) workflow = 'assigned';
+    if (assignee && workflow === 'assigned') workflow = 'triage';
+    if (!assignee) workflow = c.premises ? 'unassigned' : c.workflow;
+    persistConcernPatch(activeConcernId, { assignee: assignee || null, workflow: workflow });
+    refreshConcernDetailPage();
+    renderConcernsLists();
+  }
+
+  function saveConcernPremises(name) {
+    const c = getConcernById(activeConcernId);
+    if (!c) return;
+    const premises = name || null;
+    let workflow = c.workflow;
+    if (premises && workflow === 'awaiting_premises') workflow = 'unassigned';
+    if (!premises) workflow = 'awaiting_premises';
+    persistConcernPatch(activeConcernId, { premises: premises, workflow: workflow, dutyHolders: [] });
+    refreshConcernDetailPage();
+    renderConcernsLists();
+  }
+
+  function openConcernPremisesEdit() {
+    if (typeof setupLookupTarget !== 'undefined') setupLookupTarget = 'concern';
+    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('premises');
+  }
+
+  function saveConcernSeverity() {
+    const sev = document.getElementById('concern-severity-select')?.value;
+    if (!sev) return;
+    persistConcernPatch(activeConcernId, { severity: sev });
+    concernSeverityEditing = false;
+    refreshConcernDetailPage();
+  }
+
+  function openConcernSeverityEdit() { concernSeverityEditing = true; renderConcernSeverityField(getConcernById(activeConcernId)); }
+  function cancelConcernSeverityEdit() { concernSeverityEditing = false; renderConcernSeverityField(getConcernById(activeConcernId)); }
+
+  function saveConcernFurtherAction() {
+    const picked = document.querySelector('input[name="concern-further-action"]:checked');
+    if (!picked) return;
+    const val = picked.value;
+    let workflow = 'triage';
+    if (val === 'yes') workflow = 'desk_eval';
+    persistConcernPatch(activeConcernId, { furtherAction: val, workflow: workflow });
+    refreshConcernDetailPage();
+  }
+
+  function saveConcernReviewNotes() {
+    const text = document.getElementById('concern-review-notes')?.value || '';
+    persistConcernPatch(activeConcernId, { reviewNotes: text });
+  }
+
+  function saveConcernDeskNotes() {
+    const text = document.getElementById('concern-desk-notes')?.value || '';
+    persistConcernPatch(activeConcernId, { deskNotes: text, workflow: 'desk_eval' });
+  }
+
+  function saveConcernDeskOutcome() {
+    const picked = document.querySelector('input[name="concern-desk-outcome"]:checked');
+    if (!picked) return;
+    persistConcernPatch(activeConcernId, { deskOutcome: picked.value, workflow: 'desk_eval' });
+    refreshConcernDetailPage();
+  }
+
+  function saveConcernRemoteEval() {
+    const c = getConcernById(activeConcernId);
+    if (!c) return;
+    const o = Object.assign({}, getConcernRemoteEval(c), {
+      appointmentDate: document.getElementById('concern-remote-date')?.value || '',
+      appointmentTime: document.getElementById('concern-remote-time')?.value || '',
+      siteVisitNotes: document.getElementById('concern-remote-findings')?.value || '',
+      siteVisitDone: !!document.getElementById('concern-remote-visit-done')?.checked
+    });
+    persistConcernPatch(activeConcernId, { remoteEval: o });
+    refreshConcernDetailPage();
+  }
+
+  function saveConcernRemoteAuditDecision() {
+    const picked = document.querySelector('input[name="concern-remote-audit"]:checked');
+    if (!picked) return;
+    persistConcernPatch(activeConcernId, { auditRequired: picked.value });
+    refreshConcernDetailPage();
+  }
+
+  function closeConcernOneClick() {
+    const c = getConcernById(activeConcernId);
+    if (!c || !concernCanClose(c)) {
+      alert('Complete required steps before closing.');
+      return;
+    }
+    const reason = document.getElementById('concern-close-reason')?.value?.trim();
+    if (!reason) { alert('Enter a reason for closing.'); return; }
+    const patch = { workflow: 'closed', closeReason: reason, closedAt: new Date().toISOString(), activityLog: concernActivityLog };
+    if (c.deskOutcome === 'audit' || c.auditRequired === 'yes') {
+      patch.spawnedAuditId = 'A-2026-' + String(3300 + Math.floor(Math.random() * 100));
+      patch.auditRequired = 'yes';
+    }
+    persistConcernPatch(activeConcernId, patch);
+    renderConcernsLists();
+    refreshConcernDetailPage();
+  }
+
+  function acceptConcernDutyHolder(id) {
+    const c = getConcernById(activeConcernId);
+    if (!c) return;
+    const holders = getConcernDutyHolderRecords(c).map(function (d) {
+      if (d.id === id) return Object.assign({}, d, { status: 'accepted' });
+      return d;
+    });
+    persistConcernPatch(activeConcernId, { dutyHolders: holders });
+    refreshConcernDetailPage();
+  }
+
+  function removeConcernDutyHolder(id) {
+    const c = getConcernById(activeConcernId);
+    if (!c) return;
+    persistConcernPatch(activeConcernId, { dutyHolders: getConcernDutyHolderRecords(c).filter(function (d) { return d.id !== id; }) });
+    refreshConcernDetailPage();
+  }
+
+  function addConcernDutyHolder() {
+    if (typeof setupLookupTarget !== 'undefined') setupLookupTarget = 'concern';
+    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('dutyHolder');
+  }
+
+  function addConcernResponsiblePerson() {
+    if (typeof setupLookupTarget !== 'undefined') setupLookupTarget = 'concern';
+    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('responsiblePerson');
+  }
+
+  function setConcernActivityBarVisible(visible) {
+    document.body.classList.toggle('concern-activity-bar', visible);
+    if (!visible) document.body.classList.remove('concern-float-panel-open');
+  }
+
+  function openConcernFloatPanel(mode) {
+    const panel = document.getElementById('concern-float-panel');
+    if (!panel) return;
+    setConcernActivityBarVisible(true);
+    setConcernLogType(mode || concernLogType || 'time');
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('concern-float-panel-open');
+  }
+
+  function closeConcernFloatPanel() {
+    const panel = document.getElementById('concern-float-panel');
+    if (panel) { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); }
+    document.body.classList.remove('concern-float-panel-open');
+  }
+
+  function submitConcernLog() {
+    const stamp = typeof cpinLogTimestamp === 'function' ? cpinLogTimestamp() : { at: 'Today', ts: Date.now() };
+    if (concernLogType === 'note') {
+      const text = document.getElementById('concern-note-text')?.value?.trim();
+      if (!text) { alert('Enter a note.'); return; }
+      concernActivityLog.notes.unshift({ id: 'sn' + stamp.ts, text: text, at: stamp.at, ts: stamp.ts });
+      document.getElementById('concern-note-text').value = '';
+    } else if (concernLogType === 'time') {
+      concernActivityLog.times.unshift({
+        id: 'st' + stamp.ts,
+        activity: document.getElementById('concern-time-activity')?.value || 'Desk-based investigation',
+        minutes: parseInt(document.getElementById('concern-time-duration')?.value || '30', 10),
+        at: stamp.at, ts: stamp.ts
+      });
+    }
+    persistConcernPatch(activeConcernId, { activityLog: concernActivityLog });
+    renderConcernActivity();
+    closeConcernFloatPanel();
+  }
+
+  function setConcernLogType(type) {
+    concernLogType = type;
+    ['time', 'note', 'interim', 'file'].forEach(function (t) {
+      const el = document.getElementById('concern-log-fields-' + t);
+      if (el) el.hidden = t !== type;
+    });
+    document.querySelectorAll('#concern-log-type-row .chip').forEach(function (chip) {
+      chip.classList.toggle('active', chip.dataset.concernLogType === type);
+    });
+  }
+
+  /* Expose globals */
+  window.initConcernsPage = initConcernsPage;
+  window.layoutConcernViews = layoutConcernViews;
+  window.toggleConcernViewMenu = toggleConcernViewMenu;
+  window.initConcernDetailPage = initConcernDetailPage;
+  window.openConcern = openConcern;
+  window.toggleConcernPin = toggleConcernPin;
+  window.saveConcernAssignment = saveConcernAssignment;
+  window.saveConcernPremises = saveConcernPremises;
+  window.openConcernPremisesEdit = openConcernPremisesEdit;
+  window.saveConcernSeverity = saveConcernSeverity;
+  window.openConcernSeverityEdit = openConcernSeverityEdit;
+  window.cancelConcernSeverityEdit = cancelConcernSeverityEdit;
+  window.saveConcernFurtherAction = saveConcernFurtherAction;
+  window.saveConcernReviewNotes = saveConcernReviewNotes;
+  window.saveConcernDeskNotes = saveConcernDeskNotes;
+  window.saveConcernDeskOutcome = saveConcernDeskOutcome;
+  window.saveConcernRemoteEval = saveConcernRemoteEval;
+  window.saveConcernRemoteAuditDecision = saveConcernRemoteAuditDecision;
+  window.closeConcernOneClick = closeConcernOneClick;
+  window.acceptConcernDutyHolder = acceptConcernDutyHolder;
+  window.removeConcernDutyHolder = removeConcernDutyHolder;
+  window.addConcernDutyHolder = addConcernDutyHolder;
+  window.addConcernResponsiblePerson = addConcernResponsiblePerson;
+  window.setConcernActivityBarVisible = setConcernActivityBarVisible;
+  window.openConcernFloatPanel = openConcernFloatPanel;
+  window.closeConcernFloatPanel = closeConcernFloatPanel;
+  window.submitConcernLog = submitConcernLog;
+  window.setConcernLogType = setConcernLogType;
+  window.getConcernById = getConcernById;
+  window.persistConcernPatch = persistConcernPatch;
+  window.activeConcernId = function () { return activeConcernId; };
+  window.setActiveConcernId = function (id) { activeConcernId = id; };
+})();

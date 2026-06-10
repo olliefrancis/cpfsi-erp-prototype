@@ -113,19 +113,27 @@
 
     <ul>
       <li>
-        <a class="prototype-card prototype-card--current" href="/v1/">
-          <span class="prototype-version">V1</span>
-          <span class="prototype-audience">Current version</span>
-          <span class="prototype-purpose">For review and feedback.</span>
-          <span class="prototype-updated" data-build="v1"></span>
+        <a class="prototype-card prototype-card--current" href="/v3/">
+          <span class="prototype-version">V3</span>
+          <span class="prototype-audience">Current version — active workstream.</span>
+          <span class="prototype-purpose">CPINs, audits, premises scoring and responsive layouts.</span>
+          <span class="prototype-updated" data-build="v3"></span>
         </a>
       </li>
       <li>
         <a class="prototype-card" href="/v2/">
           <span class="prototype-version">V2</span>
-          <span class="prototype-audience">Next version with CPINs and responsive layouts.</span>
-          <span class="prototype-purpose">For review and feedback</span>
+          <span class="prototype-audience">Previous version.</span>
+          <span class="prototype-purpose">Archived snapshot for comparison.</span>
           <span class="prototype-updated" data-build="v2"></span>
+        </a>
+      </li>
+      <li>
+        <a class="prototype-card" href="/v1/">
+          <span class="prototype-version">V1</span>
+          <span class="prototype-audience">Earlier version.</span>
+          <span class="prototype-purpose">Archived snapshot for comparison.</span>
+          <span class="prototype-updated" data-build="v1"></span>
         </a>
       </li>
     </ul>
@@ -134,7 +142,8 @@
     // BUILD_STAMPS — update whenever you change the prototype (see .cursor/rules/prototype-build-stamps.mdc).
     const BUILD_STAMPS = {
       v1: '4 Jun 2026, 14:31',
-      v2: '9 Jun 2026, 12:28'
+      v2: '9 Jun 2026, 12:28',
+      v3: '2 Jun 2026, 20:15'
     };
 
     document.querySelectorAll('[data-build]').forEach(function (el) {
