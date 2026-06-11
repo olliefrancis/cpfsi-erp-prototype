@@ -15033,8 +15033,9 @@
     return SETUP_LOOKUP_CATALOG[mode] || [];
   }
 
-  function openSetupLookupModal(mode) {
-    if (setupLookupTarget !== 'cpin' && setupLookupTarget !== 'concern' && setupLookupTarget !== 'bizsupport') setupLookupTarget = 'audit';
+  function openSetupLookupModal(mode, target) {
+    if (target) setupLookupTarget = target;
+    else if (setupLookupTarget !== 'cpin' && setupLookupTarget !== 'concern' && setupLookupTarget !== 'bizsupport') setupLookupTarget = 'audit';
     setupLookupMode = mode;
     const modal = document.getElementById('setup-lookup-modal');
     const meta = SETUP_LOOKUP_META[mode];

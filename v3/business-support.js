@@ -489,7 +489,7 @@
     if (!rec) return;
     const dhKeys = getBsAcceptedDhKeys(rec);
     const list = getBsPremisesList(rec).filter(function (p) {
-      if (!p.linkedDh) return !!BS_PREMISES[p.name];
+      if (!p.linkedDh || !p.fromDh) return true;
       const linked = normalizeBsDhKey(p.linkedDh);
       if (!dhKeys.some(function (k) { return normalizeBsDhKey(k) === linked; })) return false;
       if (!BS_PREMISES[p.name]) return false;
@@ -996,18 +996,15 @@
   }
 
   function addBsPremises() {
-    if (typeof setupLookupTarget !== 'undefined') setupLookupTarget = 'bizsupport';
-    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('premises');
+    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('premises', 'bizsupport');
   }
 
   function addBsDutyHolder() {
-    if (typeof setupLookupTarget !== 'undefined') setupLookupTarget = 'bizsupport';
-    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('dutyHolder');
+    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('dutyHolder', 'bizsupport');
   }
 
   function addBsResponsiblePerson() {
-    if (typeof setupLookupTarget !== 'undefined') setupLookupTarget = 'bizsupport';
-    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('responsiblePerson');
+    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('responsiblePerson', 'bizsupport');
   }
 
   function acceptBsResponsiblePerson(id) {
@@ -1028,8 +1025,7 @@
   }
 
   function addBsInspector() {
-    if (typeof setupLookupTarget !== 'undefined') setupLookupTarget = 'bizsupport';
-    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('inspector');
+    if (typeof openSetupLookupModal === 'function') openSetupLookupModal('inspector', 'bizsupport');
   }
 
   function removeBsInspector(id) {
