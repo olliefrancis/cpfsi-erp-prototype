@@ -6658,10 +6658,6 @@
       <button class="btn" type="button" onclick="show('processes')">Back to processes</button>
     </div>
 
-    <div class="inset" id="bs-context-notice" style="margin-top:12px;">
-      <strong>Not an audit, CPIN or safety concern.</strong> Use this process for advice, meetings and ongoing dialogue with a premises. Reported hazards become Safety Concerns; reported fires become CPINs.
-    </div>
-
     <div class="process-grid" style="margin-top:16px;">
       <div class="stage-rail" id="bs-stage-rail">
         <div class="stage">Setup</div>
@@ -6822,9 +6818,6 @@
           </div>
           <div id="bs-close-done" class="cpin-close-summary" hidden>
             <strong>Closed.</strong> <span id="bs-close-done-text"></span>
-            <div id="bs-close-spawn" style="margin-top:12px;" hidden>
-              <button class="btn primary" type="button" onclick="show('auditsetup')">Start new separate process</button>
-            </div>
           </div>
         </div>
       </div>
@@ -13282,6 +13275,23 @@
   // ---------------------------------------------------------
   const LETTER_TEMPLATES = [
     {
+      id: 'bizsupport-appointment',
+      label: 'Appointment letter',
+      hint: 'Confirm a business support meeting, call or visit',
+      contexts: ['bizsupport'],
+      buildBody: function (ctx) {
+        const appt = ctx.appointment;
+        return (
+          '<p>CPFSI confirms a business support session regarding fire safety at <span class="conditional">' + escHtml(ctx.premises) + '</span> ' +
+          'on <span class="conditional">' + escHtml(appt.long) + '</span>. We anticipate the session will take approximately ' +
+          escHtml(appt.duration) + '.</p>' +
+          '<p>Please confirm that a representative will be available' +
+          (ctx.assignee ? ' to meet our inspector (<span class="conditional">' + escHtml(ctx.assignee) + '</span>)' : '') +
+          ', or let us know if alternative arrangements are needed.</p>'
+        );
+      }
+    },
+    {
       id: 'cpin-onsite-appointment',
       label: 'On-site evaluation appointment',
       hint: 'Standard appointment following incident notification',
@@ -13605,8 +13615,14 @@
     };
   }
 
+  function getDefaultLetterTemplateId(context) {
+    if (context === 'bizsupport') return 'bizsupport-appointment';
+    if (context === 'audit-setup' || context === 'audit-activity') return 'cpin-onsite-appointment';
+    return 'cpin-onsite-appointment';
+  }
+
   function getLetterTemplatesForContext(context, searchQuery) {
-    const resolvedContext = (context === 'audit-setup' || context === 'audit-activity' || context === 'bizsupport') ? 'cpin-onsite' : context;
+    const resolvedContext = (context === 'audit-setup' || context === 'audit-activity') ? 'cpin-onsite' : context;
     const q = (searchQuery || '').trim().toLowerCase();
     return LETTER_TEMPLATES.filter(function (t) {
       if (t.contexts.indexOf(resolvedContext) < 0) return false;
@@ -13731,12 +13747,13 @@
 
   function openLetterComposer(opts) {
     opts = opts || {};
+    const context = opts.context || 'cpin-onsite';
     letterComposerState = {
-      context: opts.context || 'cpin-onsite',
+      context: context,
       mode: opts.mode || 'compose',
       saveTo: opts.saveTo || 'onsite',
       viewLetterId: opts.viewLetterId || null,
-      templateId: opts.templateId || null,
+      templateId: opts.templateId || getDefaultLetterTemplateId(context),
       recipientIds: opts.recipientIds ? opts.recipientIds.slice() : null,
       customBody: opts.customBody || null,
       templateSearch: opts.templateSearch || '',
@@ -13823,10 +13840,10 @@
         searchEl.value = letterComposerState.templateSearch || '';
       }
       if (!letterComposerState.templateId && allTemplates.length) {
-        letterComposerState.templateId = allTemplates[0].id;
+        letterComposerState.templateId = getDefaultLetterTemplateId(letterComposerState.context) || allTemplates[0].id;
       }
       if (letterComposerState.templateId && templates.length && !templates.some(function (t) { return t.id === letterComposerState.templateId; })) {
-        letterComposerState.templateId = templates[0].id;
+        letterComposerState.templateId = getDefaultLetterTemplateId(letterComposerState.context) || templates[0].id;
         letterComposerState.customBody = null;
       }
       if (!letterComposerState.recipientIds) {

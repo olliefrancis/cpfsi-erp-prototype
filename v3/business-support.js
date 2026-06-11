@@ -613,9 +613,7 @@
   function renderBsCloseSection(rec) {
     const open = document.getElementById('bs-close-open');
     const done = document.getElementById('bs-close-done');
-    const btn = document.getElementById('bs-close-btn');
     const blocked = document.getElementById('bs-close-blocked');
-    const spawn = document.getElementById('bs-close-spawn');
     if (rec.workflow === 'closed') {
       if (open) open.hidden = true;
       if (done) {
@@ -623,12 +621,10 @@
         const txt = document.getElementById('bs-close-done-text');
         if (txt) txt.textContent = rec.closeReason || 'Closed.';
       }
-      if (spawn) spawn.hidden = !rec.spawnedProcessId;
     } else {
       if (open) open.hidden = rec.workflow === 'setup';
       if (done) done.hidden = true;
       if (blocked) blocked.hidden = true;
-      if (spawn) spawn.hidden = true;
     }
   }
 
@@ -809,9 +805,12 @@
     if (typeof clearProcessValidation === 'function' && workflowCol) {
       clearProcessValidation(workflowCol);
     }
-    const patch = { workflow: 'closed', closeReason: reason, closedAt: new Date().toISOString(), activityLog: bsActivityLog };
-    if (rec.furtherRequired === 'yes') patch.spawnedProcessId = 'A-2026-' + String(3400 + Math.floor(Math.random() * 100));
-    persistBsPatch(activeBizSupportId, patch);
+    persistBsPatch(activeBizSupportId, {
+      workflow: 'closed',
+      closeReason: reason,
+      closedAt: new Date().toISOString(),
+      activityLog: bsActivityLog
+    });
     refreshBsPage();
   }
 
