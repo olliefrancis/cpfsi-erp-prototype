@@ -23,7 +23,7 @@
 
   const BS_BASE = [
     {
-      id: 'bs-0044', ref: 'B-2026-0044', premises: 'Royal Courts of Justice', workflow: 'conduct',
+      id: 'bs-0044', ref: 'B-2026-0044', premises: 'Royal Courts of Justice', workflow: 'open',
       purpose: 'Fire compartmentation advice ahead of refurbishment',
       openedAt: '7 Jun 2026',
       appointment: { date: '2026-06-25', time: '10:00', mode: 'in_person', duration: 'half', confirmed: true, letterSkipped: false, letterSent: true },
@@ -37,7 +37,7 @@
       }
     },
     {
-      id: 'bs-0039', ref: 'B-2026-0039', premises: 'MoJ HQ London', workflow: 'conduct',
+      id: 'bs-0039', ref: 'B-2026-0039', premises: 'MoJ HQ London', workflow: 'open',
       purpose: 'Workshop prep — fire safety initiative for regional leads',
       openedAt: '30 May 2026',
       appointment: { date: '2026-07-12', time: '14:00', mode: 'in_person', duration: 'full', confirmed: true, letterSkipped: true, letterSent: false },
@@ -117,10 +117,8 @@
     saveBsOverrides();
   }
 
-  function bsWorkflowStage(rec) {
-    if (!rec || rec.workflow === 'closed') return 3;
-    if (rec.workflow === 'conduct') return 2;
-    return 1;
+  function bsIsOpen(rec) {
+    return rec && rec.workflow !== 'closed';
   }
 
   function bsHasAcceptedDutyHolders(rec) {
@@ -211,55 +209,6 @@
       });
     }
 
-    if (rec.furtherRequired === 'yes') {
-      const fu = rec.followUp || {};
-      const fuDate = document.getElementById('bs-followup-date')?.value || fu.date || '';
-      const fuTime = document.getElementById('bs-followup-time')?.value || fu.time || '';
-      const fuMode = document.getElementById('bs-followup-mode')?.value || fu.mode || '';
-      const fuPurpose = (document.getElementById('bs-followup-purpose')?.value || fu.purpose || '').trim();
-
-      if (!fuDate) {
-        errors.push({
-          fieldId: 'bs-followup-date',
-          wrapperId: 'bs-followup-date-wrap',
-          errorId: 'bs-followup-date-error',
-          anchor: '#bs-followup-date',
-          message: 'Enter a follow-up date',
-          summaryLink: 'Enter a follow-up date'
-        });
-      }
-      if (!fuTime) {
-        errors.push({
-          fieldId: 'bs-followup-time',
-          wrapperId: 'bs-followup-time-wrap',
-          errorId: 'bs-followup-time-error',
-          anchor: '#bs-followup-time',
-          message: 'Enter a follow-up time',
-          summaryLink: 'Enter a follow-up time'
-        });
-      }
-      if (!fuMode) {
-        errors.push({
-          fieldId: 'bs-followup-mode',
-          wrapperId: 'bs-followup-mode-wrap',
-          errorId: 'bs-followup-mode-error',
-          anchor: '#bs-followup-mode',
-          message: 'Select a follow-up mode',
-          summaryLink: 'Select a follow-up mode'
-        });
-      }
-      if (!fuPurpose) {
-        errors.push({
-          fieldId: 'bs-followup-purpose',
-          wrapperId: 'bs-followup-purpose-wrap',
-          errorId: 'bs-followup-purpose-error',
-          anchor: '#bs-followup-purpose',
-          message: 'Enter a purpose note for the follow-up',
-          summaryLink: 'Enter a purpose note for the follow-up'
-        });
-      }
-    }
-
     const reason = (document.getElementById('bs-close-reason')?.value || '').trim();
     if (!reason) {
       errors.push({
@@ -274,19 +223,10 @@
     return errors;
   }
 
-  function bsCanStartSession(rec) {
-    return rec && rec.workflow === 'setup' && bsSetupComplete(rec);
-  }
-
   function bsCanClose(rec) {
     if (!rec || rec.workflow === 'closed') return false;
-    if (rec.workflow === 'setup') return false;
-    if (!rec.furtherRequired) return false;
-    if (rec.furtherRequired === 'yes') {
-      const fu = rec.followUp || {};
-      return !!(fu.date && fu.mode && fu.purpose);
-    }
-    return true;
+    if (!bsSetupComplete(rec)) return false;
+    return !!rec.furtherRequired;
   }
 
   function defaultBsRecord(id, premisesName) {
@@ -296,7 +236,7 @@
       id: id,
       ref: nextRef,
       premises: premisesName,
-      workflow: 'setup',
+      workflow: 'open',
       purpose: '',
       openedAt: 'Today',
       appointment: { date: '', time: '', mode: 'in_person', duration: 'half', confirmed: false, letterSkipped: false, letterSent: false },
@@ -582,16 +522,27 @@
     renderBsAppointmentLetters(rec);
   }
 
-  function renderBsStageRail(rec) {
-    const stage = bsWorkflowStage(rec);
-    document.querySelectorAll('#bs-stage-rail .stage').forEach(function (el, i) {
-      const n = i + 1;
-      el.classList.remove('current', 'done', 'future');
-      if (rec.workflow === 'closed') el.classList.add('done');
-      else if (n < stage) el.classList.add('done');
-      else if (n === stage) el.classList.add('current');
-      else el.classList.add('future');
-    });
+  function bsSpawnLinksHtml(rec) {
+    const parts = [];
+    const auditId = rec.spawnedAuditId;
+    if (auditId) {
+      parts.push('<a class="btn primary" href="#" onclick="show(\'auditsetup\'); return false;">Open audit ' + escHtml(auditId) + '</a>');
+    } else {
+      parts.push('<button class="btn primary" type="button" onclick="spawnBsFollowOn(\'audit\')">Start audit</button>');
+    }
+    parts.push('<button class="btn" type="button" onclick="spawnBsFollowOn(\'bizsupport\')">Another business support</button>');
+    parts.push('<button class="btn" type="button" onclick="spawnBsFollowOn(\'concern\')">Log safety concern</button>');
+    return parts.join('');
+  }
+
+  function renderBsSpawnLinks(rec) {
+    const panel = document.getElementById('bs-spawn-links');
+    const list = document.getElementById('bs-spawn-links-list');
+    if (!panel || !list) return;
+    const show = rec.furtherRequired === 'yes' && bsIsOpen(rec);
+    panel.hidden = !show;
+    if (!show) return;
+    list.innerHTML = bsSpawnLinksHtml(rec);
   }
 
   function renderBsWorkflowSections(rec) {
@@ -599,21 +550,20 @@
     const conduct = document.getElementById('bs-section-conduct');
     const closeSec = document.getElementById('bs-section-close');
     const isClosed = rec.workflow === 'closed';
+    const setupDone = bsSetupComplete(rec);
 
-    if (setup) setup.hidden = isClosed || rec.workflow !== 'setup';
-    if (conduct) conduct.hidden = isClosed || rec.workflow === 'setup';
-    if (closeSec) closeSec.hidden = isClosed ? false : rec.workflow === 'setup';
+    if (setup) setup.hidden = isClosed;
+    if (conduct) conduct.hidden = isClosed || !setupDone;
+    if (closeSec) closeSec.hidden = !isClosed && !setupDone;
 
-    const followUp = document.getElementById('bs-follow-up-fields');
-    if (followUp) followUp.hidden = rec.furtherRequired !== 'yes';
-
+    renderBsSpawnLinks(rec);
     renderBsCloseSection(rec);
   }
 
   function renderBsCloseSection(rec) {
     const open = document.getElementById('bs-close-open');
     const done = document.getElementById('bs-close-done');
-    const blocked = document.getElementById('bs-close-blocked');
+    const spawned = document.getElementById('bs-close-spawned-links');
     if (rec.workflow === 'closed') {
       if (open) open.hidden = true;
       if (done) {
@@ -621,10 +571,15 @@
         const txt = document.getElementById('bs-close-done-text');
         if (txt) txt.textContent = rec.closeReason || 'Closed.';
       }
+      if (spawned) {
+        const showSpawned = rec.furtherRequired === 'yes';
+        spawned.hidden = !showSpawned;
+        if (showSpawned) spawned.innerHTML = bsSpawnLinksHtml(rec);
+      }
     } else {
-      if (open) open.hidden = rec.workflow === 'setup';
+      if (open) open.hidden = false;
       if (done) done.hidden = true;
-      if (blocked) blocked.hidden = true;
+      if (spawned) spawned.hidden = true;
     }
   }
 
@@ -685,19 +640,15 @@
     const meta = document.getElementById('bs-detail-meta');
     if (title) title.textContent = 'Business support  ·  ' + rec.ref;
     if (meta) {
-      const stages = ['', 'Setup', 'Conduct the support', 'Close'];
-      const st = bsWorkflowStage(rec);
       const statusPill = rec.workflow === 'closed'
         ? '<span class="pill grey">Closed</span>'
         : '<span class="pill blue">Open</span>';
-      meta.innerHTML = '<span class="pill grey">Support</span> Stage ' + st + ' of 3  ·  ' + stages[st] +
-        '  ·  ' + statusPill + '  ·  ' + escHtml(rec.openedAt || 'Today');
+      meta.innerHTML = '<span class="pill grey">Support</span>  ·  ' + statusPill + '  ·  ' + escHtml(rec.openedAt || 'Today');
     }
 
     const sumPrem = document.getElementById('bs-sum-premises');
     if (sumPrem) sumPrem.textContent = rec.premises || '—';
 
-    renderBsStageRail(rec);
     renderBsPremisesCard(rec);
     renderBsTeam(rec);
     ensureBsDutyHolderSuggestions(getBizSupportById(rec.id) || rec);
@@ -712,15 +663,8 @@
       inp.checked = rec.furtherRequired === inp.value;
     });
 
-    const fu = rec.followUp || {};
-    const fuDate = document.getElementById('bs-followup-date');
-    const fuTime = document.getElementById('bs-followup-time');
-    const fuMode = document.getElementById('bs-followup-mode');
     const fuPurpose = document.getElementById('bs-followup-purpose');
-    if (fuDate) fuDate.value = fu.date || '';
-    if (fuTime) fuTime.value = fu.time || '';
-    if (fuMode) fuMode.value = fu.mode || 'call';
-    if (fuPurpose) fuPurpose.value = fu.purpose || '';
+    if (fuPurpose) fuPurpose.value = (rec.followUp || {}).purpose || '';
 
     renderBsWorkflowSections(getBizSupportById(rec.id) || rec);
     initBsActivity(getBizSupportById(rec.id) || rec);
@@ -752,21 +696,6 @@
     refreshBsPage();
   }
 
-  function startBsSession() {
-    saveBsAppointment();
-    const rec = getBizSupportById(activeBizSupportId);
-    if (!rec) return;
-    const summary = document.getElementById('bs-setup-error-summary');
-    const errors = getBsSetupValidationErrors(rec);
-    if (typeof showProcessValidation === 'function' && !showProcessValidation(summary, errors)) return;
-    if (!bsCanStartSession(rec)) return;
-    if (typeof clearProcessValidation === 'function') {
-      clearProcessValidation(document.getElementById('bs-section-setup'));
-    }
-    persistBsPatch(activeBizSupportId, { workflow: 'conduct' });
-    refreshBsPage();
-  }
-
   function saveBsConductNotes() {
     persistBsPatch(activeBizSupportId, { conductNotes: document.getElementById('bs-conduct-notes')?.value || '' });
   }
@@ -779,17 +708,30 @@
   }
 
   function saveBsFollowUp() {
-    const rec = getBizSupportById(activeBizSupportId);
-    if (!rec) return;
     persistBsPatch(activeBizSupportId, {
-      followUp: {
-        date: document.getElementById('bs-followup-date')?.value || '',
-        time: document.getElementById('bs-followup-time')?.value || '',
-        mode: document.getElementById('bs-followup-mode')?.value || 'call',
-        purpose: document.getElementById('bs-followup-purpose')?.value || ''
-      }
+      followUp: { purpose: document.getElementById('bs-followup-purpose')?.value || '' }
     });
     refreshBsPage();
+  }
+
+  function spawnBsFollowOn(type) {
+    saveBsFollowUp();
+    const rec = getBizSupportById(activeBizSupportId);
+    if (!rec) return;
+    const premises = rec.premises;
+    if (type === 'audit') {
+      const auditId = 'A-2026-' + String(3200 + Math.floor(Math.random() * 200));
+      if (typeof seedAuditSetupFromBizSupport === 'function') {
+        seedAuditSetupFromBizSupport(rec, auditId);
+      }
+      persistBsPatch(activeBizSupportId, { spawnedAuditId: auditId });
+      if (typeof show === 'function') show('auditsetup');
+    } else if (type === 'bizsupport') {
+      startBizSupportFromPremises(premises);
+    } else if (type === 'concern') {
+      if (typeof show === 'function') show('concerns');
+      if (typeof openScIntakeForm === 'function') openScIntakeForm();
+    }
   }
 
   function closeBsProcess() {
@@ -879,7 +821,7 @@
   function startBizSupportFromPremises(premisesName) {
     loadBsOverrides();
     const existing = getAllBsRecords().find(function (r) {
-      return r.premises === premisesName && r.workflow === 'setup';
+      return r.premises === premisesName && bsIsOpen(r) && !bsSetupComplete(r);
     });
     if (existing) { openBizSupport(existing.id); return; }
     const id = 'bs-new-' + Date.now();
@@ -958,7 +900,7 @@
   window.appendBsLettersToActivity = appendBsLettersToActivity;
   window.getBsSetupValidationErrors = getBsSetupValidationErrors;
   window.getBsCloseValidationErrors = getBsCloseValidationErrors;
-  window.startBsSession = startBsSession;
+  window.spawnBsFollowOn = spawnBsFollowOn;
   window.saveBsConductNotes = saveBsConductNotes;
   window.saveBsFurtherRequired = saveBsFurtherRequired;
   window.saveBsFollowUp = saveBsFollowUp;

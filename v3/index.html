@@ -523,6 +523,9 @@
     gap: 20px;
     margin-top: 16px;
   }
+  #bizsupport .process-grid {
+    grid-template-columns: 1fr 280px;
+  }
   .stage-rail {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -6642,7 +6645,7 @@
 </div>
 
 <!-- =========================================================
-     BUSINESS SUPPORT (3-stage process from premises)
+     BUSINESS SUPPORT (single-page process from premises)
 ========================================================= -->
 <div id="bizsupport" class="screen">
   <main>
@@ -6659,18 +6662,12 @@
     </div>
 
     <div class="process-grid" style="margin-top:16px;">
-      <div class="stage-rail" id="bs-stage-rail">
-        <div class="stage">Setup</div>
-        <div class="stage future">Conduct the support</div>
-        <div class="stage future">Close</div>
-      </div>
-
-      <div>
-        <div class="setup-section" id="bs-section-setup">
+      <div class="cpin-single-workflow">
+        <div class="setup-section cpin-workflow-section" id="bs-section-setup">
           <div id="bs-setup-error-summary" class="error-summary" role="alert" aria-labelledby="bs-setup-error-summary-title" tabindex="-1" hidden></div>
 
           <h3>1. Premises</h3>
-          <div class="help">Process is anchored to this premises. Status is Open with an automatic timestamp.</div>
+          <div class="help">Process is anchored to this premises. Further sections appear as you complete each step.</div>
           <div id="bs-premises-card"></div>
 
           <h3 style="margin-top:24px;">2. Team</h3>
@@ -6746,13 +6743,10 @@
             <span id="bs-letter-status" style="font-size:12px;color:var(--ink-3);"></span>
           </div>
 
-          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;align-items:center;">
-            <button class="btn primary" type="button" id="bs-start-btn" onclick="startBsSession()">Start support session →</button>
-          </div>
         </div>
 
-        <div class="setup-section" id="bs-section-conduct" hidden>
-          <h3>Conduct the support</h3>
+        <div class="setup-section cpin-workflow-section" id="bs-section-conduct" hidden>
+          <h3>6. Conduct the support</h3>
           <div class="help">Carry out the meeting, call or dialogue. Log notes, files and time using <strong>+ Log</strong> in the activity bar below.</div>
           <div class="audit-note-form" style="margin-top:12px;margin-bottom:20px;">
             <label for="bs-conduct-notes">Session summary</label>
@@ -6768,45 +6762,24 @@
               </label>
               <label class="cpin-decision-option">
                 <input type="radio" name="bs-further-required" value="yes" onchange="saveBsFurtherRequired()" />
-                <div><strong>Yes — new process needed</strong><span>Schedule follow-up; a new audit or other process may be created on close.</span></div>
+                <div><strong>Yes — new process needed</strong><span>Start a follow-on process below, then close this business support record.</span></div>
               </label>
             </div>
           </div>
-          <div id="bs-follow-up-fields" hidden style="margin-top:20px;">
-            <h4 style="margin:0 0 8px;font-size:14px;">Follow-up details</h4>
-            <div class="field-row">
-              <div class="field field-wrap" id="bs-followup-date-wrap">
-                <label for="bs-followup-date">Date</label>
-                <span class="field-error-message" id="bs-followup-date-error" hidden></span>
-                <input type="date" id="bs-followup-date" onchange="saveBsFollowUp()" />
-              </div>
-              <div class="field field-wrap" id="bs-followup-time-wrap">
-                <label for="bs-followup-time">Time</label>
-                <span class="field-error-message" id="bs-followup-time-error" hidden></span>
-                <input type="time" id="bs-followup-time" step="900" onchange="saveBsFollowUp()" />
-              </div>
-              <div class="field field-wrap" id="bs-followup-mode-wrap">
-                <label for="bs-followup-mode">Mode</label>
-                <span class="field-error-message" id="bs-followup-mode-error" hidden></span>
-                <select id="bs-followup-mode" onchange="saveBsFollowUp()">
-                  <option value="in_person">In person</option>
-                  <option value="call">Phone call</option>
-                  <option value="video">Video call</option>
-                  <option value="email">Email</option>
-                </select>
-              </div>
-            </div>
-            <div class="audit-note-form field-wrap" id="bs-followup-purpose-wrap" style="margin-top:12px;">
-              <label for="bs-followup-purpose">Purpose note</label>
-              <span class="field-error-message" id="bs-followup-purpose-error" hidden></span>
-              <textarea id="bs-followup-purpose" placeholder="Short note for the follow-up or new process…" onchange="saveBsFollowUp()"></textarea>
+          <div id="bs-spawn-links" class="cpin-branch-panel" hidden style="margin-top:20px;">
+            <h4 style="margin:0 0 8px;font-size:14px;">Start a follow-on process</h4>
+            <div class="help">Choose the type of process needed. The premises and context from this business support are carried forward where possible.</div>
+            <div id="bs-spawn-links-list" class="letter-composer-actions" style="margin-top:12px;flex-wrap:wrap;"></div>
+            <div class="audit-note-form field-wrap" id="bs-followup-purpose-wrap" style="margin-top:16px;">
+              <label for="bs-followup-purpose">Context note (optional)</label>
+              <textarea id="bs-followup-purpose" placeholder="Brief note for the follow-on process…" onchange="saveBsFollowUp()"></textarea>
             </div>
           </div>
         </div>
 
-        <div class="setup-section" id="bs-section-close" hidden>
+        <div class="setup-section cpin-workflow-section" id="bs-section-close" hidden>
           <div id="bs-close-error-summary" class="error-summary" role="alert" aria-labelledby="bs-close-error-summary-title" tabindex="-1" hidden></div>
-          <h3>Close business support</h3>
+          <h3>7. Close business support</h3>
           <div id="bs-close-open">
             <div class="help">Time is finalised; notes and files are preserved against this process and the premises.</div>
             <div class="audit-note-form field-wrap" id="bs-close-reason-wrap" style="margin-top:12px;margin-bottom:14px;">
@@ -6818,6 +6791,7 @@
           </div>
           <div id="bs-close-done" class="cpin-close-summary" hidden>
             <strong>Closed.</strong> <span id="bs-close-done-text"></span>
+            <div id="bs-close-spawned-links" style="margin-top:12px;" hidden></div>
           </div>
         </div>
       </div>
@@ -14381,6 +14355,65 @@
     setup.appointmentTime = o.appointmentTime || '';
     setup.appointmentDuration = o.appointmentDuration || 'half';
     setup.fromCpinClose = true;
+    auditSetup = setup;
+    localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(setup));
+  }
+
+  function seedAuditSetupFromBizSupport(rec, auditId) {
+    if (!rec) return;
+    const setup = defaultAuditSetup();
+    setup.premises = rec.premises || '';
+    setup.trigger = 'Business support — ' + (rec.ref || '');
+    setup.sourceBizSupportId = rec.id;
+    setup.sourceBizSupportRef = rec.ref;
+    setup.spawnedAuditId = auditId;
+    const dhList = (rec.dutyHolders || []).filter(function (dh) { return dh.status === 'accepted'; });
+    if (dhList.length) {
+      setup.dutyHolders = dhList.map(function (dh) {
+        return {
+          id: dh.id,
+          key: dh.key || SETUP_DH_KEY_BY_NAME[dh.name],
+          name: dh.name,
+          role: dh.role,
+          initials: dh.initials,
+          fromPremises: !!dh.fromPremises,
+          status: 'accepted'
+        };
+      });
+      const rpList = (rec.responsiblePersons || []).filter(function (rp) {
+        return rp.status === 'accepted' && rp.linkedDh;
+      });
+      if (rpList.length) {
+        setup.responsiblePersons = rpList.map(function (rp) {
+          return {
+            id: rp.id,
+            key: rp.key,
+            ref: rp.ref,
+            name: rp.name,
+            role: rp.role,
+            initials: rp.initials,
+            fromPremises: !!rp.fromPremises,
+            status: 'accepted',
+            linkedDh: rp.linkedDh
+          };
+        });
+      }
+    }
+    const lead = (rec.inspectors || []).find(function (i) { return i.isLead; }) || (rec.inspectors || [])[0];
+    if (lead) {
+      setup.inspectors = [{
+        id: lead.id || 'ins-bs',
+        name: lead.name,
+        role: lead.role || 'Lead inspector',
+        initials: lead.initials || setupInitials(lead.name),
+        fromPremises: false
+      }];
+    }
+    const apt = rec.appointment || {};
+    setup.appointmentDate = apt.date || '';
+    setup.appointmentTime = apt.time || '';
+    setup.appointmentDuration = apt.duration || 'half';
+    setup.fromBizSupportClose = true;
     auditSetup = setup;
     localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(setup));
   }
