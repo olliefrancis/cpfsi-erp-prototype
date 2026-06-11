@@ -4,6 +4,7 @@
 
   const SC_PIN_KEY = 'sc-pins-v1';
   const SC_OVERRIDE_KEY = 'sc-overrides-v1';
+  const SC_INTAKE_KEY = 'cpfsi-sc-intake-v1';
   const SC_CURRENT_INSPECTOR = 'Phil Gower';
   const SC_IN_PROGRESS_WF = new Set(['assigned', 'triage', 'desk_eval', 'awaiting_info', 'audit_spawned', 'in_review', 'audit']);
 
@@ -107,10 +108,92 @@
     return Object.assign({}, base, scOverrides[base.id] || {});
   }
 
+  function loadScIntake() {
+    try {
+      return JSON.parse(localStorage.getItem(SC_INTAKE_KEY) || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function formatScUkDate(iso) {
+    if (!iso) return '';
+    const p = String(iso).split('-');
+    if (p.length !== 3) return iso;
+    return p[2] + '/' + p[1] + '/' + p[0];
+  }
+
+  function formatScTime(t) {
+    if (!t) return '';
+    const parts = String(t).split(':');
+    return parts[0] + ':' + (parts[1] || '00');
+  }
+
+  function scSeverityScore(sev) {
+    if (sev === 'red') return 5;
+    if (sev === 'amber') return 2;
+    return 0;
+  }
+
+  function nextScIntakeRef() {
+    const nums = getAllConcernRecords().map(function (c) {
+      const part = (c.ref || '').split('-').pop();
+      return parseInt(part, 10);
+    }).filter(function (n) { return !isNaN(n); });
+    const max = nums.length ? Math.max.apply(null, nums) : 159;
+    return 'SC-2026-' + String(max + 1).padStart(4, '0');
+  }
+
+  function nextScFisRef() {
+    return 'FIS-' + String(3300 + Math.floor(Math.random() * 200));
+  }
+
+  function saveScIntakeFromForm(formData) {
+    const severity = formData.get('severity');
+    if (!severity) return null;
+
+    const premises = (formData.get('premises') || '').trim();
+    const premisesFree = (formData.get('premisesFree') || '').trim();
+    const description = (formData.get('description') || '').trim();
+    const hazardType = (formData.get('hazardType') || '').trim();
+    const matched = !!premises;
+    const summary = hazardType + (description ? ' — ' + (description.length > 48 ? description.slice(0, 48) + '…' : description) : '');
+
+    const record = {
+      id: 'sc-in-' + Date.now(),
+      ref: nextScIntakeRef(),
+      severity: severity,
+      severityScore: scSeverityScore(severity),
+      when: 'Just now',
+      premises: premises || null,
+      summary: summary.length > 72 ? summary.slice(0, 72) + '…' : summary,
+      patch: false,
+      workflow: matched ? 'incoming' : (premisesFree ? 'awaiting_premises' : 'incoming'),
+      assignee: null,
+      intake: {
+        reportRef: (formData.get('reportRef') || '').trim() || nextScFisRef(),
+        reportDate: formatScUkDate(formData.get('reportDate')),
+        reportTime: formatScTime(formData.get('reportTime')),
+        reporter: formData.get('reporter'),
+        reporterEmail: formData.get('reporterEmail') || '',
+        source: formData.get('source'),
+        hazardType: hazardType,
+        description: description,
+        premisesFree: premisesFree
+      }
+    };
+
+    const list = loadScIntake();
+    list.unshift(record);
+    localStorage.setItem(SC_INTAKE_KEY, JSON.stringify(list));
+    renderConcernsLists();
+    return record;
+  }
+
   function getAllConcernRecords() {
     const seen = new Set();
     const out = [];
-    CONCERNS_INCOMING.concat(CONCERNS_MINE, CONCERNS_UNASSIGNED, CONCERNS_COMPLETED).forEach(function (c) {
+    loadScIntake().concat(CONCERNS_INCOMING, CONCERNS_MINE, CONCERNS_UNASSIGNED, CONCERNS_COMPLETED).forEach(function (c) {
       if (seen.has(c.id)) return;
       seen.add(c.id);
       out.push(mergeConcernRecord(c));
@@ -914,6 +997,7 @@
 
   /* Expose globals */
   window.initConcernsPage = initConcernsPage;
+  window.switchConcernsTab = switchConcernsTab;
   window.layoutConcernViews = layoutConcernViews;
   window.toggleConcernViewMenu = toggleConcernViewMenu;
   window.initConcernDetailPage = initConcernDetailPage;
@@ -945,4 +1029,5 @@
   window.persistConcernPatch = persistConcernPatch;
   window.activeConcernId = function () { return activeConcernId; };
   window.setActiveConcernId = function (id) { activeConcernId = id; };
+  window.saveScIntakeFromForm = saveScIntakeFromForm;
 })();

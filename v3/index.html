@@ -2296,6 +2296,171 @@
     height: 14px;
     flex-shrink: 0;
   }
+  /* Safety concern intake (fullscreen log form) */
+  #sc-intake-modal.modal-backdrop {
+    padding: 0;
+    align-items: stretch;
+    overflow: hidden;
+    z-index: 110;
+  }
+  #sc-intake-modal .sc-intake-modal {
+    max-width: none;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none;
+    background: var(--surface);
+  }
+  .sc-intake-header {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sc-intake-header h2 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+  }
+  .sc-intake-header .sub {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-top: 4px;
+    max-width: 52rem;
+  }
+  .sc-intake-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 24px 24px 32px;
+    background: var(--bg);
+  }
+  .sc-intake-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .sc-intake-required {
+    color: var(--red);
+    font-size: 13px;
+    margin: 0 0 20px;
+  }
+  .sc-intake-section {
+    margin: 28px 0 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  .sc-intake-section h3 {
+    margin: 0 0 16px;
+    font-size: 14px;
+    text-transform: none;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .sc-intake-rag-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  /* Override global .field label/input rules that break card layout */
+  #sc-intake-modal .field label.sc-intake-rag-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: inherit;
+    font-weight: 400;
+    color: inherit;
+    margin-bottom: 0;
+  }
+  #sc-intake-modal .field .sc-intake-rag-option input[type="radio"] {
+    width: auto;
+    margin: 3px 0 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: none;
+    flex-shrink: 0;
+    box-shadow: none;
+  }
+  .sc-intake-rag-option {
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    cursor: pointer;
+  }
+  .sc-intake-rag-option:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent-soft) inset;
+  }
+  .sc-intake-rag-copy {
+    flex: 1;
+    min-width: 0;
+  }
+  .sc-intake-rag-option strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  .sc-intake-rag-option span {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    line-height: 1.45;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  .sc-intake-urgent {
+    color: var(--red);
+    font-weight: 600;
+    font-size: 13px;
+    margin: 12px 0 0;
+  }
+  .sc-intake-footer {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .sc-intake-footer .btn.primary {
+    min-width: 160px;
+  }
+  @media (max-width: 640px) {
+    .sc-intake-header,
+    .sc-intake-body,
+    .sc-intake-footer {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    .sc-intake-footer {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+    .sc-intake-footer .btn {
+      width: 100%;
+    }
+  }
+
   .letter-composer-actions {
     display: flex;
     gap: 8px;
@@ -3403,6 +3568,10 @@
       grid-column: 1;
       grid-row: 2;
     }
+    .screen-head .cpin-queue-hint {
+      grid-column: 1;
+      grid-row: 3;
+    }
     .screen-head-new,
     a.screen-head-new {
       grid-column: 2;
@@ -4034,6 +4203,60 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+
+  /* GOV.UK-style form validation (error summary + field errors) */
+  .error-summary {
+    border: 4px solid var(--red);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    background: #fdefe2;
+  }
+  .error-summary:focus {
+    outline: 3px solid transparent;
+    box-shadow: 0 0 0 3px var(--gov-focus);
+  }
+  .error-summary__title {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .error-summary__list {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--red);
+  }
+  .error-summary__list a {
+    color: var(--red);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+  .error-summary__list a:hover {
+    color: #942514;
+  }
+  .field-error-message {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--red);
+    margin: 4px 0 8px;
+  }
+  .field-error-message[hidden] {
+    display: none;
+  }
+  .field--error input,
+  .field--error select,
+  .field--error textarea,
+  .field-wrap.field--error input,
+  .field-wrap.field--error select,
+  .field-wrap.field--error textarea {
+    border: 2px solid var(--red);
+  }
+  .section--error {
+    border-left: 4px solid var(--red);
+    padding-left: 12px;
+    margin-left: -4px;
   }
   .scroll-x {
     overflow-x: auto;
@@ -4695,6 +4918,7 @@
       <div class="user-menu" id="user-menu" hidden role="menu" aria-label="Account menu">
         <button type="button" role="menuitem" onclick="closeUserMenu();show('time')">Time log</button>
         <button type="button" role="menuitem" onclick="openCpinReportFromMenu()">Submit CPIN</button>
+        <button type="button" role="menuitem" onclick="openSafetyConcernReportFromMenu()">Log safety concern</button>
         <button type="button" role="menuitem" onclick="closeUserMenu();show('admin')">Admin and settings</button>
         <button type="button" role="menuitem" onclick="resetPrototypeData()">Reset prototype</button>
         <div class="user-menu-divider" role="separator"></div>
@@ -6111,10 +6335,10 @@
       <div class="screen-head-text">
         <div class="screen-head-title-row">
           <h1>Safety Concerns</h1>
-          <button type="button" class="screen-head-new" onclick="alert('Add new safety concern — manual entry form coming soon.')">+ Add new concern</button>
+          <button type="button" class="screen-head-new" onclick="openScIntakeForm()">+ Add new concern</button>
         </div>
-        <div class="meta">Potential fire hazards reported to CPFSI — via FIS, Duty Holders, unions and other sources</div>
-        <div class="cpin-queue-hint">New reports appear under <strong>Unassigned</strong> until an inspector picks them up. The Duty Holder is automatically notified on submission.</div>
+        <div class="meta">Potential fire hazards reported to CPFSI — via email, FIS, Duty Holders, unions and other sources</div>
+        <div class="cpin-queue-hint">Reports received by email are logged with <strong>+ Add new concern</strong>. New entries appear under <strong>Unassigned</strong> until an inspector picks them up. The Duty Holder is automatically notified on submission.</div>
       </div>
     </div>
 
@@ -6447,6 +6671,8 @@
 
       <div>
         <div class="setup-section" id="bs-section-setup">
+          <div id="bs-setup-error-summary" class="error-summary" role="alert" aria-labelledby="bs-setup-error-summary-title" tabindex="-1" hidden></div>
+
           <h3>1. Premises</h3>
           <div class="help">Process is anchored to this premises. Status is Open with an automatic timestamp.</div>
           <div id="bs-premises-card"></div>
@@ -6463,9 +6689,12 @@
           <div class="add-holder-btn" onclick="addBsInspector()">+ Add another inspector</div>
 
           <h3 style="margin-top:24px;">3. Duty Holders and Responsible Persons</h3>
-          <div class="help">Suggested from the premises record — approve before confirming the appointment.</div>
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders</div>
-          <div id="bs-dh-list"></div>
+          <div class="help">Duty Holders are pre-suggested on load. Approve, reject or add organisations first — Responsible Persons are then suggested for each approved Duty Holder.</div>
+          <div id="bs-dh-section">
+            <span class="field-error-message" id="bs-dh-error" hidden></span>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders</div>
+            <div id="bs-dh-list"></div>
+          </div>
           <div class="add-holder-btn" onclick="addBsDutyHolder()">+ Add a Duty Holder</div>
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:16px 0 6px;">Responsible Persons</div>
           <div id="bs-rp-list"></div>
@@ -6473,17 +6702,20 @@
 
           <h3 style="margin-top:24px;">4. Meeting details</h3>
           <div class="help">Set date, time and mode. Confirm when ready — letter is optional for informal calls.</div>
-          <div class="audit-note-form" style="margin-bottom:14px;">
+          <div class="audit-note-form field-wrap" id="bs-purpose-wrap" style="margin-bottom:14px;">
             <label for="bs-purpose">Purpose of support</label>
+            <span class="field-error-message" id="bs-purpose-error" hidden></span>
             <textarea id="bs-purpose" placeholder="e.g. Fire door training discussion, advice on upcoming refurbishment…" onchange="saveBsAppointment()"></textarea>
           </div>
           <div class="field-row">
-            <div class="field">
+            <div class="field field-wrap" id="bs-apt-date-wrap">
               <label for="bs-apt-date">Date</label>
+              <span class="field-error-message" id="bs-apt-date-error" hidden></span>
               <input type="date" id="bs-apt-date" onchange="saveBsAppointment()" />
             </div>
-            <div class="field">
+            <div class="field field-wrap" id="bs-apt-time-wrap">
               <label for="bs-apt-time">Time</label>
+              <span class="field-error-message" id="bs-apt-time-error" hidden></span>
               <input type="time" id="bs-apt-time" step="900" onchange="saveBsAppointment()" />
             </div>
             <div class="field">
@@ -6504,19 +6736,21 @@
               </select>
             </div>
           </div>
-          <label class="cpin-check-row" style="margin-top:10px;"><input type="checkbox" id="bs-apt-confirmed" onchange="saveBsAppointment()" /> Appointment confirmed</label>
+          <div class="field-wrap" id="bs-apt-confirmed-wrap" style="margin-top:10px;">
+            <span class="field-error-message" id="bs-apt-confirmed-error" hidden></span>
+            <label class="cpin-check-row"><input type="checkbox" id="bs-apt-confirmed" onchange="saveBsAppointment()" /> Appointment confirmed</label>
+          </div>
 
           <h3 style="margin-top:24px;">5. Appointment letter</h3>
-          <div class="help">Optional — skip if this is an informal call or email dialogue.</div>
+          <div class="help">Write templated letters to Responsible Persons linked to your approved Duty Holders. Saved letters appear here as attachments and in the activity log. Skip if this is an informal call or email dialogue.</div>
+          <div class="letter-attachment-list" id="bs-appointment-letters-list"></div>
           <div class="letter-composer-actions" style="margin-top:10px;">
-            <button class="btn primary" type="button" onclick="alert('Letter composer — coming soon.')">Write letter</button>
+            <button class="btn primary" type="button" onclick="openBsLetterComposer()">Write letter</button>
             <button class="btn" type="button" onclick="skipBsLetter()">Skip letter</button>
-            <button class="btn" type="button" onclick="sendBsLetter()">Mark letter sent</button>
             <span id="bs-letter-status" style="font-size:12px;color:var(--ink-3);"></span>
           </div>
 
           <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;align-items:center;">
-            <p id="bs-start-blocked" style="margin:0;font-size:13px;color:var(--ink-3);flex:1;min-width:200px;" hidden></p>
             <button class="btn primary" type="button" id="bs-start-btn" onclick="startBsSession()">Start support session →</button>
           </div>
         </div>
@@ -6528,8 +6762,9 @@
             <label for="bs-conduct-notes">Session summary</label>
             <textarea id="bs-conduct-notes" placeholder="What was discussed, advice given, outcomes…" onchange="saveBsConductNotes()"></textarea>
           </div>
-          <div class="cpin-branch-panel">
+          <div class="cpin-branch-panel" id="bs-further-required-section">
             <h3>Is anything further required?</h3>
+            <span class="field-error-message" id="bs-further-required-error" hidden></span>
             <div class="cpin-decision-options">
               <label class="cpin-decision-option">
                 <input type="radio" name="bs-further-required" value="no" onchange="saveBsFurtherRequired()" />
@@ -6544,10 +6779,19 @@
           <div id="bs-follow-up-fields" hidden style="margin-top:20px;">
             <h4 style="margin:0 0 8px;font-size:14px;">Follow-up details</h4>
             <div class="field-row">
-              <div class="field"><label for="bs-followup-date">Date</label><input type="date" id="bs-followup-date" onchange="saveBsFollowUp()" /></div>
-              <div class="field"><label for="bs-followup-time">Time</label><input type="time" id="bs-followup-time" step="900" onchange="saveBsFollowUp()" /></div>
-              <div class="field">
+              <div class="field field-wrap" id="bs-followup-date-wrap">
+                <label for="bs-followup-date">Date</label>
+                <span class="field-error-message" id="bs-followup-date-error" hidden></span>
+                <input type="date" id="bs-followup-date" onchange="saveBsFollowUp()" />
+              </div>
+              <div class="field field-wrap" id="bs-followup-time-wrap">
+                <label for="bs-followup-time">Time</label>
+                <span class="field-error-message" id="bs-followup-time-error" hidden></span>
+                <input type="time" id="bs-followup-time" step="900" onchange="saveBsFollowUp()" />
+              </div>
+              <div class="field field-wrap" id="bs-followup-mode-wrap">
                 <label for="bs-followup-mode">Mode</label>
+                <span class="field-error-message" id="bs-followup-mode-error" hidden></span>
                 <select id="bs-followup-mode" onchange="saveBsFollowUp()">
                   <option value="in_person">In person</option>
                   <option value="call">Phone call</option>
@@ -6556,22 +6800,24 @@
                 </select>
               </div>
             </div>
-            <div class="audit-note-form" style="margin-top:12px;">
+            <div class="audit-note-form field-wrap" id="bs-followup-purpose-wrap" style="margin-top:12px;">
               <label for="bs-followup-purpose">Purpose note</label>
+              <span class="field-error-message" id="bs-followup-purpose-error" hidden></span>
               <textarea id="bs-followup-purpose" placeholder="Short note for the follow-up or new process…" onchange="saveBsFollowUp()"></textarea>
             </div>
           </div>
         </div>
 
         <div class="setup-section" id="bs-section-close" hidden>
+          <div id="bs-close-error-summary" class="error-summary" role="alert" aria-labelledby="bs-close-error-summary-title" tabindex="-1" hidden></div>
           <h3>Close business support</h3>
           <div id="bs-close-open">
             <div class="help">Time is finalised; notes and files are preserved against this process and the premises.</div>
-            <div class="audit-note-form" style="margin-top:12px;margin-bottom:14px;">
+            <div class="audit-note-form field-wrap" id="bs-close-reason-wrap" style="margin-top:12px;margin-bottom:14px;">
               <label for="bs-close-reason">Reason for closing</label>
+              <span class="field-error-message" id="bs-close-reason-error" hidden></span>
               <textarea id="bs-close-reason" placeholder="e.g. Advice given — DH to update fire door maintenance regime…"></textarea>
             </div>
-            <p id="bs-close-blocked" style="margin:0 0 10px;font-size:13px;color:var(--ink-3);" hidden></p>
             <button class="btn primary" type="button" id="bs-close-btn" onclick="closeBsProcess()">Close business support</button>
           </div>
           <div id="bs-close-done" class="cpin-close-summary" hidden>
@@ -7382,6 +7628,136 @@
   </div>
 </div>
 
+<!-- Safety concern intake — fullscreen log form (email / manual entry) -->
+<div id="sc-intake-modal" class="modal-backdrop" onclick="if(event.target===this) closeScIntakeForm()">
+  <div class="modal sc-intake-modal" onclick="event.stopPropagation()">
+    <div class="sc-intake-header">
+      <div>
+        <h2 id="sc-intake-title">Log safety concern</h2>
+        <div class="sub" id="sc-intake-sub">Record a potential fire hazard received by email or other channel. Not for fires (use CPINs) or audit follow-up (use Business Support).</div>
+      </div>
+      <button class="modal-close" type="button" onclick="closeScIntakeForm()" title="Close (Esc)">×</button>
+    </div>
+
+    <div class="sc-intake-body">
+      <div class="sc-intake-inner">
+        <form id="sc-intake-form" novalidate>
+          <p class="sc-intake-required" id="sc-intake-required-note">* denotes a required field</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="sc-intake-report-ref">Report reference *</label>
+              <input type="text" id="sc-intake-report-ref" name="reportRef" required placeholder="From email subject or reference, e.g. FIS-3305" />
+            </div>
+            <div class="field">
+              <label for="sc-intake-report-date">Date reported *</label>
+              <input type="date" id="sc-intake-report-date" name="reportDate" required />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="sc-intake-report-time">Time reported</label>
+              <input type="time" id="sc-intake-report-time" name="reportTime" />
+            </div>
+            <div class="field">
+              <label for="sc-intake-source">Source *</label>
+              <select id="sc-intake-source" name="source" required>
+                <option value="">Please select</option>
+                <option value="Email report">Email report</option>
+                <option value="FIS direct report">FIS direct report</option>
+                <option value="Duty Holder portal">Duty Holder portal</option>
+                <option value="Union safety rep">Union safety rep</option>
+                <option value="FIS web form">FIS web form</option>
+                <option value="FM company">FM company</option>
+                <option value="Site manager">Site manager</option>
+                <option value="FIS escalation">FIS escalation</option>
+                <option value="Staff member">Staff member</option>
+                <option value="Anonymous">Anonymous</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="sc-intake-reporter">Reporter name *</label>
+              <input type="text" id="sc-intake-reporter" name="reporter" required placeholder="Name and role, if known" />
+            </div>
+            <div class="field">
+              <label for="sc-intake-reporter-email">Reporter email</label>
+              <input type="email" id="sc-intake-reporter-email" name="reporterEmail" placeholder="Optional contact email" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="sc-intake-premises">Address of premises</label>
+            <select id="sc-intake-premises" name="premises">
+              <option value="">Please select</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="sc-intake-premises-free">Premises not in system or not found</label>
+            <div class="help" style="margin:-2px 0 6px;">If unable to find premises in the list above, enter the address here.</div>
+            <input type="text" id="sc-intake-premises-free" name="premisesFree" />
+          </div>
+
+          <section class="sc-intake-section" aria-labelledby="sc-intake-hazard-heading">
+            <h3 id="sc-intake-hazard-heading">Hazard details</h3>
+
+            <div class="field">
+              <label for="sc-intake-hazard-type">Hazard type *</label>
+              <select id="sc-intake-hazard-type" name="hazardType" required>
+                <option value="">Please select</option>
+                <option>Combustible materials</option>
+                <option>Fire door defect</option>
+                <option>Blocked escape route</option>
+                <option>Hot works</option>
+                <option>Emergency lighting</option>
+                <option>Fire compartmentation</option>
+                <option>Ignition source</option>
+                <option>Automatic alarm / false activation</option>
+                <option>Other hazard</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>RAG severity *</label>
+              <div class="help" style="margin:-2px 0 8px;">How urgent is this hazard? Inspectors may override after review.</div>
+              <div class="sc-intake-rag-group">
+                <label class="sc-intake-rag-option">
+                  <input type="radio" name="severity" value="green" required />
+                  <div class="sc-intake-rag-copy"><strong>Green</strong><span>Low risk — no immediate injury concern; typical monitoring or DH self-fix</span></div>
+                </label>
+                <label class="sc-intake-rag-option">
+                  <input type="radio" name="severity" value="amber" />
+                  <div class="sc-intake-rag-copy"><strong>Amber</strong><span>Moderate risk — action may be required; inspector triage expected</span></div>
+                </label>
+                <label class="sc-intake-rag-option">
+                  <input type="radio" name="severity" value="red" />
+                  <div class="sc-intake-rag-copy"><strong>Red</strong><span>Serious hazard — urgent attention required</span></div>
+                </label>
+              </div>
+              <p class="sc-intake-urgent">Call 0300 1233911 immediately if there is an active fire or immediate danger to life (24hr line).</p>
+            </div>
+
+            <div class="field" style="margin-top:16px;">
+              <label for="sc-intake-description">Hazard description *</label>
+              <div class="help" style="margin:-2px 0 6px;">What was observed? Where on site? Who reported it? Use plain language.</div>
+              <textarea id="sc-intake-description" name="description" rows="5" required></textarea>
+            </div>
+          </section>
+        </form>
+      </div>
+    </div>
+
+    <div class="sc-intake-footer">
+      <button class="btn" type="button" onclick="closeScIntakeForm()">Cancel</button>
+      <button class="btn primary" type="button" onclick="submitScIntakeForm()">Log safety concern</button>
+    </div>
+  </div>
+</div>
+
 <!-- Setup: lookup modal for Duty Holders, RPs, inspectors, premises -->
 <div id="setup-lookup-modal" class="modal-backdrop" onclick="if(event.target===this) closeSetupLookupModal()">
   <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
@@ -7674,13 +8050,13 @@
             </div>
           </button>
 
-          <button class="new-option" onclick="closeNewModal();show('concerns');">
+          <button class="new-option" onclick="closeNewModal();show('concerns');openScIntakeForm();">
             <div class="icon">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L1.5 15.5H16.5L9 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 7V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="12.5" r="0.8" fill="currentColor"/></svg>
             </div>
             <div>
               <div class="ttl">Safety concern</div>
-              <div class="desc">Log a hazard reported by a union, fire service, or other party. Triage and escalate if needed.</div>
+              <div class="desc">Log a hazard received by email or from FIS, unions and other reporters. Triage and escalate if needed.</div>
             </div>
           </button>
 
@@ -7822,6 +8198,7 @@
   const AUTH_STORAGE_KEY = 'prototype-authenticated-v3';
   const PROTOTYPE_DATA_STORAGE_KEYS = [
     'cpfsi-cpin-intake-v1',
+    'cpfsi-sc-intake-v1',
     'cpfsi-cpin-overrides-v1',
     'cpin-pins-v1',
     'audit-setup-draft-v1',
@@ -7855,11 +8232,17 @@
     window.open('cpin-report.html', '_blank', 'noopener');
   }
 
+  function openSafetyConcernReportFromMenu() {
+    closeUserMenu();
+    show('concerns');
+    openScIntakeForm();
+  }
+
   function resetPrototypeData() {
     closeUserMenu();
     const ok = window.confirm(
       'Reset all prototype data saved in this browser?\n\n' +
-      'This clears CPIN submissions, triage changes, pins, audit setup drafts and feedback name — then reloads the app. You will stay signed in.'
+      'This clears CPIN and safety concern submissions, triage changes, pins, audit setup drafts and feedback name — then reloads the app. You will stay signed in.'
     );
     if (!ok) return;
     PROTOTYPE_DATA_STORAGE_KEYS.forEach(function (key) {
@@ -8378,7 +8761,10 @@
     hmcts: ['mstevens', 'kallen'],
     equans: ['spatel', 'dhussain'],
     propdir: ['rbyrne'],
+    mojprop: ['jwong'],
+    'moj-prop': ['jwong'],
     'hmpps-se': ['jgower', 'smitchell'],
+    'hmpps-sw': ['jgower', 'smitchell'],
     'hmpps-lon': ['jgower', 'sreid'],
     'hmpps-kent': ['smitchell', 'jgower'],
     serco: ['tclarke', 'nroberts'],
@@ -8391,7 +8777,10 @@
     'Equans': 'equans',
     'The Property Directorate': 'propdir',
     'Property Directorate': 'propdir',
+    'MoJ': 'propdir',
+    'Ministry of Justice Property': 'moj-prop',
     'HMPPS - South East': 'hmpps-se',
+    'HMPPS - South West': 'hmpps-sw',
     'HMPPS - London': 'hmpps-lon',
     'HMPPS - Kent': 'hmpps-kent',
     'Serco FM': 'serco',
@@ -10278,6 +10667,71 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  /** GOV.UK-style validation: error summary + inline field errors (reusable across processes). */
+  function clearProcessValidation(scopeEl) {
+    if (!scopeEl) return;
+    scopeEl.querySelectorAll('.error-summary').forEach(function (el) {
+      el.hidden = true;
+      el.innerHTML = '';
+    });
+    scopeEl.querySelectorAll('.field--error, .section--error').forEach(function (el) {
+      el.classList.remove('field--error', 'section--error');
+    });
+    scopeEl.querySelectorAll('.field-error-message').forEach(function (el) {
+      el.hidden = true;
+      el.innerHTML = '';
+    });
+    scopeEl.querySelectorAll('[aria-invalid="true"]').forEach(function (el) {
+      el.removeAttribute('aria-invalid');
+      el.removeAttribute('aria-describedby');
+    });
+  }
+
+  function showProcessValidation(summaryEl, errors, scopeEl) {
+    if (!summaryEl) return !errors || !errors.length;
+    const scope = scopeEl || summaryEl.closest('.setup-section') || summaryEl.parentElement;
+    clearProcessValidation(scope);
+    if (!errors || !errors.length) {
+      summaryEl.hidden = true;
+      return true;
+    }
+    const titleId = summaryEl.id + '-title';
+    const items = errors.map(function (err) {
+      const text = err.summaryLink || err.message;
+      const href = err.anchor || ('#' + (err.fieldId || err.wrapperId || ''));
+      return '<li><a href="' + escHtml(href) + '">' + escHtml(text) + '</a></li>';
+    }).join('');
+    summaryEl.innerHTML =
+      '<h2 class="error-summary__title" id="' + escHtml(titleId) + '">There is a problem</h2>' +
+      '<div class="error-summary__body"><ul class="error-summary__list">' + items + '</ul></div>';
+    summaryEl.hidden = false;
+
+    errors.forEach(function (err) {
+      if (err.wrapperId) {
+        const wrap = document.getElementById(err.wrapperId);
+        if (wrap) wrap.classList.add(err.sectionError ? 'section--error' : 'field--error');
+      }
+      if (err.errorId) {
+        const msg = document.getElementById(err.errorId);
+        if (msg) {
+          msg.hidden = false;
+          msg.innerHTML = '<span class="visually-hidden">Error:</span> ' + escHtml(err.message);
+        }
+      }
+      if (err.fieldId) {
+        const field = document.getElementById(err.fieldId);
+        if (field) {
+          field.setAttribute('aria-invalid', 'true');
+          if (err.errorId) field.setAttribute('aria-describedby', err.errorId);
+        }
+      }
+    });
+
+    summaryEl.focus();
+    summaryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return false;
   }
 
   function switchAuditLetter(id) {
@@ -12680,6 +13134,68 @@
   }
 
   // ---------------------------------------------------------
+  // Safety concern intake (fullscreen log form)
+  // ---------------------------------------------------------
+  function populateScIntakePremisesSelect() {
+    const sel = document.getElementById('sc-intake-premises');
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Please select</option>';
+    getCpinPremisesCatalog().forEach(function (p) {
+      const opt = document.createElement('option');
+      opt.value = p.name;
+      opt.textContent = p.name;
+      sel.appendChild(opt);
+    });
+    if (current) sel.value = current;
+  }
+
+  function resetScIntakeForm() {
+    const form = document.getElementById('sc-intake-form');
+    if (form) {
+      form.reset();
+      const dateEl = document.getElementById('sc-intake-report-date');
+      if (dateEl) dateEl.valueAsDate = new Date();
+      const sourceEl = document.getElementById('sc-intake-source');
+      if (sourceEl) sourceEl.value = 'Email report';
+    }
+  }
+
+  function openScIntakeForm() {
+    populateScIntakePremisesSelect();
+    resetScIntakeForm();
+    document.getElementById('sc-intake-modal')?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function () {
+      document.getElementById('sc-intake-report-ref')?.focus();
+    });
+  }
+
+  function closeScIntakeForm() {
+    document.getElementById('sc-intake-modal')?.classList.remove('open');
+    if (!document.getElementById('setup-lookup-modal')?.classList.contains('open') &&
+        !document.getElementById('letter-composer-modal')?.classList.contains('open') &&
+        !document.getElementById('list-date-range-modal')?.classList.contains('open') &&
+        !document.getElementById('new-modal')?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+    resetScIntakeForm();
+  }
+
+  function submitScIntakeForm() {
+    const form = document.getElementById('sc-intake-form');
+    if (!form || typeof saveScIntakeFromForm !== 'function') return;
+    if (!form.reportValidity()) return;
+
+    const record = saveScIntakeFromForm(new FormData(form));
+    if (!record) return;
+
+    closeScIntakeForm();
+    show('concerns');
+    if (typeof switchConcernsTab === 'function') switchConcernsTab('unassigned');
+  }
+
+  // ---------------------------------------------------------
   // + New modal
   // ---------------------------------------------------------
   function openNewModal() {
@@ -12690,7 +13206,8 @@
     document.getElementById('new-modal').classList.remove('open');
     if (!document.getElementById('setup-lookup-modal')?.classList.contains('open') &&
         !document.getElementById('letter-composer-modal')?.classList.contains('open') &&
-        !document.getElementById('list-date-range-modal')?.classList.contains('open')) {
+        !document.getElementById('list-date-range-modal')?.classList.contains('open') &&
+        !document.getElementById('sc-intake-modal')?.classList.contains('open')) {
       document.body.style.overflow = '';
     }
   }
@@ -12716,6 +13233,8 @@
         closeGlobalFloatPanel();
       } else if (document.getElementById('letter-composer-modal')?.classList.contains('open')) {
         closeLetterComposer();
+      } else if (document.getElementById('sc-intake-modal')?.classList.contains('open')) {
+        closeScIntakeForm();
       } else if (document.getElementById('list-date-range-modal')?.classList.contains('open')) {
         closeListDateRangeModal();
       } else if (document.getElementById('setup-lookup-modal')?.classList.contains('open')) {
@@ -13013,6 +13532,11 @@
     return letterComposerState.context === 'audit-setup' || letterComposerState.context === 'audit-activity';
   }
 
+  function letterComposerUsesBizSupport() {
+    if (!letterComposerState) return false;
+    return letterComposerState.context === 'bizsupport';
+  }
+
   function getSetupLetterRecipients() {
     return getSetupResponsiblePersonsForDutyHolders().filter(function (rp) {
       return rp.status === 'accepted';
@@ -13031,12 +13555,20 @@
 
   function getLetterComposerRecipients() {
     if (letterComposerUsesAuditSetup()) return getSetupLetterRecipients();
+    if (letterComposerUsesBizSupport() && typeof getBizSupportById === 'function' && typeof getBsLetterRecipients === 'function') {
+      const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
+      return bs ? getBsLetterRecipients(bs) : [];
+    }
     const cpin = getCpinById(activeCpinId);
     return cpin ? getCpinLetterRecipients(cpin) : [];
   }
 
   function getLetterComposerSavedLetters() {
     if (letterComposerUsesAuditSetup()) return getAuditSetupSavedLetters();
+    if (letterComposerUsesBizSupport() && typeof getBizSupportById === 'function' && typeof getBsSavedLetters === 'function') {
+      const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
+      return bs ? getBsSavedLetters(bs) : [];
+    }
     const cpin = getCpinById(activeCpinId);
     return cpin ? getCpinSavedLetters(cpin) : [];
   }
@@ -13045,12 +13577,36 @@
     if (letterComposerUsesAuditSetup()) {
       return auditSetup.premises || 'Temple Quay House, Bristol BS1';
     }
+    if (letterComposerUsesBizSupport() && typeof getBizSupportById === 'function') {
+      const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
+      return bs?.premises || '';
+    }
     const cpin = getCpinById(activeCpinId);
     return cpin?.premises || '';
   }
 
+  function formatBsAppointment(rec) {
+    const apt = (rec && rec.appointment) || {};
+    const dateVal = apt.date || '';
+    const timeVal = apt.time || '10:00';
+    const durKey = apt.duration || 'half';
+    const durationMap = Object.assign({}, DURATION_LABELS, { short: '1–2 hours' });
+    const duration = durationMap[durKey] || DURATION_LABELS.half;
+    if (!dateVal) {
+      return { label: '—', long: 'the agreed date', duration: duration };
+    }
+    const day = new Date(dateVal).toLocaleDateString('en-GB', { weekday: 'long' });
+    const dateShort = new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const time = timeVal ? timeVal.slice(0, 5) : '10:00';
+    return {
+      label: day.slice(0, 3) + ' ' + dateShort + ', ' + time,
+      long: day + ' ' + new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + time,
+      duration: duration
+    };
+  }
+
   function getLetterTemplatesForContext(context, searchQuery) {
-    const resolvedContext = (context === 'audit-setup' || context === 'audit-activity') ? 'cpin-onsite' : context;
+    const resolvedContext = (context === 'audit-setup' || context === 'audit-activity' || context === 'bizsupport') ? 'cpin-onsite' : context;
     const q = (searchQuery || '').trim().toLowerCase();
     return LETTER_TEMPLATES.filter(function (t) {
       if (t.contexts.indexOf(resolvedContext) < 0) return false;
@@ -13123,6 +13679,15 @@
         premises: auditSetup.premises || 'Temple Quay House, Bristol BS1',
         appointment: appt,
         incidentRef: auditSetup.sourceCpinRef || 'CPIN-2026-0418',
+        assignee: 'Phil Gower'
+      };
+    }
+    if (context === 'bizsupport' && typeof getBizSupportById === 'function') {
+      const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
+      return {
+        premises: bs?.premises || 'Premises',
+        appointment: formatBsAppointment(bs),
+        incidentRef: bs?.ref || '',
         assignee: 'Phil Gower'
       };
     }
@@ -13201,6 +13766,7 @@
     if (!letterComposerState) return;
     const cpin = getCpinById(activeCpinId);
     const isAudit = letterComposerUsesAuditSetup();
+    const isBs = letterComposerUsesBizSupport();
     const isView = letterComposerState.mode === 'view';
     const allTemplates = getLetterTemplatesForContext(letterComposerState.context);
     const templates = getLetterTemplatesForContext(letterComposerState.context, letterComposerState.templateSearch);
@@ -13225,6 +13791,8 @@
         subEl.textContent = 'Choose a template and recipients — use View to preview each letter. Saved copies appear in All and Files on this CPIN.';
       } else if (letterComposerState.context === 'audit-setup') {
         subEl.textContent = 'Choose a template and recipients — letters are saved here and sent when you start the audit.';
+      } else if (letterComposerState.context === 'bizsupport') {
+        subEl.textContent = 'Choose a template and recipients — letters are saved to this business support record and the activity log.';
       } else {
         subEl.textContent = 'Choose a template and recipients on the left — use View to preview each person\'s letter.';
       }
@@ -13285,7 +13853,7 @@
     if (recEl) {
       if (isView) {
         if (!saved.length) {
-          recEl.innerHTML = '<div class="letter-attachment-empty">No saved letters' + (isAudit ? ' for this audit setup' : ' on this CPIN') + '.</div>';
+          recEl.innerHTML = '<div class="letter-attachment-empty">No saved letters' + (isAudit ? ' for this audit setup' : (isBs ? ' on this business support' : ' on this CPIN')) + '.</div>';
         } else {
           recEl.innerHTML = saved.map(function (ltr) {
             const previewing = ltr.id === letterComposerState.viewLetterId;
@@ -13345,10 +13913,10 @@
     const previewRp = recipients.find(function (rp) { return rp.id === letterComposerState.previewRecipientId; }) || recipients[0];
 
     if (dateEl) dateEl.textContent = letterComposerTodayLabel();
-    if (addresseeEl && (cpin || isAudit)) {
+    if (addresseeEl && (cpin || isAudit || isBs)) {
       addresseeEl.innerHTML = letterComposerAddresseeHtml(previewRp, premises);
     }
-    if (bodyEl && template && (cpin || isAudit)) {
+    if (bodyEl && template && (cpin || isAudit || isBs)) {
       if (letterComposerState.customBody && !letterComposerState.editing) {
         bodyEl.innerHTML = letterComposerState.customBody;
       } else if (!letterComposerState.editing) {
@@ -13465,8 +14033,9 @@
   function saveLetterComposer() {
     if (!letterComposerState || letterComposerState.mode === 'view') return;
     const isAudit = letterComposerUsesAuditSetup();
+    const isBs = letterComposerUsesBizSupport();
     const cpin = getCpinById(activeCpinId);
-    if (!isAudit && !cpin) return;
+    if (!isAudit && !isBs && !cpin) return;
     const recipients = getLetterComposerRecipients();
     const recipientIds = letterComposerState.recipientIds || [];
     const selected = recipients.filter(function (rp) { return recipientIds.indexOf(rp.id) >= 0; });
@@ -13526,6 +14095,21 @@
     if (saveTo === 'audit-activity-files') {
       appendAuditLettersToActivity(newLetters, stamp);
       closeLetterComposer();
+      return;
+    }
+
+    if (saveTo === 'bizsupport' && typeof getBizSupportById === 'function' && typeof persistBsPatch === 'function') {
+      const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
+      if (!bs) return;
+      const apt = Object.assign({}, bs.appointment || {}, {
+        letters: getBsSavedLetters(bs).concat(newLetters),
+        letterSent: true,
+        letterSkipped: false
+      });
+      persistBsPatch(bs.id, { appointment: apt });
+      if (typeof appendBsLettersToActivity === 'function') appendBsLettersToActivity(newLetters, stamp);
+      closeLetterComposer();
+      if (typeof initBizSupportPage === 'function') initBizSupportPage();
       return;
     }
 
@@ -13651,6 +14235,26 @@
       return;
     }
     openLetterComposer({ context: 'audit-setup', saveTo: 'setup' });
+  }
+
+  function openBsLetterComposer() {
+    if (typeof getBizSupportById !== 'function') return;
+    const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
+    if (!bs) return;
+    const hasDh = (bs.dutyHolders || []).some(function (d) { return d.status === 'accepted'; });
+    if (!hasDh) {
+      window.alert('Approve at least one Duty Holder before writing letters.');
+      return;
+    }
+    if (typeof getBsLetterRecipients === 'function' && !getBsLetterRecipients(bs).length) {
+      window.alert('Approve at least one Responsible Person linked to your Duty Holders before writing letters.');
+      return;
+    }
+    openLetterComposer({ context: 'bizsupport', saveTo: 'bizsupport' });
+  }
+
+  function viewBsLetter(letterId) {
+    openLetterComposer({ context: 'bizsupport', mode: 'view', viewLetterId: letterId });
   }
 
   function openAuditActivityLetterComposer() {

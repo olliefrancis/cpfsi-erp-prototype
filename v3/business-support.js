@@ -130,7 +130,148 @@
   function bsSetupComplete(rec) {
     if (!rec || !rec.premises) return false;
     const apt = rec.appointment || {};
-    return !!(apt.date && apt.time && apt.confirmed && bsHasAcceptedDutyHolders(rec));
+    const purpose = (rec.purpose || '').trim();
+    return !!(purpose && apt.date && apt.time && apt.confirmed && bsHasAcceptedDutyHolders(rec));
+  }
+
+  function getBsSetupValidationErrors(rec) {
+    if (!rec) return [];
+    const errors = [];
+    const purpose = (document.getElementById('bs-purpose')?.value || rec.purpose || '').trim();
+    const apt = rec.appointment || {};
+    const date = document.getElementById('bs-apt-date')?.value || apt.date || '';
+    const time = document.getElementById('bs-apt-time')?.value || apt.time || '';
+    const confirmed = document.getElementById('bs-apt-confirmed')?.checked ?? !!apt.confirmed;
+
+    if (!purpose) {
+      errors.push({
+        fieldId: 'bs-purpose',
+        wrapperId: 'bs-purpose-wrap',
+        errorId: 'bs-purpose-error',
+        anchor: '#bs-purpose',
+        message: 'Enter the purpose of support',
+        summaryLink: 'Enter the purpose of support'
+      });
+    }
+    if (!bsHasAcceptedDutyHolders(rec)) {
+      errors.push({
+        wrapperId: 'bs-dh-section',
+        errorId: 'bs-dh-error',
+        anchor: '#bs-dh-section',
+        sectionError: true,
+        message: 'Approve at least one Duty Holder',
+        summaryLink: 'Approve at least one Duty Holder'
+      });
+    }
+    if (!date) {
+      errors.push({
+        fieldId: 'bs-apt-date',
+        wrapperId: 'bs-apt-date-wrap',
+        errorId: 'bs-apt-date-error',
+        anchor: '#bs-apt-date',
+        message: 'Enter an appointment date',
+        summaryLink: 'Enter an appointment date'
+      });
+    }
+    if (!time) {
+      errors.push({
+        fieldId: 'bs-apt-time',
+        wrapperId: 'bs-apt-time-wrap',
+        errorId: 'bs-apt-time-error',
+        anchor: '#bs-apt-time',
+        message: 'Enter an appointment time',
+        summaryLink: 'Enter an appointment time'
+      });
+    }
+    if (!confirmed) {
+      errors.push({
+        fieldId: 'bs-apt-confirmed',
+        wrapperId: 'bs-apt-confirmed-wrap',
+        errorId: 'bs-apt-confirmed-error',
+        anchor: '#bs-apt-confirmed',
+        message: 'Confirm the appointment is agreed',
+        summaryLink: 'Confirm the appointment is agreed'
+      });
+    }
+    return errors;
+  }
+
+  function getBsCloseValidationErrors(rec) {
+    if (!rec) return [];
+    const errors = [];
+
+    if (!rec.furtherRequired) {
+      errors.push({
+        wrapperId: 'bs-further-required-section',
+        errorId: 'bs-further-required-error',
+        anchor: '#bs-further-required-section',
+        sectionError: true,
+        message: 'Select whether anything further is required',
+        summaryLink: 'Select whether anything further is required'
+      });
+    }
+
+    if (rec.furtherRequired === 'yes') {
+      const fu = rec.followUp || {};
+      const fuDate = document.getElementById('bs-followup-date')?.value || fu.date || '';
+      const fuTime = document.getElementById('bs-followup-time')?.value || fu.time || '';
+      const fuMode = document.getElementById('bs-followup-mode')?.value || fu.mode || '';
+      const fuPurpose = (document.getElementById('bs-followup-purpose')?.value || fu.purpose || '').trim();
+
+      if (!fuDate) {
+        errors.push({
+          fieldId: 'bs-followup-date',
+          wrapperId: 'bs-followup-date-wrap',
+          errorId: 'bs-followup-date-error',
+          anchor: '#bs-followup-date',
+          message: 'Enter a follow-up date',
+          summaryLink: 'Enter a follow-up date'
+        });
+      }
+      if (!fuTime) {
+        errors.push({
+          fieldId: 'bs-followup-time',
+          wrapperId: 'bs-followup-time-wrap',
+          errorId: 'bs-followup-time-error',
+          anchor: '#bs-followup-time',
+          message: 'Enter a follow-up time',
+          summaryLink: 'Enter a follow-up time'
+        });
+      }
+      if (!fuMode) {
+        errors.push({
+          fieldId: 'bs-followup-mode',
+          wrapperId: 'bs-followup-mode-wrap',
+          errorId: 'bs-followup-mode-error',
+          anchor: '#bs-followup-mode',
+          message: 'Select a follow-up mode',
+          summaryLink: 'Select a follow-up mode'
+        });
+      }
+      if (!fuPurpose) {
+        errors.push({
+          fieldId: 'bs-followup-purpose',
+          wrapperId: 'bs-followup-purpose-wrap',
+          errorId: 'bs-followup-purpose-error',
+          anchor: '#bs-followup-purpose',
+          message: 'Enter a purpose note for the follow-up',
+          summaryLink: 'Enter a purpose note for the follow-up'
+        });
+      }
+    }
+
+    const reason = (document.getElementById('bs-close-reason')?.value || '').trim();
+    if (!reason) {
+      errors.push({
+        fieldId: 'bs-close-reason',
+        wrapperId: 'bs-close-reason-wrap',
+        errorId: 'bs-close-reason-error',
+        anchor: '#bs-close-reason',
+        message: 'Enter a reason for closing',
+        summaryLink: 'Enter a reason for closing'
+      });
+    }
+    return errors;
   }
 
   function bsCanStartSession(rec) {
@@ -170,6 +311,98 @@
     };
   }
 
+  function getBsDhKey(dh) {
+    if (!dh) return null;
+    return dh.key || (typeof SETUP_DH_KEY_BY_NAME !== 'undefined' ? SETUP_DH_KEY_BY_NAME[dh.name] : null) || null;
+  }
+
+  function getBsAcceptedDhKeys(rec) {
+    return (rec.dutyHolders || []).filter(function (d) { return d.status === 'accepted'; }).map(getBsDhKey).filter(Boolean);
+  }
+
+  function getBsDhKeysOnList(rec) {
+    return (rec.dutyHolders || []).filter(function (d) { return d.status !== 'rejected'; }).map(getBsDhKey).filter(Boolean);
+  }
+
+  function getBsResponsiblePersonsForDutyHolders(rec, opts) {
+    opts = opts || {};
+    const dhKeys = opts.acceptedOnly ? getBsAcceptedDhKeys(rec) : getBsDhKeysOnList(rec);
+    if (!dhKeys.length) return [];
+    return (rec.responsiblePersons || []).filter(function (rp) {
+      if (rp.status === 'rejected') return false;
+      if (opts.acceptedOnly && rp.status !== 'accepted') return false;
+      if (!rp.linkedDh) return false;
+      return dhKeys.indexOf(rp.linkedDh) >= 0;
+    });
+  }
+
+  function getBsLetterRecipients(rec) {
+    return getBsResponsiblePersonsForDutyHolders(rec, { acceptedOnly: true });
+  }
+
+  function getBsSavedLetters(rec) {
+    const apt = rec.appointment || {};
+    if (apt.letters && apt.letters.length) return apt.letters.slice();
+    return [];
+  }
+
+  function suggestBsRpsForDh(dhKey) {
+    const rec = getBizSupportById(activeBizSupportId);
+    if (!rec || !dhKey || typeof SETUP_DH_TO_RP_KEYS === 'undefined') return false;
+    const keys = SETUP_DH_TO_RP_KEYS[dhKey] || [];
+    const catalog = typeof SETUP_LOOKUP_CATALOG !== 'undefined' ? SETUP_LOOKUP_CATALOG.responsiblePerson : [];
+    const rps = (rec.responsiblePersons || []).slice();
+    let changed = false;
+    keys.forEach(function (rk) {
+      const entry = catalog.find(function (e) { return e.key === rk; });
+      if (!entry) return;
+      const exists = rps.some(function (r) {
+        return (r.key === rk || r.name.toLowerCase() === entry.name.toLowerCase()) && r.linkedDh === dhKey;
+      });
+      if (exists) return;
+      rps.push({
+        id: 'rp-' + dhKey + '-' + rk,
+        key: rk,
+        ref: entry.ref,
+        name: entry.name,
+        role: entry.role,
+        initials: entry.initials,
+        fromPremises: true,
+        status: 'suggested',
+        linkedDh: dhKey
+      });
+      changed = true;
+    });
+    if (changed) persistBsPatch(rec.id, { responsiblePersons: rps });
+    return changed;
+  }
+
+  function ensureBsRpSuggestions(rec) {
+    if (!rec) return false;
+    const holders = (rec.dutyHolders || []).filter(function (d) { return d.status !== 'rejected'; });
+    if (!holders.length) return false;
+    let changed = false;
+    holders.forEach(function (dh) {
+      const dhKey = getBsDhKey(dh);
+      if (dhKey && suggestBsRpsForDh(dhKey)) changed = true;
+    });
+    return changed;
+  }
+
+  function pruneBsResponsiblePersons(rec) {
+    if (!rec) return false;
+    const dhKeys = getBsDhKeysOnList(rec);
+    const rps = (rec.responsiblePersons || []).filter(function (rp) {
+      if (!rp.linkedDh) return true;
+      return dhKeys.indexOf(rp.linkedDh) >= 0;
+    });
+    if (rps.length !== (rec.responsiblePersons || []).length) {
+      persistBsPatch(rec.id, { responsiblePersons: rps });
+      return true;
+    }
+    return false;
+  }
+
   function ensureBsDutyHolderSuggestions(rec) {
     const fromMap = BS_DH_BY_PREMISES[rec.premises] || [];
     const holders = (rec.dutyHolders || []).slice();
@@ -190,6 +423,31 @@
       changed = true;
     });
     if (changed) persistBsPatch(rec.id, { dutyHolders: holders });
+  }
+
+  function appendBsLettersToActivity(letters, stamp) {
+    letters.forEach(function (ltr, i) {
+      const entryTs = stamp.ts - i;
+      bsActivityLog.files.unshift({
+        id: 'f-' + ltr.id,
+        name: ltr.fileName,
+        description: ltr.templateLabel + ' · ' + ltr.recipientName,
+        at: ltr.at,
+        ts: entryTs
+      });
+    });
+    if (letters.length) {
+      const names = letters.map(function (ltr) { return ltr.recipientName; });
+      bsActivityLog.notes.unshift({
+        id: 'n-ltr-' + stamp.ts,
+        text: letters.length === 1
+          ? 'Appointment letter saved for ' + names[0] + '.'
+          : letters.length + ' appointment letters saved for ' + names.join(', ') + '.',
+        at: stamp.at,
+        ts: stamp.ts
+      });
+    }
+    persistBsPatch(activeBizSupportId, { activityLog: bsActivityLog });
   }
 
   function renderBsPremisesCard(rec) {
@@ -244,23 +502,58 @@
   function renderBsResponsiblePersons(rec) {
     const list = document.getElementById('bs-rp-list');
     if (!list) return;
-    const rps = rec.responsiblePersons || [];
+    ensureBsRpSuggestions(rec);
+    pruneBsResponsiblePersons(rec);
+    rec = getBizSupportById(rec.id) || rec;
+    const rps = getBsResponsiblePersonsForDutyHolders(rec);
     if (!rps.length) {
-      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;">Approve Duty Holders first — Responsible Persons are suggested for each.</p>';
+      list.innerHTML = '<p style="color:var(--ink-3);font-size:13px;margin:0;">Suggested contacts appear here for each Duty Holder above. Use + Add to search the directory.</p>';
       return;
     }
     list.innerHTML = rps.map(function (rp) {
-      const pill = rp.status === 'suggested' ? '<span class="pill amber">Suggested</span>' : '<span class="pill blue">Approved</span>';
+      const dhLabel = rp.linkedDh && typeof getDutyHolderLabelForKey === 'function'
+        ? getDutyHolderLabelForKey(rp.linkedDh)
+        : '';
+      const roleLine = escHtml(rp.role || '') + (dhLabel ? '  ·  Contact for ' + escHtml(dhLabel) : '');
+      const pill = rp.status === 'suggested' ? '<span class="pill amber">Suggested</span>' : '<span class="pill grey">Approved</span>';
       const actions = rp.status === 'suggested'
         ? '<div class="holder-actions"><button class="btn primary" type="button" onclick="acceptBsResponsiblePerson(\'' + rp.id + '\')">Approve</button><button class="btn" type="button" onclick="removeBsResponsiblePerson(\'' + rp.id + '\')">Reject</button></div>'
         : '<div class="holder-actions"><span class="remove" onclick="removeBsResponsiblePerson(\'' + rp.id + '\')">×</span></div>';
       return '<div class="holder-card' + (rp.status === 'suggested' ? ' is-suggested' : '') + '">' +
         '<div class="avatar-sm">' + escHtml(rp.initials || 'RP') + '</div>' +
-        '<div><div class="name">' + escHtml(rp.name) + '</div><div class="role">' + escHtml(rp.role || '') + '</div></div>' +
+        '<div><div class="name">' + escHtml(rp.name) + '</div><div class="role">' + roleLine + '</div></div>' +
         pill + actions + '</div>';
     }).join('');
     const sum = document.getElementById('bs-sum-rp');
     if (sum) sum.textContent = String(rps.filter(function (r) { return r.status === 'accepted'; }).length);
+  }
+
+  function renderBsAppointmentLetters(rec) {
+    const list = document.getElementById('bs-appointment-letters-list');
+    const status = document.getElementById('bs-letter-status');
+    if (!list) return;
+    const letters = getBsSavedLetters(rec);
+    const apt = rec.appointment || {};
+
+    if (!letters.length) {
+      list.innerHTML = '<div class="letter-attachment-empty">No letters saved yet. Use Write letter to create templated letters for Responsible Persons on this business support.</div>';
+    } else {
+      list.innerHTML = letters.map(function (ltr) {
+        const meta = (ltr.templateLabel || 'Letter') + ' · ' + (ltr.recipientName || 'Recipient') + (ltr.at ? ' · ' + ltr.at : '');
+        return '<div class="letter-attachment-item">' +
+          '<div class="letter-attachment-icon">PDF</div>' +
+          '<div class="letter-attachment-info"><strong>' + escHtml(ltr.fileName || 'Letter.pdf') + '</strong>' +
+          '<span>' + escHtml(meta) + '</span></div>' +
+          '<button class="btn" type="button" onclick="viewBsLetter(\'' + escHtml(ltr.id) + '\')">View</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    if (status) {
+      if (apt.letterSkipped) status.textContent = 'Skipped — informal call or email';
+      else if (letters.length) status.textContent = '✓ ' + letters.length + (letters.length === 1 ? ' letter saved' : ' letters saved');
+      else status.textContent = '';
+    }
   }
 
   function renderBsAppointmentFields(rec) {
@@ -286,12 +579,7 @@
         sumAppt.textContent = 'Not set';
       }
     }
-    const letterStatus = document.getElementById('bs-letter-status');
-    if (letterStatus) {
-      if (apt.letterSent) letterStatus.textContent = 'Appointment letter sent.';
-      else if (apt.letterSkipped) letterStatus.textContent = 'Letter skipped — informal call or email.';
-      else letterStatus.textContent = '';
-    }
+    renderBsAppointmentLetters(rec);
   }
 
   function renderBsStageRail(rec) {
@@ -310,19 +598,11 @@
     const setup = document.getElementById('bs-section-setup');
     const conduct = document.getElementById('bs-section-conduct');
     const closeSec = document.getElementById('bs-section-close');
-    const startBtn = document.getElementById('bs-start-btn');
-    const startBlocked = document.getElementById('bs-start-blocked');
     const isClosed = rec.workflow === 'closed';
 
     if (setup) setup.hidden = isClosed || rec.workflow !== 'setup';
     if (conduct) conduct.hidden = isClosed || rec.workflow === 'setup';
     if (closeSec) closeSec.hidden = isClosed ? false : rec.workflow === 'setup';
-
-    if (startBtn) startBtn.disabled = !bsCanStartSession(rec);
-    if (startBlocked) {
-      startBlocked.hidden = bsCanStartSession(rec);
-      if (!bsCanStartSession(rec)) startBlocked.textContent = 'Set purpose, appointment, approve a Duty Holder and confirm the appointment first.';
-    }
 
     const followUp = document.getElementById('bs-follow-up-fields');
     if (followUp) followUp.hidden = rec.furtherRequired !== 'yes';
@@ -347,11 +627,7 @@
     } else {
       if (open) open.hidden = rec.workflow === 'setup';
       if (done) done.hidden = true;
-      if (btn) btn.disabled = !bsCanClose(rec);
-      if (blocked) {
-        blocked.hidden = bsCanClose(rec) || rec.workflow === 'setup';
-        if (!bsCanClose(rec) && rec.workflow === 'conduct') blocked.textContent = 'Complete the support session and answer whether anything further is required.';
-      }
+      if (blocked) blocked.hidden = true;
       if (spawn) spawn.hidden = true;
     }
   }
@@ -480,18 +756,16 @@
     refreshBsPage();
   }
 
-  function sendBsLetter() {
+  function startBsSession() {
+    saveBsAppointment();
     const rec = getBizSupportById(activeBizSupportId);
     if (!rec) return;
-    persistBsPatch(activeBizSupportId, { appointment: Object.assign({}, rec.appointment || {}, { letterSent: true, letterSkipped: false }) });
-    refreshBsPage();
-  }
-
-  function startBsSession() {
-    const rec = getBizSupportById(activeBizSupportId);
-    if (!rec || !bsCanStartSession(rec)) {
-      alert('Complete setup steps first.');
-      return;
+    const summary = document.getElementById('bs-setup-error-summary');
+    const errors = getBsSetupValidationErrors(rec);
+    if (typeof showProcessValidation === 'function' && !showProcessValidation(summary, errors)) return;
+    if (!bsCanStartSession(rec)) return;
+    if (typeof clearProcessValidation === 'function') {
+      clearProcessValidation(document.getElementById('bs-section-setup'));
     }
     persistBsPatch(activeBizSupportId, { workflow: 'conduct' });
     refreshBsPage();
@@ -523,10 +797,18 @@
   }
 
   function closeBsProcess() {
+    saveBsFollowUp();
     const rec = getBizSupportById(activeBizSupportId);
-    if (!rec || !bsCanClose(rec)) { alert('Complete required steps before closing.'); return; }
+    if (!rec) return;
+    const summary = document.getElementById('bs-close-error-summary');
+    const errors = getBsCloseValidationErrors(rec);
+    const workflowCol = document.getElementById('bs-section-close')?.parentElement;
+    if (typeof showProcessValidation === 'function' && !showProcessValidation(summary, errors, workflowCol)) return;
+    if (!bsCanClose(rec)) return;
     const reason = document.getElementById('bs-close-reason')?.value?.trim();
-    if (!reason) { alert('Enter a reason for closing.'); return; }
+    if (typeof clearProcessValidation === 'function' && workflowCol) {
+      clearProcessValidation(workflowCol);
+    }
     const patch = { workflow: 'closed', closeReason: reason, closedAt: new Date().toISOString(), activityLog: bsActivityLog };
     if (rec.furtherRequired === 'yes') patch.spawnedProcessId = 'A-2026-' + String(3400 + Math.floor(Math.random() * 100));
     persistBsPatch(activeBizSupportId, patch);
@@ -536,10 +818,13 @@
   function acceptBsDutyHolder(id) {
     const rec = getBizSupportById(activeBizSupportId);
     if (!rec) return;
+    const record = (rec.dutyHolders || []).find(function (d) { return d.id === id; });
     const holders = (rec.dutyHolders || []).map(function (d) {
-      return d.id === id ? Object.assign({}, d, { status: 'accepted' }) : d;
+      return d.id === id ? Object.assign({}, d, { status: 'accepted', key: d.key || (typeof SETUP_DH_KEY_BY_NAME !== 'undefined' ? SETUP_DH_KEY_BY_NAME[d.name] : null) }) : d;
     });
     persistBsPatch(activeBizSupportId, { dutyHolders: holders });
+    const dhKey = record && getBsDhKey(Object.assign({}, record, { status: 'accepted' }));
+    if (dhKey) suggestBsRpsForDh(dhKey);
     refreshBsPage();
   }
 
@@ -547,6 +832,7 @@
     const rec = getBizSupportById(activeBizSupportId);
     if (!rec) return;
     persistBsPatch(activeBizSupportId, { dutyHolders: (rec.dutyHolders || []).filter(function (d) { return d.id !== id; }) });
+    pruneBsResponsiblePersons(getBizSupportById(activeBizSupportId));
     refreshBsPage();
   }
 
@@ -668,7 +954,11 @@
   window.startBizSupportFromPremises = startBizSupportFromPremises;
   window.saveBsAppointment = saveBsAppointment;
   window.skipBsLetter = skipBsLetter;
-  window.sendBsLetter = sendBsLetter;
+  window.getBsLetterRecipients = getBsLetterRecipients;
+  window.getBsSavedLetters = getBsSavedLetters;
+  window.appendBsLettersToActivity = appendBsLettersToActivity;
+  window.getBsSetupValidationErrors = getBsSetupValidationErrors;
+  window.getBsCloseValidationErrors = getBsCloseValidationErrors;
   window.startBsSession = startBsSession;
   window.saveBsConductNotes = saveBsConductNotes;
   window.saveBsFurtherRequired = saveBsFurtherRequired;
