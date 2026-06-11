@@ -525,6 +525,10 @@
   }
   #bizsupport .process-grid {
     grid-template-columns: 1fr 280px;
+    align-items: start;
+  }
+  #bizsupport .process-grid .cpin-single-workflow {
+    margin-top: 0;
   }
   .stage-rail {
     background: var(--surface);
@@ -2129,6 +2133,7 @@
   .letter-composer-layout {
     display: grid;
     grid-template-columns: 380px 1fr;
+    width: 100%;
     height: 100%;
     min-height: 0;
   }
@@ -2238,6 +2243,8 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
   }
   .letter-composer-preview-section {
     flex: 1;
@@ -2248,6 +2255,8 @@
   .letter-composer-preview-wrap {
     flex: 1;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     margin-top: 4px;
@@ -2256,8 +2265,12 @@
   #letter-composer-preview {
     flex: 1;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: none;
     height: 100%;
     overflow-y: auto;
+    box-sizing: border-box;
   }
   #letter-composer-preview.editing {
     outline: 2px solid var(--gov-focus);
@@ -5318,7 +5331,7 @@
           <button class="btn" onclick="show('audit')">▶ Continue current audit</button>
           <button class="btn" onclick="show('auditsetup')">+ New audit</button>
           <button class="btn" onclick="startBizSupportFromPremises('Temple Quay House')">+ Log business support</button>
-          <button class="btn" onclick="show('concerns')">+ Log safety concern</button>
+          <button class="btn" onclick="openScIntakeForm('Temple Quay House')">+ Log safety concern</button>
           <button class="btn">+ New consultation</button>
         </div>
         <div style="margin-top:16px;font-size:11px;color:var(--ink-3);">
@@ -6490,88 +6503,133 @@
 
       <div class="setup-section cpin-workflow-section" id="concern-section-triage" hidden>
         <h3>Triage and decision</h3>
-        <div class="help">Review the hazard report, RAG flag and premises — then decide if the Duty Holder needs to do anything further.</div>
+        <div class="help">Review the concern report, RAG flag and premises — then decide if any further action is required.</div>
         <div class="audit-note-form" style="margin-top:12px;margin-bottom:14px;">
           <label for="concern-review-notes">Review notes</label>
           <textarea id="concern-review-notes" placeholder="What was reported, context, contact with Duty Holder…" onchange="saveConcernReviewNotes()"></textarea>
         </div>
         <div class="cpin-branch-panel">
-          <h3>Does the Duty Holder need to do anything further?</h3>
+          <h3>Does this concern need any further action?</h3>
           <div class="cpin-decision-options">
             <label class="cpin-decision-option">
               <input type="radio" name="concern-further-action" value="no" onchange="saveConcernFurtherAction()" />
-              <div><strong>No — remain open or close</strong><span>Typical for Green concerns — record reason and close below.</span></div>
+              <div><strong>No further action</strong><span>Typical for Green concerns — record reason and close below.</span></div>
             </label>
             <label class="cpin-decision-option">
               <input type="radio" name="concern-further-action" value="yes" onchange="saveConcernFurtherAction()" />
-              <div><strong>Yes — action required</strong><span>Proceed to desk-based examination and remote evaluation if needed.</span></div>
+              <div><strong>Yes — action required</strong><span>Proceed to examine the concern and decide next steps.</span></div>
             </label>
           </div>
         </div>
       </div>
 
       <div class="setup-section cpin-workflow-section" id="concern-section-dh" hidden>
-        <h3>Duty Holders</h3>
-        <div class="help">Contact the Duty Holder. Suggested organisations from the premises record — approve before remote evaluation.</div>
+        <h3>Duty Holders and Responsible Persons</h3>
+        <div class="help">Duty Holders are pre-suggested from this premises. Responsible Persons are suggested for each Duty Holder — approve both before examination unlocks.</div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders</div>
         <div id="concern-dh-list"></div>
         <div class="add-holder-btn" onclick="addConcernDutyHolder()">+ Add a Duty Holder</div>
+        <p id="concern-dh-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:16px 0 6px;">Responsible Persons</div>
+        <div id="concern-rp-list"></div>
+        <div class="add-holder-btn" onclick="addConcernResponsiblePerson()">+ Add a Responsible Person</div>
+        <p id="concern-rp-hint" style="margin:8px 0 0;font-size:13px;color:var(--ink-2);"></p>
       </div>
 
       <div class="setup-section cpin-workflow-section" id="concern-section-remote" hidden>
-        <h3>Examine the hazard (desk-based)</h3>
-        <div class="help">Carry out the remote evaluation. Contact premises, national fire safety team or other parties. Use <strong>Log</strong> in the activity bar.</div>
+        <h3>Examine the concern (desk-based)</h3>
+        <div class="help">Carry out the desk-based examination. Contact premises, national fire safety team or other parties. Use <strong>Log</strong> in the activity bar.</div>
         <div class="audit-note-form" style="margin-top:12px;">
           <label for="concern-desk-notes">Evaluation summary</label>
-          <textarea id="concern-desk-notes" placeholder="Remote evaluation findings…" onchange="saveConcernDeskNotes()"></textarea>
+          <textarea id="concern-desk-notes" placeholder="Desk-based examination findings…" onchange="saveConcernDeskNotes()"></textarea>
         </div>
       </div>
 
       <div class="setup-section cpin-workflow-section" id="concern-section-outcome" hidden>
-        <h3>What does the hazard need?</h3>
+        <h3>What does the concern need?</h3>
         <div class="cpin-decision-options" style="margin-top:0;">
           <label class="cpin-decision-option">
             <input type="radio" name="concern-desk-outcome" value="no_action" onchange="saveConcernDeskOutcome()" />
-            <div><strong>No further action needed</strong><span>Log findings against premises and close.</span></div>
+            <div><strong>No further action needed</strong><span>Log evaluation and close with a reason.</span></div>
+          </label>
+          <label class="cpin-decision-option">
+            <input type="radio" name="concern-desk-outcome" value="onsite_eval" onchange="saveConcernDeskOutcome()" />
+            <div><strong>On-site Fire Safety Evaluation needed</strong><span>Physical visit within 24–48h — CCTV, discussions, then decide if an audit is required.</span></div>
           </label>
           <label class="cpin-decision-option">
             <input type="radio" name="concern-desk-outcome" value="audit" onchange="saveConcernDeskOutcome()" />
-            <div><strong>An audit is needed</strong><span>Closing will create a new audit process.</span></div>
-          </label>
-          <label class="cpin-decision-option">
-            <input type="radio" name="concern-desk-outcome" value="remote_eval" onchange="saveConcernDeskOutcome()" />
-            <div><strong>Remote evaluation with visit needed</strong><span>Confirm appointment, conduct evaluation, record findings.</span></div>
+            <div><strong>Audit required (no on-site evaluation first)</strong><span>Closing this safety concern will automatically start a new audit process.</span></div>
           </label>
         </div>
+        <p id="concern-outcome-hint" style="margin:12px 0 0;font-size:13px;color:var(--ink-3);"></p>
       </div>
 
-      <div class="setup-section cpin-workflow-section" id="concern-section-remote-visit" hidden>
-        <h3>Remote evaluation</h3>
-        <div class="help">Confirm the appointment, send confirmation, then conduct the remote evaluation and record findings.</div>
-        <div class="field-row" style="margin-top:12px;">
-          <div class="field">
-            <label for="concern-remote-date">Date</label>
-            <input type="date" id="concern-remote-date" onchange="saveConcernRemoteEval()" />
-          </div>
-          <div class="field">
-            <label for="concern-remote-time">Time</label>
-            <input type="time" id="concern-remote-time" step="900" onchange="saveConcernRemoteEval()" />
+      <div class="setup-section cpin-workflow-section" id="concern-section-audit-direct" hidden>
+        <h3>Audit required</h3>
+        <div class="inset">When you close this safety concern, the system will automatically start a new reactive audit — appointment, duty holder notification and reminders are handled in that process.</div>
+      </div>
+
+      <div class="setup-section cpin-workflow-section" id="concern-section-onsite" hidden>
+        <h3>On-site evaluation</h3>
+        <div class="help">Serious cases typically within 24–48 hours. Appointment may be confirmed by telephone; the letter can be saved or skipped when urgent.</div>
+
+        <div class="cpin-subsection" style="margin-top:16px;">
+          <h4>Appointment</h4>
+          <div class="help">Pick a date and time. We will check the lead inspector's calendar and the premises' working hours.</div>
+          <div class="field-row">
+            <div class="field">
+              <label for="concern-onsite-date">Date</label>
+              <input type="date" id="concern-onsite-date" onchange="saveConcernOnsiteEval()" />
+            </div>
+            <div class="field">
+              <label for="concern-onsite-time">Time</label>
+              <input type="time" id="concern-onsite-time" step="900" onchange="saveConcernOnsiteEval()" />
+            </div>
+            <div class="field">
+              <label for="concern-onsite-duration">Duration (estimated)</label>
+              <select id="concern-onsite-duration" onchange="saveConcernOnsiteEval()">
+                <option value="half">Half day (4 hours)</option>
+                <option value="full">Full day (7 hours)</option>
+                <option value="two">Two days</option>
+                <option value="custom">Custom...</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="audit-note-form" style="margin-top:16px;">
-          <label for="concern-remote-findings">Evaluation findings</label>
-          <textarea id="concern-remote-findings" placeholder="Remote evaluation findings…" onchange="saveConcernRemoteEval()"></textarea>
-        </div>
-        <label class="cpin-check-row" style="margin-top:10px;"><input type="checkbox" id="concern-remote-visit-done" onchange="saveConcernRemoteEval()" /> Remote evaluation completed</label>
+
         <div style="margin-top:20px;">
-          <h4 style="margin:0 0 8px;font-size:14px;">Does an audit result?</h4>
+          <h4 style="margin:0 0 8px;font-size:14px;">Appointment letters</h4>
+          <div class="help">Write templated letters to Responsible Persons linked to your approved Duty Holders. Saved letters appear here as attachments and in the activity log.</div>
+          <div class="letter-attachment-list" id="concern-onsite-letters-list"></div>
+          <div class="letter-composer-actions" style="margin-top:10px;">
+            <button class="btn primary" type="button" onclick="openConcernOnsiteLetterComposer()">Write letter</button>
+            <button class="btn" type="button" onclick="skipConcernOnsiteLetter()">Skip letter</button>
+            <span id="concern-onsite-letter-status" style="font-size:12px;color:var(--ink-3);"></span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <h4 style="margin:0 0 8px;font-size:14px;">Site evaluation</h4>
+          <div class="audit-note-form">
+            <label for="concern-onsite-findings">Site visit notes</label>
+            <textarea id="concern-onsite-findings" placeholder="Findings, failings, evidence collected…" onchange="saveConcernOnsiteEval()"></textarea>
+          </div>
+          <label class="cpin-check-row" style="margin-top:10px;"><input type="checkbox" id="concern-onsite-visit-done" onchange="saveConcernOnsiteEval()" /> On site evaluation completed</label>
+        </div>
+
+        <div style="margin-top:20px;" id="concern-onsite-audit-blocked">
+          <p class="help" style="margin:0;" id="concern-onsite-audit-blocked-text">Complete the steps above before deciding whether an audit is required.</p>
+        </div>
+        <div style="margin-top:20px;" id="concern-onsite-audit-decision" hidden>
+          <h4 style="margin:0 0 8px;font-size:14px;">Is an audit required?</h4>
           <div class="cpin-decision-options" style="margin-top:0;">
             <label class="cpin-decision-option">
-              <input type="radio" name="concern-remote-audit" value="no" onchange="saveConcernRemoteAuditDecision()" />
-              <div><strong>No</strong><span>Log findings against premises — go to close.</span></div>
+              <input type="radio" name="concern-onsite-audit" value="no" onchange="saveConcernOnsiteAuditDecision()" />
+              <div><strong>No</strong><span>Log evaluation against premises and close.</span></div>
             </label>
             <label class="cpin-decision-option">
-              <input type="radio" name="concern-remote-audit" value="yes" onchange="saveConcernRemoteAuditDecision()" />
-              <div><strong>Yes — audit required</strong><span>Creates a new audit in the system on close.</span></div>
+              <input type="radio" name="concern-onsite-audit" value="yes" onchange="saveConcernOnsiteAuditDecision()" />
+              <div><strong>Yes</strong><span>Closing will automatically start a new audit process.</span></div>
             </label>
           </div>
         </div>
@@ -6580,12 +6638,15 @@
       <div class="setup-section cpin-workflow-section" id="concern-section-close" hidden>
         <h3>Close safety concern</h3>
         <div id="concern-close-open">
-          <div class="help">Close with a reason. Default time 0.5h logged to this concern automatically.</div>
+          <div class="help" id="concern-close-help">Close with a reason. Default time 0.5h logged to this concern automatically.</div>
           <div class="audit-note-form" style="margin-top:12px;margin-bottom:14px;">
             <label for="concern-close-reason">Reason for closing</label>
             <textarea id="concern-close-reason" placeholder="e.g. DH remediated hazard — no further action required…"></textarea>
           </div>
-          <button class="btn primary" type="button" id="concern-close-btn" onclick="closeConcernOneClick()">Close safety concern</button>
+          <p style="font-size:13px;color:var(--ink-2);">Default time <strong>0.5h</strong> will be logged to this concern automatically.<span id="concern-close-audit-note"></span></p>
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn primary" type="button" id="concern-close-btn" onclick="closeConcernOneClick()">Close safety concern</button>
+          </div>
           <p id="concern-close-blocked" style="margin:10px 0 0;font-size:13px;color:var(--ink-3);" hidden></p>
         </div>
         <div id="concern-close-done" class="cpin-close-summary" hidden>
@@ -6657,25 +6718,26 @@
       <a id="bs-crumbs-premises" href="#" onclick="return false;">Premises</a> /  Business support
     </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;">
+    <div style="margin-bottom:8px;">
+      <a href="#" onclick="show('processes'); return false;">‹ Back to processes</a>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
       <div>
-        <h1 id="bs-detail-title">Business support</h1>
+        <h1 id="bs-detail-title" style="margin:0;">Business support</h1>
         <div class="meta" id="bs-detail-meta"></div>
       </div>
-      <button class="btn" type="button" onclick="show('processes')">Back to processes</button>
+      <div id="bs-detail-actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" type="button" id="bs-save-progress-btn" onclick="saveBsProgress()">Save progress</button>
+      </div>
     </div>
 
     <div class="process-grid" style="margin-top:16px;">
       <div class="cpin-single-workflow">
-        <div class="setup-section cpin-workflow-section" id="bs-section-setup">
-          <div id="bs-setup-error-summary" class="error-summary" role="alert" aria-labelledby="bs-setup-error-summary-title" tabindex="-1" hidden></div>
+        <div id="bs-setup-error-summary" class="error-summary" role="alert" aria-labelledby="bs-setup-error-summary-title" tabindex="-1" hidden></div>
 
-          <h3>1. Premises</h3>
-          <div class="help">Process is anchored to this premises. Further sections appear as you complete each step.</div>
-          <div id="bs-premises-card"></div>
-
-          <h3 style="margin-top:24px;">2. Team</h3>
-          <div class="help">Lead inspector defaults to you. Add colleagues if needed.</div>
+        <div class="setup-section cpin-workflow-section" id="bs-section-team">
+          <h3>1. Team</h3>
+          <div class="help">Lead inspector defaults to you. Add colleagues if needed. Further sections appear as you complete each step.</div>
           <div class="holder-card">
             <div class="avatar-sm" style="background:var(--accent);color:white;">PG</div>
             <div><div class="name">Phil Gower</div><div class="role">Lead Fire Safety Inspector</div></div>
@@ -6684,9 +6746,11 @@
           </div>
           <div id="bs-team-extra"></div>
           <div class="add-holder-btn" onclick="addBsInspector()">+ Add another inspector</div>
+        </div>
 
-          <h3 style="margin-top:24px;">3. Duty Holders and Responsible Persons</h3>
-          <div class="help">Duty Holders are pre-suggested on load. Approve, reject or add organisations first — Responsible Persons are then suggested for each approved Duty Holder.</div>
+        <div class="setup-section cpin-workflow-section" id="bs-section-dh">
+          <h3>2. Duty Holders and Responsible Persons</h3>
+          <div class="help">Add Duty Holders manually. Responsible Persons are suggested once a Duty Holder is approved.</div>
           <div id="bs-dh-section">
             <span class="field-error-message" id="bs-dh-error" hidden></span>
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:8px 0 6px;">Duty Holders</div>
@@ -6696,8 +6760,18 @@
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin:16px 0 6px;">Responsible Persons</div>
           <div id="bs-rp-list"></div>
           <div class="add-holder-btn" onclick="addBsResponsiblePerson()">+ Add a Responsible Person</div>
+        </div>
 
-          <h3 style="margin-top:24px;">4. Meeting details</h3>
+        <div class="setup-section cpin-workflow-section" id="bs-section-premises" hidden>
+          <h3>3. Premises</h3>
+          <div class="help">Premises are suggested from your approved Duty Holders. Add one or more premises for this business support.</div>
+          <span class="field-error-message" id="bs-premises-error" hidden></span>
+          <div id="bs-premises-list"></div>
+          <div class="add-holder-btn" onclick="addBsPremises()">+ Add premises</div>
+        </div>
+
+        <div class="setup-section cpin-workflow-section" id="bs-section-meeting" hidden>
+          <h3>4. Meeting details</h3>
           <div class="help">Set date, time and mode. Confirm when ready — letter is optional for informal calls.</div>
           <div class="audit-note-form field-wrap" id="bs-purpose-wrap" style="margin-bottom:14px;">
             <label for="bs-purpose">Purpose of support</label>
@@ -6737,8 +6811,10 @@
             <span class="field-error-message" id="bs-apt-confirmed-error" hidden></span>
             <label class="cpin-check-row"><input type="checkbox" id="bs-apt-confirmed" onchange="saveBsAppointment()" /> Appointment confirmed</label>
           </div>
+        </div>
 
-          <h3 style="margin-top:24px;">5. Appointment letter</h3>
+        <div class="setup-section cpin-workflow-section" id="bs-section-letter" hidden>
+          <h3>5. Appointment letter</h3>
           <div class="help">Write templated letters to Responsible Persons linked to your approved Duty Holders. Saved letters appear here as attachments and in the activity log. Skip if this is an informal call or email dialogue.</div>
           <div class="letter-attachment-list" id="bs-appointment-letters-list"></div>
           <div class="letter-composer-actions" style="margin-top:10px;">
@@ -6746,7 +6822,6 @@
             <button class="btn" type="button" onclick="skipBsLetter()">Skip letter</button>
             <span id="bs-letter-status" style="font-size:12px;color:var(--ink-3);"></span>
           </div>
-
         </div>
 
         <div class="setup-section cpin-workflow-section" id="bs-section-conduct" hidden>
@@ -6770,22 +6845,36 @@
               </label>
             </div>
           </div>
-          <div id="bs-spawn-links" class="cpin-branch-panel" hidden style="margin-top:20px;">
-            <h4 style="margin:0 0 8px;font-size:14px;">Start a follow-on process</h4>
-            <div class="help">Choose the type of process needed. The premises and context from this business support are carried forward where possible.</div>
-            <div id="bs-spawn-links-list" class="letter-composer-actions" style="margin-top:12px;flex-wrap:wrap;"></div>
-            <div class="audit-note-form field-wrap" id="bs-followup-purpose-wrap" style="margin-top:16px;">
-              <label for="bs-followup-purpose">Context note (optional)</label>
-              <textarea id="bs-followup-purpose" placeholder="Brief note for the follow-on process…" onchange="saveBsFollowUp()"></textarea>
-            </div>
-          </div>
         </div>
 
         <div class="setup-section cpin-workflow-section" id="bs-section-close" hidden>
           <div id="bs-close-error-summary" class="error-summary" role="alert" aria-labelledby="bs-close-error-summary-title" tabindex="-1" hidden></div>
           <h3>7. Close business support</h3>
           <div id="bs-close-open">
-            <div class="help">Time is finalised; notes and files are preserved against this process and the premises.</div>
+            <div class="help" id="bs-close-help">Time is finalised; notes and files are preserved against this process and the premises.</div>
+            <div id="bs-close-follow-on" class="cpin-branch-panel" hidden style="margin-top:16px;">
+              <h4 style="margin:0 0 8px;font-size:14px;">Follow-on process required</h4>
+              <div class="help">Choose the type of process needed. Context is carried forward where possible.</div>
+              <div class="cpin-decision-options" style="margin-top:12px;">
+                <label class="cpin-decision-option">
+                  <input type="radio" name="bs-follow-on-process" value="audit" onchange="saveBsFollowOnProcess()" />
+                  <div><strong>Start audit</strong><span>Reactive audit seeded from this business support.</span></div>
+                </label>
+                <label class="cpin-decision-option">
+                  <input type="radio" name="bs-follow-on-process" value="bizsupport" onchange="saveBsFollowOnProcess()" />
+                  <div><strong>Another business support</strong><span>New support record for the same premises.</span></div>
+                </label>
+                <label class="cpin-decision-option">
+                  <input type="radio" name="bs-follow-on-process" value="concern" onchange="saveBsFollowOnProcess()" />
+                  <div><strong>Log safety concern</strong><span>Open the safety concern intake form.</span></div>
+                </label>
+              </div>
+              <span class="field-error-message" id="bs-follow-on-error" hidden></span>
+              <div class="audit-note-form field-wrap" id="bs-followup-purpose-wrap" style="margin-top:16px;">
+                <label for="bs-followup-purpose">Context (optional)</label>
+                <textarea id="bs-followup-purpose" placeholder="Brief note for the follow-on process…" onchange="saveBsFollowUp()"></textarea>
+              </div>
+            </div>
             <div class="audit-note-form field-wrap" id="bs-close-reason-wrap" style="margin-top:12px;margin-bottom:14px;">
               <label for="bs-close-reason">Reason for closing</label>
               <span class="field-error-message" id="bs-close-reason-error" hidden></span>
@@ -13132,9 +13221,13 @@
     }
   }
 
-  function openScIntakeForm() {
+  function openScIntakeForm(premisesName) {
     populateScIntakePremisesSelect();
     resetScIntakeForm();
+    if (premisesName) {
+      const sel = document.getElementById('sc-intake-premises');
+      if (sel) sel.value = premisesName;
+    }
     document.getElementById('sc-intake-modal')?.classList.add('open');
     document.body.style.overflow = 'hidden';
     requestAnimationFrame(function () {
@@ -13525,6 +13618,16 @@
     return letterComposerState.context === 'bizsupport';
   }
 
+  function letterComposerUsesConcern() {
+    if (!letterComposerState) return false;
+    return letterComposerState.saveTo === 'concern-onsite';
+  }
+
+  function getActiveConcernRecord() {
+    if (typeof getConcernById !== 'function' || typeof activeConcernId !== 'function') return null;
+    return getConcernById(activeConcernId());
+  }
+
   function getSetupLetterRecipients() {
     return getSetupResponsiblePersonsForDutyHolders().filter(function (rp) {
       return rp.status === 'accepted';
@@ -13547,6 +13650,10 @@
       const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
       return bs ? getBsLetterRecipients(bs) : [];
     }
+    if (letterComposerUsesConcern() && typeof getConcernLetterRecipients === 'function') {
+      const concern = getActiveConcernRecord();
+      return concern ? getConcernLetterRecipients(concern) : [];
+    }
     const cpin = getCpinById(activeCpinId);
     return cpin ? getCpinLetterRecipients(cpin) : [];
   }
@@ -13556,6 +13663,10 @@
     if (letterComposerUsesBizSupport() && typeof getBizSupportById === 'function' && typeof getBsSavedLetters === 'function') {
       const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
       return bs ? getBsSavedLetters(bs) : [];
+    }
+    if (letterComposerUsesConcern() && typeof getConcernSavedLetters === 'function') {
+      const concern = getActiveConcernRecord();
+      return concern ? getConcernSavedLetters(concern) : [];
     }
     const cpin = getCpinById(activeCpinId);
     return cpin ? getCpinSavedLetters(cpin) : [];
@@ -13568,6 +13679,10 @@
     if (letterComposerUsesBizSupport() && typeof getBizSupportById === 'function') {
       const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
       return bs?.premises || '';
+    }
+    if (letterComposerUsesConcern()) {
+      const concern = getActiveConcernRecord();
+      return concern?.premises || '';
     }
     const cpin = getCpinById(activeCpinId);
     return cpin?.premises || '';
@@ -13618,6 +13733,23 @@
 
   function formatCpinAppointment(cpin) {
     const o = getCpinOnsiteEval(cpin);
+    const dateVal = o.appointmentDate || '';
+    const timeVal = o.appointmentTime || '09:00';
+    const durKey = o.appointmentDuration || 'half';
+    if (!dateVal) {
+      return { label: '—', long: 'the agreed date', duration: DURATION_LABELS.half };
+    }
+    const day = new Date(dateVal).toLocaleDateString('en-GB', { weekday: 'long' });
+    const time = timeVal ? timeVal.slice(0, 5) : '09:00';
+    return {
+      label: day.slice(0, 3) + ' ' + new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' + time,
+      long: day + ' ' + new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' + time,
+      duration: DURATION_LABELS[durKey] || DURATION_LABELS.half
+    };
+  }
+
+  function formatConcernOnsiteAppointment(concern) {
+    const o = typeof getConcernOnsiteEval === 'function' ? getConcernOnsiteEval(concern) : {};
     const dateVal = o.appointmentDate || '';
     const timeVal = o.appointmentTime || '09:00';
     const durKey = o.appointmentDuration || 'half';
@@ -13685,12 +13817,21 @@
         assignee: 'Phil Gower'
       };
     }
+    if (letterComposerUsesConcern()) {
+      const concern = getActiveConcernRecord();
+      return {
+        premises: concern?.premises || 'Premises',
+        appointment: formatConcernOnsiteAppointment(concern),
+        incidentRef: concern?.intake?.reportRef || concern?.ref || '',
+        assignee: concern?.assignee || 'Phil Gower'
+      };
+    }
     const appt = formatCpinAppointment(cpin);
     return {
-      premises: cpin.premises || 'Premises',
+      premises: cpin?.premises || 'Premises',
       appointment: appt,
-      incidentRef: cpin.intake?.incidentNumber || cpin.ref || '',
-      assignee: cpin.assignee || 'CPFSI inspector'
+      incidentRef: cpin?.intake?.incidentNumber || cpin?.ref || '',
+      assignee: cpin?.assignee || 'CPFSI inspector'
     };
   }
 
@@ -13762,7 +13903,9 @@
     const cpin = getCpinById(activeCpinId);
     const isAudit = letterComposerUsesAuditSetup();
     const isBs = letterComposerUsesBizSupport();
+    const isConcern = letterComposerUsesConcern();
     const isView = letterComposerState.mode === 'view';
+    const canPreview = isAudit || isBs || isConcern || !!getCpinById(activeCpinId);
     const allTemplates = getLetterTemplatesForContext(letterComposerState.context);
     const templates = getLetterTemplatesForContext(letterComposerState.context, letterComposerState.templateSearch);
     const recipients = getLetterComposerRecipients();
@@ -13788,6 +13931,8 @@
         subEl.textContent = 'Choose a template and recipients — letters are saved here and sent when you start the audit.';
       } else if (letterComposerState.context === 'bizsupport') {
         subEl.textContent = 'Choose a template and recipients — letters are saved to this business support record and the activity log.';
+      } else if (isConcern) {
+        subEl.textContent = 'Choose a template and recipients — letters are saved to this safety concern and the activity log.';
       } else {
         subEl.textContent = 'Choose a template and recipients on the left — use View to preview each person\'s letter.';
       }
@@ -13848,7 +13993,7 @@
     if (recEl) {
       if (isView) {
         if (!saved.length) {
-          recEl.innerHTML = '<div class="letter-attachment-empty">No saved letters' + (isAudit ? ' for this audit setup' : (isBs ? ' on this business support' : ' on this CPIN')) + '.</div>';
+          recEl.innerHTML = '<div class="letter-attachment-empty">No saved letters' + (isAudit ? ' for this audit setup' : (isBs ? ' on this business support' : (isConcern ? ' on this safety concern' : ' on this CPIN'))) + '.</div>';
         } else {
           recEl.innerHTML = saved.map(function (ltr) {
             const previewing = ltr.id === letterComposerState.viewLetterId;
@@ -13908,10 +14053,10 @@
     const previewRp = recipients.find(function (rp) { return rp.id === letterComposerState.previewRecipientId; }) || recipients[0];
 
     if (dateEl) dateEl.textContent = letterComposerTodayLabel();
-    if (addresseeEl && (cpin || isAudit || isBs)) {
+    if (addresseeEl && canPreview) {
       addresseeEl.innerHTML = letterComposerAddresseeHtml(previewRp, premises);
     }
-    if (bodyEl && template && (cpin || isAudit || isBs)) {
+    if (bodyEl && template && canPreview) {
       if (letterComposerState.customBody && !letterComposerState.editing) {
         bodyEl.innerHTML = letterComposerState.customBody;
       } else if (!letterComposerState.editing) {
@@ -14029,8 +14174,9 @@
     if (!letterComposerState || letterComposerState.mode === 'view') return;
     const isAudit = letterComposerUsesAuditSetup();
     const isBs = letterComposerUsesBizSupport();
+    const isConcern = letterComposerUsesConcern();
     const cpin = getCpinById(activeCpinId);
-    if (!isAudit && !isBs && !cpin) return;
+    if (!isAudit && !isBs && !isConcern && !cpin) return;
     const recipients = getLetterComposerRecipients();
     const recipientIds = letterComposerState.recipientIds || [];
     const selected = recipients.filter(function (rp) { return recipientIds.indexOf(rp.id) >= 0; });
@@ -14093,6 +14239,22 @@
       return;
     }
 
+    if (saveTo === 'concern-onsite' && typeof getConcernById === 'function' && typeof persistConcernPatch === 'function') {
+      const concern = getConcernById(typeof activeConcernId === 'function' ? activeConcernId() : null);
+      if (!concern) return;
+      const existing = typeof getConcernSavedLetters === 'function' ? getConcernSavedLetters(concern) : [];
+      const o = Object.assign({}, typeof getConcernOnsiteEval === 'function' ? getConcernOnsiteEval(concern) : {}, {
+        letters: existing.concat(newLetters),
+        letterSent: true,
+        letterSkipped: false
+      });
+      persistConcernPatch(concern.id, { onsiteEval: o, workflow: 'desk_eval' });
+      if (typeof appendConcernLettersToActivity === 'function') appendConcernLettersToActivity(newLetters, stamp);
+      closeLetterComposer();
+      if (typeof initConcernDetailPage === 'function') initConcernDetailPage();
+      return;
+    }
+
     if (saveTo === 'bizsupport' && typeof getBizSupportById === 'function' && typeof persistBsPatch === 'function') {
       const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
       if (!bs) return;
@@ -14145,6 +14307,48 @@
       return;
     }
     openLetterComposer({ context: 'cpin-onsite', saveTo: 'activity-files' });
+  }
+
+  function openConcernOnsiteLetterComposer() {
+    if (typeof getConcernById !== 'function') return;
+    const concern = getConcernById(typeof activeConcernId === 'function' ? activeConcernId() : null);
+    if (!concern) return;
+    const hasDh = (concern.dutyHolders || []).some(function (d) { return d.status === 'accepted'; });
+    if (!hasDh) {
+      window.alert('Approve at least one Duty Holder before writing letters.');
+      return;
+    }
+    if (typeof getConcernLetterRecipients === 'function' && !getConcernLetterRecipients(concern).length) {
+      window.alert('Approve at least one Responsible Person linked to your Duty Holders before writing letters.');
+      return;
+    }
+    openLetterComposer({ context: 'cpin-onsite', saveTo: 'concern-onsite' });
+  }
+
+  function renderConcernOnsiteLetters(c) {
+    const list = document.getElementById('concern-onsite-letters-list');
+    const status = document.getElementById('concern-onsite-letter-status');
+    if (!list || typeof getConcernSavedLetters !== 'function') return;
+    const letters = getConcernSavedLetters(c);
+    const o = typeof getConcernOnsiteEval === 'function' ? getConcernOnsiteEval(c) : {};
+
+    if (!letters.length) {
+      list.innerHTML = '<div class="letter-attachment-empty">No letters saved yet. Use Write letter to create templated letters for Responsible Persons on this safety concern.</div>';
+    } else {
+      list.innerHTML = letters.map(function (ltr) {
+        const meta = (ltr.templateLabel || 'Letter') + ' · ' + (ltr.recipientName || 'Recipient') + (ltr.at ? ' · ' + ltr.at : '');
+        return '<div class="letter-attachment-item">' +
+          '<div class="letter-attachment-icon">PDF</div>' +
+          '<div class="letter-attachment-info"><strong>' + escHtml(ltr.fileName || 'Letter.pdf') + '</strong>' +
+          '<span>' + escHtml(meta) + '</span></div></div>';
+      }).join('');
+    }
+
+    if (status) {
+      if (o.letterSkipped) status.textContent = 'Skipped — confirmed by telephone';
+      else if (letters.length) status.textContent = '✓ ' + letters.length + (letters.length === 1 ? ' letter saved' : ' letters saved');
+      else status.textContent = '';
+    }
   }
 
   function openCpinOnsiteLetterComposer() {
@@ -14418,6 +14622,64 @@
     setup.appointmentTime = apt.time || '';
     setup.appointmentDuration = apt.duration || 'half';
     setup.fromBizSupportClose = true;
+    auditSetup = setup;
+    localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(setup));
+  }
+
+  function seedAuditSetupFromConcern(concern, auditId) {
+    if (!concern) return;
+    const setup = defaultAuditSetup();
+    setup.premises = concern.premises || '';
+    setup.trigger = 'Safety concern — ' + (concern.ref || '');
+    setup.sourceConcernId = concern.id;
+    setup.sourceConcernRef = concern.ref;
+    setup.spawnedAuditId = auditId;
+    const dhList = (concern.dutyHolders || []).filter(function (dh) { return dh.status === 'accepted'; });
+    if (dhList.length) {
+      setup.dutyHolders = dhList.map(function (dh) {
+        return {
+          id: dh.id,
+          key: dh.key || SETUP_DH_KEY_BY_NAME[dh.name],
+          name: dh.name,
+          role: dh.role,
+          initials: dh.initials,
+          fromPremises: !!dh.fromPremises,
+          status: 'accepted'
+        };
+      });
+      const rpList = (concern.responsiblePersons || []).filter(function (rp) {
+        return rp.status === 'accepted' && rp.linkedDh;
+      });
+      if (rpList.length) {
+        setup.responsiblePersons = rpList.map(function (rp) {
+          return {
+            id: rp.id,
+            key: rp.key,
+            ref: rp.ref,
+            name: rp.name,
+            role: rp.role,
+            initials: rp.initials,
+            fromPremises: !!rp.fromPremises,
+            status: 'accepted',
+            linkedDh: rp.linkedDh
+          };
+        });
+      }
+    }
+    if (concern.assignee) {
+      setup.inspectors = [{
+        id: 'ins-concern',
+        name: concern.assignee,
+        role: 'Lead inspector',
+        initials: setupInitials(concern.assignee),
+        fromPremises: false
+      }];
+    }
+    const o = typeof getConcernOnsiteEval === 'function' ? getConcernOnsiteEval(concern) : {};
+    setup.appointmentDate = o.appointmentDate || '';
+    setup.appointmentTime = o.appointmentTime || '';
+    setup.appointmentDuration = o.appointmentDuration || 'half';
+    setup.fromConcernClose = true;
     auditSetup = setup;
     localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(setup));
   }
@@ -14883,6 +15145,11 @@
           return r.status !== 'rejected' && r.name.toLowerCase() === entry.name.toLowerCase();
         });
       }
+      if (setupLookupTarget === 'bizsupport' && setupLookupMode === 'premises' && typeof getBizSupportById === 'function') {
+        const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
+        const list = bs && typeof getBsPremisesList === 'function' ? getBsPremisesList(bs) : (bs.premisesList || []);
+        added = list.some(function (p) { return p.name.toLowerCase() === entry.name.toLowerCase(); });
+      }
       const tag = added
         ? '<span class="pill grey">' + (setupLookupMode === 'premises' ? 'Current' : 'Added') + '</span>'
         : '<span class="pill blue">Select</span>';
@@ -14968,6 +15235,17 @@
           renderCpinWorkflowSections(getCpinById(activeCpinId));
         }
         setupLookupTarget = 'audit';
+      } else if (setupLookupTarget === 'concern' && typeof getConcernById === 'function') {
+        const concern = getConcernById(typeof activeConcernId === 'function' ? activeConcernId() : null);
+        if (concern) {
+          const accepted = (concern.dutyHolders || []).filter(function (d) { return d.status === 'accepted'; });
+          rp.linkedDh = getDhKeyForRpKey(entry.key) || (accepted[0] && (accepted[0].key || SETUP_DH_KEY_BY_NAME[accepted[0].name])) || null;
+          const rps = (concern.responsiblePersons || []).slice();
+          rps.push(rp);
+          persistConcernPatch(concern.id, { responsiblePersons: rps });
+          if (typeof initConcernDetailPage === 'function') initConcernDetailPage();
+        }
+        setupLookupTarget = 'audit';
       } else if (setupLookupTarget === 'bizsupport' && typeof getBizSupportById === 'function') {
         const bs = getBizSupportById(typeof activeBizSupportId === 'function' ? activeBizSupportId() : null);
         if (bs) {
@@ -15014,6 +15292,9 @@
       setupLookupTarget = 'audit';
     } else if (setupLookupMode === 'premises' && setupLookupTarget === 'concern') {
       if (typeof saveConcernPremises === 'function') saveConcernPremises(entry.name);
+      setupLookupTarget = 'audit';
+    } else if (setupLookupMode === 'premises' && setupLookupTarget === 'bizsupport') {
+      if (typeof addBsPremisesFromLookup === 'function') addBsPremisesFromLookup(entry.name);
       setupLookupTarget = 'audit';
     }
 
